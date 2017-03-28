@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: registry-ui
+  labels:
+    app: registry-ui
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: registry-ui
+      labels:
+        app: registry-ui
+    spec:
+      containers:
+        - name: registry-ui
+          image: parabuzzle/docker-registry-ui:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 3
+            timeoutSeconds: 1
+          env:
+           - name: REGISTRY_ALLOW_DELETE
+             value: "true"
+           - name: REGISTRY_HOST
+             value: "registry.${NAMESPACE}"
+           - name: REGISTRY_PROTO
+             value: "http"
+           - name: REGISTRY_PORT
+             value: "5000"
+      nodeSelector:
+        app: ccp-registry
