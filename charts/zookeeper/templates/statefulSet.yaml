@@ -1,0 +1,144 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: "{{ printf "zk-%s" .Release.Name  | trunc 63 }}"
+  annotations:
+    helm.sh/created: {{.Release.Time.Seconds | quote }}
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    app: "{{ printf "zk-%s" .Release.Name  | trunc 63 }}"
+spec:
+  serviceName: "{{ printf "zk-%s" .Release.Name | trunc 63 }}"
+  replicas: {{.Values.replicas}}
+  template:
+    metadata:
+      labels:
+        app: "{{ printf "zk-%s" .Release.Name  | trunc 63 }}"
+      annotations:
+        {{- if .Values.persistence.enabled }}
+        pod.beta.kubernetes.io/init-containers: '[
+        {
+            "name": "zookeeper-init",
+            "image": "busybox",
+            "imagePullPolicy": "IfNotPresent",
+            "command": ["sh", "-c", "chown -R 1000:1000 /var/lib/zookeeper"],
+            "volumeMounts": [
+                {
+                  "name": "datadir",
+                  "mountPath": "/var/lib/zookeeper"
+                }
+            ]
+        }
+        ]'
+        {{- end }}
+        pod.alpha.kubernetes.io/initialized: "true"
+        {{- if eq .Values.antiAffinity "hard"}}
+        scheduler.alpha.kubernetes.io/affinity: >
+            {
+              "podAntiAffinity": {
+                "requiredDuringSchedulingIgnoredDuringExecution": [{
+                  "labelSelector": {
+                    "matchExpressions": [{
+                      "key": "app",
+                      "operator": "In",
+                      "values": ["{{ printf "zk-%s" .Release.Name  | trunc 63 }}"]
+                    }]
+                  },
+                  "topologyKey": "kubernetes.io/hostname"
+                }]
+              }
+            }
+        {{- else if eq .Values.antiAffinity "soft"}}
+        scheduler.alpha.kubernetes.io/affinity: >
+            {
+              "podAntiAffinity": {
+                "preferredDuringSchedulingIgnoredDuringExecution": [{
+                  "labelSelector": {
+                    "matchExpressions": [{
+                      "key": "app",
+                      "operator": "In",
+                      "values": ["{{ printf "zk-%s" .Release.Name  | trunc 63 }}"]
+                    }]
+                  },
+                  "topologyKey": "kubernetes.io/hostname"
+                }]
+              }
+            }
+        {{- end}}
+    spec:
+      containers:
+      - name: zookeeper
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{.Values.clientPort}}
+          name: client
+        - containerPort: {{.Values.serverPort}}
+          name: server
+        - containerPort: {{.Values.leaderElectionPort}}
+          name: leader-election
+        env:
+        - name : ZK_REPLICAS
+          value: "{{.Values.replicas}}"
+        - name: ZK_LOG_LEVEL
+          value: "{{.Values.LogLevel}}"
+        - name: ZK_CLIENT_PORT
+          value: "{{.Values.clientPort}}"
+        - name: ZK_SERVER_PORT
+          value: "{{.Values.serverPort}}"
+        - name: ZK_ELECTION_PORT
+          value: "{{.Values.leaderElectionPort}}"
+        command:
+        - entrypoint.sh
+        lifecycle:
+          postStart:
+            exec:
+              command:
+              - zkReconfigAdd.sh
+          preStop:
+            exec:
+              command:
+              - zkReconfigRemove.sh
+        readinessProbe:
+          exec:
+            command:
+            - "/opt/zookeeper/bin/zkServer.sh"
+            - "status"
+          initialDelaySeconds: {{.Values.probeInitialDelaySeconds}}
+          timeoutSeconds: {{.Values.probeTimeoutSeconds}}
+        livenessProbe:
+          exec:
+            command:
+            - "/opt/zookeeper/bin/zkServer.sh"
+            - "status"
+          initialDelaySeconds: {{.Values.probeInitialDelaySeconds}}
+          timeoutSeconds: {{.Values.probeTimeoutSeconds}}
+        volumeMounts:
+        {{- if .Values.persistence.enabled }}
+        - name: datadir
+          mountPath: /var/lib/zookeeper
+        {{- end }}
+        - name: zoo-cfg
+          mountPath: /opt/zookeeper/conf/static
+      volumes:
+      - name: zoo-cfg
+        configMap:
+          name: "{{ printf "cm-zk-%s" .Release.Name | trunc 63 }}"
+  {{- if .Values.persistence.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+      annotations:
+        {{- if .Values.persistence.storageClass}}
+        volume.beta.kubernetes.io/storage-class: {{.Values.persistence.storageClass | quote}}
+        {{- else}}
+        volume.alpha.kubernetes.io/storage-class: "default"
+        {{- end}}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{.Values.persistence.volumeSize}}
+  {{- end }}
