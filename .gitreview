@@ -1,0 +1,4 @@
+[gerrit]
+host=mcp-ci-gerrit
+port=29418
+project=k8s-apps/k8s-apps.git
