@@ -1,0 +1,4 @@
+dependencies:
+- name: zookeeper
+  version: 0.1.0
+  repository: "file://../zookeeper"

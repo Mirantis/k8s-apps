@@ -1,0 +1,124 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: "{{ printf "kafka-%s" .Release.Name  | trunc 63 }}"
+  annotations:
+    helm.sh/created: {{.Release.Time.Seconds | quote }}
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    app: "{{ printf "kafka-%s" .Release.Name  | trunc 63 }}"
+spec:
+  serviceName: "{{ printf "kafka-%s" .Release.Name | trunc 63 }}"
+  replicas: {{.Values.replicas}}
+  template:
+    metadata:
+      labels:
+        app: "{{ printf "kafka-%s" .Release.Name  | trunc 63 }}"
+      annotations:
+        pod.beta.kubernetes.io/init-containers: '[
+        {{- if .Values.persistence.enabled }}
+        {
+            "name": "set-perm",
+            "image": "busybox",
+            "imagePullPolicy": "IfNotPresent",
+            "command": ["sh", "-c", "chown -R 1000:1000 /var/lib/kafka"],
+            "volumeMounts": [
+                {
+                  "name": "datadir",
+                  "mountPath": "/var/lib/kafka"
+                }
+            ]
+        },
+        {{- end }}
+        {
+            "name": "wait-for-zk",
+            "image": "{{ .Values.image.repository }}:{{ .Values.image.tag }}",
+            "imagePullPolicy": "{{ .Values.image.pullPolicy }}",
+            "command": ["sh", "-c", "waitForZK.sh {{.Values.zookeeper.replicas}} {{ printf "zk-%s" .Release.Name | trunc 63 }}"]
+        }
+        ]'
+        pod.alpha.kubernetes.io/initialized: "true"
+        {{- if eq .Values.antiAffinity "hard"}}
+        scheduler.alpha.kubernetes.io/affinity: >
+            {
+              "podAntiAffinity": {
+                "requiredDuringSchedulingIgnoredDuringExecution": [{
+                  "labelSelector": {
+                    "matchExpressions": [{
+                      "key": "app",
+                      "operator": "In",
+                      "values": ["{{ printf "kafka-%s" .Release.Name  | trunc 63 }}"]
+                    }]
+                  },
+                  "topologyKey": "kubernetes.io/hostname"
+                }]
+              }
+            }
+        {{- else if eq .Values.antiAffinity "soft"}}
+        scheduler.alpha.kubernetes.io/affinity: >
+            {
+              "podAntiAffinity": {
+                "preferredDuringSchedulingIgnoredDuringExecution": [{
+                  "weight": 100,
+                  "preference": {
+                    "matchExpressions": [{
+                      "key": "app",
+                      "operator": "In",
+                      "values": ["{{ printf "kafka-%s" .Release.Name  | trunc 63 }}"]
+                    }]
+                  },
+                  "topologyKey": "kubernetes.io/hostname"
+                }]
+              }
+            }
+        {{- end}}
+    spec:
+      containers:
+      - name: kafka
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{.Values.port}}
+          name: port
+        env:
+        {{ $zk_replicas := int (.Values.zookeeper.replicas) }}
+        - name: KAFKA_PORT
+          value: "{{.Values.port}}"
+        - name: ZK_CONNECT
+          value: "{{- range $i, $e := until $zk_replicas }}{{- if $i -}},{{- end -}}{{printf "zk-%s" $.Release.Name | trunc 63 }}-{{ $i }}.{{ printf "zk-%s" $.Release.Name | trunc 63 }}:{{$.Values.zookeeper.clientPort}}{{- end }}"
+        command:
+        - entrypoint.sh
+        readinessProbe:
+          tcpSocket:
+            port: {{.Values.port | int}}
+          initialDelaySeconds: {{.Values.probeInitialDelaySeconds}}
+          timeoutSeconds: {{.Values.probeTimeoutSeconds}}
+        livenessProbe:
+          tcpSocket:
+            port: {{.Values.port | int}}
+          initialDelaySeconds: {{.Values.probeInitialDelaySeconds}}
+          timeoutSeconds: {{.Values.probeTimeoutSeconds}}
+        {{- if .Values.persistence.enabled }}
+        volumeMounts:
+        - name: datadir
+          mountPath: /var/lib/kafka
+        {{- end }}
+  {{- if .Values.persistence.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+      annotations:
+        {{- if .Values.persistence.storageClass}}
+        volume.beta.kubernetes.io/storage-class: {{.Values.persistence.storageClass | quote}}
+        {{- else}}
+        volume.alpha.kubernetes.io/storage-class: "default"
+        {{- end}}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{.Values.persistence.volumeSize}}
+  {{- end }}
+
