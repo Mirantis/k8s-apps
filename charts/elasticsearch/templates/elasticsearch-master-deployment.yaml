@@ -1,0 +1,43 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "master-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    component: "{{ .Release.Name }}-{{ .Values.Elasticsearch.Component.Name }}"
+    type: master
+spec:
+  replicas: {{ default 2 .Values.Elasticsearch.Master.Replicas }}
+  template:
+    metadata:
+      labels:
+        heritage: {{ .Release.Service | quote }}
+        release: {{ .Release.Name | quote }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        component: "{{ .Release.Name }}-{{ .Values.Elasticsearch.Component.Name }}"
+        type: master
+    spec:
+      containers:
+      - name: {{ .Values.Elasticsearch.Component.Name }}
+        env:
+        - name: SERVICE
+          value: {{ template "es-fullname" . }}
+        - name: KUBERNETES_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: NODE_DATA
+          value: "false"
+        - name: ES_JAVA_OPTS
+          value: "-Xms{{ .Values.Elasticsearch.Master.HeapSize }} -Xmx{{ .Values.Elasticsearch.Master.HeapSize }}"
+        command:
+          - elasticsearch
+        resources:
+{{ toYaml .Values.Elasticsearch.Master.Resources | indent 12 }}
+        image: "{{ .Values.Elasticsearch.Image.Name }}:{{ .Values.Elasticsearch.Image.Tag }}"
+        imagePullPolicy: {{.Values.Elasticsearch.Image.PullPolicy | quote }}
+        ports:
+        - containerPort: 9300
+          name: transport

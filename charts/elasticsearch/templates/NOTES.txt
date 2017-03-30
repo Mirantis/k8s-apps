@@ -1,0 +1,9 @@
+To operate with Elasticsearch, you should get it url:
+
+  export ELASTICSEARCH_URL="http://$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "client-fullname" . }} -o jsonpath="{.spec.clusterIP}"):{{ .Values.Elasticsearch.Component.Port }}"
+
+and check availability of Elasticsearch cluster with next command:
+
+  curl -X GET $ELASTICSEARCH_URL/
+  curl -X GET $ELASTICSEARCH_URL/_cluster/health?pretty
+
