@@ -55,7 +55,8 @@ spec:
             {
               "podAntiAffinity": {
                 "preferredDuringSchedulingIgnoredDuringExecution": [{
-                  "labelSelector": {
+                  "weight": 100,
+                  "preference": {
                     "matchExpressions": [{
                       "key": "app",
                       "operator": "In",
@@ -93,10 +94,6 @@ spec:
         command:
         - entrypoint.sh
         lifecycle:
-          postStart:
-            exec:
-              command:
-              - zkReconfigAdd.sh
           preStop:
             exec:
               command:
@@ -104,15 +101,13 @@ spec:
         readinessProbe:
           exec:
             command:
-            - "/opt/zookeeper/bin/zkServer.sh"
-            - "status"
+            - zkCheck.sh
           initialDelaySeconds: {{.Values.probeInitialDelaySeconds}}
           timeoutSeconds: {{.Values.probeTimeoutSeconds}}
         livenessProbe:
           exec:
             command:
-            - "/opt/zookeeper/bin/zkServer.sh"
-            - "status"
+            - zkCheck.sh
           initialDelaySeconds: {{.Values.probeInitialDelaySeconds}}
           timeoutSeconds: {{.Values.probeTimeoutSeconds}}
         volumeMounts:
@@ -121,7 +116,7 @@ spec:
           mountPath: /var/lib/zookeeper
         {{- end }}
         - name: zoo-cfg
-          mountPath: /opt/zookeeper/conf/static
+          mountPath: /opt/zookeeper/configmap
       volumes:
       - name: zoo-cfg
         configMap:
