@@ -2,7 +2,7 @@
 
 set -e
 
-if ! which helm; then
+if ! hash helm 2>/dev/null; then
     echo "Helm is not installed"
     exit 1
 fi
