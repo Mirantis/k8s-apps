@@ -7,8 +7,9 @@ if ! hash helm 2>/dev/null; then
     exit 1
 fi
 
+workdir=$(dirname $0)
 
-for chart in $(find -name 'Chart.yaml'); do
+for chart in $(find $workdir/../ -name 'Chart.yaml'); do
     chart_dir=$(dirname "${chart}")
     chart_name=$(basename "${chart_dir}")
     echo "Inspect ${chart_name}"
