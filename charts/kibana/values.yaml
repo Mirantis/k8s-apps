@@ -1,0 +1,40 @@
+component: "kibana"
+port: 5601
+HTTPPort: 80
+protocol: TCP
+
+replicas: 1
+
+# The Elasticsearch instance to use for all your queries.
+elasticsearch:
+  service: elasticsearch-elasticsearch # elasticsearch cluster svc name
+  port: 9200
+  preserveHost: true
+  # Time in milliseconds to wait for responses from the back end or Elasticsearch.
+  requestTimeout: 30000
+  # Time in milliseconds for Elasticsearch to wait for responses from shards. Set to 0 to disable.
+  shardTimeout: 0
+  # Time in milliseconds to wait for Elasticsearch at Kibana startup before retrying.
+  startupTimeout: 5000
+
+image:
+  repository: "127.0.0.1:31500/kibana"
+  tag: "latest"
+  pullPolicy: "Always"
+
+# Configure resource requests and limits.
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "250m"
+
+service:
+  type: "ClusterIP"
+  #nodePort: ""
+  #loadBalancerIP: ""
+
+ingress:
+  enabled: false
+  # annotations:
+    # kubernetes.io/ingress.class: nginx
+  # hosts: []

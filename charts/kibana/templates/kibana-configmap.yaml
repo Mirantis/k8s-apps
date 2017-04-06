@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "cm-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "fullname" . }}
+data:
+  kibana-conf: |
+    server.port: {{ .Values.port }}
+    server.host: 0.0.0.0
+    server.name: {{ .Values.component | quote }}
+    elasticsearch.url: "http://{{ .Values.elasticsearch.service }}:{{ .Values.elasticsearch.port }}"
+    elasticsearch.preserveHost: {{ .Values.elasticsearch.preserveHost }}
+    elasticsearch.requestTimeout:  {{ .Values.elasticsearch.requestTimeout }}
+    elasticsearch.shardTimeout: {{ .Values.elasticsearch.shardTimeout }}
+    elasticsearch.startupTimeout: {{ .Values.elasticsearch.startupTimeout }}
+    elasticsearch.tribe.ssl.verify: false
+    kibana.index: ".kibana"
+    kibana.defaultAppId: "dashboard/Main"
