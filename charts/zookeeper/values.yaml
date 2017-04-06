@@ -4,7 +4,7 @@
 # name: value
 
 replicas: 3
-antiAffinity: "hard" # or "soft"
+antiAffinity: hard # or soft
 probeInitialDelaySeconds: 15
 probeTimeoutSeconds: 5
 minAvailable: 2
@@ -21,7 +21,10 @@ image:
 persistence:
   enabled: false
   #storageClass: glusterfs
-  volumeSize: "10Gi"
+  volumeSize: 10Gi
+
+heapSize: 1G
+logLevel: INFO
 
 # Zokeeper config (zoo.cfg) parameters
 tickTime: 2000

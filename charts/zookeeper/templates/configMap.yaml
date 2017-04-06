@@ -24,3 +24,18 @@ data:
     4lw.commands.whitelist=*
     reconfigEnabled=true
     skipACL=yes
+  java.env: |-
+    JVMFLAGS="-Xmx{{.Values.heapSize}} -Xms{{.Values.heapSize}}"
+    ZOO_LOG_DIR="/var/log/zookeeper"
+  log4j.properties: |-
+    zookeeper.root.logger=CONSOLE
+    zookeeper.console.threshold={{.Values.logLevel}}
+    zookeeper.log.maxfilesize=256MB
+    zookeeper.log.maxbackupindex=20
+    zookeeper.log.dir=/var/log/zookeeper
+    zookeeper.log.file=zookeeper.log
+    log4j.rootLogger=${zookeeper.root.logger}
+    log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
+    log4j.appender.CONSOLE.Threshold=${zookeeper.console.threshold}
+    log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
+    log4j.appender.CONSOLE.layout.ConversionPattern=%d{ISO8601} [myid:%X{myid}] - %-5p [%t:%C{1}@%L] - %m%n
