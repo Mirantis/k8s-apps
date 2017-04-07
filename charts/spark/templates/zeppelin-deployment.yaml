@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "zeppelin-fullname" . }}
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    component: "{{.Release.Name}}-{{.Values.Zeppelin.Component}}"
+spec:
+  ports:
+    - port: {{ .Values.Zeppelin.ServicePort }}
+      targetPort: {{ .Values.Zeppelin.ContainerPort }}
+  externalIPs: {{ .Values.Zeppelin.ExternalIPs }}
+  selector:
+    component: "{{.Release.Name}}-{{.Values.Zeppelin.Component}}"
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "zeppelin-fullname" . }}
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    component: "{{.Release.Name}}-{{.Values.Zeppelin.Component}}"
+spec:
+  replicas: {{default 1 .Values.Zeppelin.Replicas}}
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      component: "{{.Release.Name}}-{{.Values.Zeppelin.Component}}"
+  template:
+    metadata:
+      labels:
+        heritage: {{.Release.Service | quote }}
+        release: {{.Release.Name | quote }}
+        chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+        component: "{{.Release.Name}}-{{.Values.Zeppelin.Component}}"
+    spec:
+      containers:
+        - name: {{ template "zeppelin-fullname" . }}
+          image: "{{.Values.Zeppelin.Image}}:{{.Values.Zeppelin.ImageTag}}"
+          command:
+            - zeppelin.sh
+          env:
+            - name: MASTER
+              value: spark://{{ template "master-fullname" . }}:{{ .Values.Master.ServicePort }}
+          resources:
+            requests:
+              cpu: {{.Values.Zeppelin.Cpu}}
