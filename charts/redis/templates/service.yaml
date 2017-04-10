@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: redis-sentinel
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    app: {{ printf "red-%s" .Release.Name | trunc 24 }}
+spec:
+  ports:
+  - port: {{ .Values.sentinelPort }}
+    name: sentinel
+  - port: {{ .Values.redisPort }}
+    name: redis
+  selector:
+    app: {{ printf "red-%s" .Release.Name | trunc 24 }}
