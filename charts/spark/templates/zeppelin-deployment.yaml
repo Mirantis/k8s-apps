@@ -8,10 +8,17 @@ metadata:
     chart: "{{.Chart.Name}}-{{.Chart.Version}}"
     component: "{{.Release.Name}}-{{.Values.Zeppelin.Component}}"
 spec:
+  type: {{ .Values.Zeppelin.serviceType }}
   ports:
     - port: {{ .Values.Zeppelin.ServicePort }}
       targetPort: {{ .Values.Zeppelin.ContainerPort }}
-  externalIPs: {{ .Values.Zeppelin.ExternalIPs }}
+      {{- if .Values.Zeppelin.nodePort }}
+      nodePort: {{.Values.Zeppelin.nodePort}}
+      {{- end }}
+{{- if .Values.Zeppelin.externalIPs }}
+  externalIPs:
+{{ toYaml .Values.Zeppelin.externalIPs | indent 4 }}
+{{- end }}
   selector:
     component: "{{.Release.Name}}-{{.Values.Zeppelin.Component}}"
 ---
@@ -42,6 +49,7 @@ spec:
       containers:
         - name: {{ template "zeppelin-fullname" . }}
           image: "{{.Values.Zeppelin.Image}}:{{.Values.Zeppelin.ImageTag}}"
+          imagePullPolicy: {{ .Values.Zeppelin.imagePullPolicy }}
           command:
             - zeppelin.sh
           env:

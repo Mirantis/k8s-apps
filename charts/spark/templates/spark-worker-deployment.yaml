@@ -25,6 +25,7 @@ spec:
       containers:
         - name: {{ template "worker-fullname" . }}
           image: "{{.Values.Worker.Image}}:{{.Values.Worker.ImageTag}}"
+          imagePullPolicy: {{ .Values.Worker.imagePullPolicy }}
           command:
             - /usr/local/spark/sbin/start-slave.sh
             - spark://{{ template "master-fullname" . }}:{{ .Values.Master.ServicePort }}

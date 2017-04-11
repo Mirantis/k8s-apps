@@ -26,11 +26,19 @@ metadata:
     chart: "{{.Chart.Name}}-{{.Chart.Version}}"
     component: "{{.Release.Name}}-{{.Values.Master.Component}}"
 spec:
+  type: {{ .Values.WebUi.serviceType }}
   ports:
     - port: {{.Values.WebUi.ServicePort}}
       targetPort: {{.Values.WebUi.ContainerPort}}
+      {{- if .Values.WebUi.nodePort }}
+      nodePort: {{.Values.WebUi.nodePort}}
+      {{- end }}
   selector:
     component: "{{.Release.Name}}-{{.Values.Master.Component}}"
+{{- if .Values.WebUi.externalIPs }}
+  externalIPs:
+{{ toYaml .Values.WebUi.externalIPs | indent 4 }}
+{{- end }}
 
 ---
 
@@ -79,6 +87,7 @@ spec:
       containers:
         - name: {{ template "master-fullname" . }}
           image: "{{.Values.Master.Image}}:{{.Values.Master.ImageTag}}"
+          imagePullPolicy: {{ .Values.Master.imagePullPolicy }}
           command:
             - /usr/local/spark/sbin/start-master.sh
           resources:

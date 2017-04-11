@@ -7,6 +7,7 @@ Master:
   Name: spark-master
   Image: localhost:31500/apps/spark
   ImageTag: 2.1.0
+  imagePullPolicy: Always
   Replicas: 1
   Component: "spark-master"
   Cpu: "100m"
@@ -20,6 +21,10 @@ WebUi:
   Name: spark-webui
   ServicePort: 8080
   ContainerPort: 8080
+  serviceType: ClusterIP
+  #externalIPs:
+  #  - ip
+  #nodePort: port
 
 Rest:
   Name: spark-restapi
@@ -30,6 +35,7 @@ Worker:
   Name: spark-worker
   Image: localhost:31500/apps/spark
   ImageTag: 2.1.0
+  imagePullPolicy: Always
   Replicas: 3
   Component: "spark-worker"
   Cpu: "100m"
@@ -44,9 +50,13 @@ Zeppelin:
   Name: zeppelin
   Image: localhost:31500/apps/zeppelin
   ImageTag: 0.7.1
+  imagePullPolicy: Always
   Replicas: 1
   Component: "zeppelin"
   Cpu: "100m"
   ServicePort: 8080
   ContainerPort: 8080
-  ExternalIPs: []
+  serviceType: ClusterIP
+  #externalIPs:
+  #  - ip
+  # nodePort: port
