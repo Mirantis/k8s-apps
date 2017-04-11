@@ -88,6 +88,8 @@ spec:
           value: "{{.Values.port}}"
         - name: ZK_CONNECT
           value: "{{- range $i, $e := until $zk_replicas }}{{- if $i -}},{{- end -}}{{printf "zk-%s" $.Release.Name | trunc 63 }}-{{ $i }}.{{ printf "zk-%s" $.Release.Name | trunc 63 }}:{{$.Values.zookeeper.clientPort}}{{- end }}"
+        - name: KAFKA_HEAP_OPTS
+          value: "-Xmx{{.Values.heapSize}} -Xms{{.Values.heapSize}}"
         command:
         - entrypoint.sh
         readinessProbe:
