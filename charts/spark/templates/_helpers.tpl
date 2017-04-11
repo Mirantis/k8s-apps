@@ -2,35 +2,42 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 24 -}}
-{{- end -}}
 
-{{/*
-Create fully qualified names.
-We truncate at 24 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-*/}}
 {{- define "master-fullname" -}}
-{{- $name := default .Chart.Name .Values.Master.Name -}}
-{{- printf "%s-%s" .Release.Name $name | trunc 24 -}}
+{{- printf "spark-master-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "webui-fullname" -}}
-{{- $name := default .Chart.Name .Values.WebUi.Name -}}
-{{- printf "%s-%s" .Release.Name $name | trunc 24 -}}
-{{- end -}}
-
-{{- define "restapi-fullname" -}}
-{{- $name := default .Chart.Name .Values.Rest.Name -}}
-{{- printf "%s-%s" .Release.Name $name | trunc 24 -}}
+{{- define "master-external" -}}
+{{- printf "spark-master-ext-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "worker-fullname" -}}
-{{- $name := default .Chart.Name .Values.Worker.Name -}}
-{{- printf "%s-%s" .Release.Name $name | trunc 24 -}}
+{{- printf "spark-worker-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "zeppelin-fullname" -}}
-{{- $name := default .Chart.Name .Values.Zeppelin.Name -}}
-{{- printf "%s-%s" .Release.Name $name | trunc 24 -}}
+{{- printf "zeppelin-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "spark-address" -}}
+{{- $ctx := . -}}
+{{- range $i, $e := until (int .Values.spark.master.replicas) -}}
+    {{- if $i }},{{- end -}}
+    {{- template "master-fullname" $ctx -}}
+    {{- printf "-%d." $i -}}
+    {{- template "master-fullname" $ctx -}}
+    {{- printf ":%d" (int $ctx.Values.spark.master.rpcPort) -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "zookeeper-address" -}}
+    {{- if .Values.zookeeper.deployChart -}}
+        {{- $release := (.Release.Name | trunc 63 | trimSuffix "-") -}}
+        {{- range $i, $e := until (int $.Values.zookeeper.replicas) -}}
+            {{- if $i }},{{- end -}}
+            {{- printf "zk-%s-%d.zk-%s:%d" $release $i $release (int $.Values.zookeeper.clientPort) -}}
+        {{- end -}}
+    {{- else -}}
+        {{- printf .Values.zookeeper.externalAddress -}}
+    {{- end -}}
 {{- end -}}

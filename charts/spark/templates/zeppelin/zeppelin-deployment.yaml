@@ -1,0 +1,62 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "zeppelin-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "zeppelin-fullname" . }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        release: {{ .Release.Name | quote }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "zeppelin-fullname" . }}
+    spec:
+      containers:
+        - name: zeppelin
+          image: {{ .Values.zeppelin.image.repository }}:{{ .Values.zeppelin.image.tag }}
+          imagePullPolicy: {{ .Values.zeppelin.image.pullPolicy }}
+          command:
+            - zeppelin.sh
+          env:
+            - name: MASTER
+              value: spark://{{ template "spark-address" . }}
+          resources:
+{{ toYaml .Values.zeppelin.resources | indent 12 }}
+          {{- if .Values.logCollector.enabled }}
+          volumeMounts:
+            - name: logdir
+              mountPath: /zeppelin-0.7.1-bin-all/logs
+          {{- end }}
+        {{- if .Values.logCollector.enabled }}
+        - name: filebeat
+          image: "{{ .Values.logCollector.image.repository }}:{{ .Values.logCollector.image.tag }}"
+          imagePullPolicy: {{ .Values.logCollector.image.pullPolicy | quote }}
+          volumeMounts:
+            - name: filebeat-config
+              mountPath: /etc/filebeat
+            - name: logdir
+              mountPath: /zeppelin-0.7.1-bin-all/logs
+          command:
+            - "filebeat"
+            - "-c"
+            - "/etc/filebeat/filebeat.yml"
+            - "-e"
+            - "-d"
+            - "\"*\""
+        {{- end }}
+      {{- if .Values.logCollector.enabled }}
+      volumes:
+        - name: filebeat-config
+          configMap:
+            name: {{ printf "zeppelin-fb-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+            items:
+              - key: filebeat-yml
+                path: filebeat.yml
+        - name: logdir
+          emptyDir: {}
+      {{- end }}

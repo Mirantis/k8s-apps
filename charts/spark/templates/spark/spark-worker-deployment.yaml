@@ -3,45 +3,37 @@ kind: Deployment
 metadata:
   name: {{ template "worker-fullname" . }}
   labels:
-    heritage: {{.Release.Service | quote }}
-    release: {{.Release.Name | quote }}
-    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
-    component: "{{.Release.Name}}-{{.Values.Worker.Component}}"
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "worker-fullname" . }}
 spec:
-  replicas: {{default 1 .Values.Worker.Replicas}}
-  strategy:
-    type: RollingUpdate
-  selector:
-    matchLabels:
-      component: "{{.Release.Name}}-{{.Values.Worker.Component}}"
+  replicas: {{ .Values.spark.worker.replicas }}
   template:
     metadata:
       labels:
-        heritage: {{.Release.Service | quote }}
-        release: {{.Release.Name | quote }}
-        chart: "{{.Chart.Name}}-{{.Chart.Version}}"
-        component: "{{.Release.Name}}-{{.Values.Worker.Component}}"
+        release: {{ .Release.Name | quote }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "worker-fullname" . }}
       {{- if .Values.monitoring }}
       annotations:
         prometheus.io/scrape: "true"
       {{- end }}
     spec:
       containers:
-        - name: {{ template "worker-fullname" . }}
-          image: "{{.Values.Worker.Image}}:{{.Values.Worker.ImageTag}}"
-          imagePullPolicy: {{ .Values.Worker.imagePullPolicy }}
+        - name: worker
+          image: {{ .Values.spark.image.repository }}:{{ .Values.spark.image.tag }}
+          imagePullPolicy: {{ .Values.spark.image.pullPolicy }}
           command:
             - /usr/local/spark/sbin/start-slave.sh
-            - spark://{{ template "master-fullname" . }}:{{ .Values.Master.ServicePort }}
+            - spark://{{ template "spark-address" . }}
           resources:
-            requests:
-              cpu: "{{.Values.Worker.Cpu}}"
-              memory: "{{.Values.Worker.Memory}}"
+{{ toYaml .Values.spark.worker.resources | indent 12 }}
           env:
           - name: SPARK_DAEMON_MEMORY
-            value: {{ default "1g" .Values.Worker.DaemonMemory | quote }}
+            value: {{ .Values.spark.worker.daemonMemory | quote }}
           - name: SPARK_WORKER_MEMORY
-            value: {{ default "1g" .Values.Worker.ExecutorMemory | quote }}
+            value: {{ .Values.spark.worker.executorMemory | quote }}
           - name: SPARK_NO_DAEMONIZE
             value: "1"
           {{- if .Values.monitoring }}
@@ -84,7 +76,7 @@ spec:
       {{- if .Values.logCollector.enabled }}
         - name: filebeat-config
           configMap:
-            name: {{ printf "fb-spark-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+            name: {{ printf "spark-fb-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
             items:
               - key: filebeat-yml
                 path: filebeat.yml

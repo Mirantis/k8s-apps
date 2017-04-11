@@ -1,20 +1,20 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{ printf "fb-spark-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+  name: {{ printf "zeppelin-fb-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
   labels:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    component: "{{.Release.Name}}-{{.Values.Master.Component}}"
+    app: {{ template "zeppelin-fullname" . }}
 data:
   filebeat-yml: |-
     filebeat.prospectors:
       - input_type: log
         paths:
-        - /var/log/spark/*.log
+        - /zeppelin-0.7.1-bin-all/logs/*.log
         fields:
-          log_host: "spark"
+          log_host: "zeppelin"
     output.logstash:
       hosts:
       {{- range .Values.logCollector.logstashHost }}
