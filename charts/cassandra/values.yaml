@@ -1,9 +1,9 @@
 ## Cassandra image version
 ## ref: https://hub.docker.com/r/library/cassandra/
 image:
-  repo: "cassandra"
-  tag: "latest"
-  pullPolicy: IfNotPresent
+  repo: 127.0.0.1:31500/cassandra
+  tag: latest
+  pullPolicy: Always
 
 service:
   type: ClusterIP
@@ -49,6 +49,7 @@ config:
     cql: 9042
     thrift: 9160
 
+monitoring: true
 ## Configure node selector. Edit code below for adding selector to pods
 ## ref: https://kubernetes.io/docs/user-guide/node-selection/
 # selector:
