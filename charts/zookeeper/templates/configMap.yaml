@@ -26,6 +26,9 @@ data:
     skipACL=yes
   java.env: |-
     JVMFLAGS="-Xmx{{.Values.heapSize}} -Xms{{.Values.heapSize}}"
+    {{- if .Values.monitoring }}
+    JVMFLAGS="$JVMFLAGS -javaagent:/opt/zookeeper/jmx_prometheus_javaagent-0.9.jar=7071:/opt/zookeeper/configmap/zookeeper.yaml"
+    {{- end }}
     ZOO_LOG_DIR="/var/log/zookeeper"
   log4j.properties: |-
     zookeeper.root.logger=CONSOLE
@@ -39,3 +42,23 @@ data:
     log4j.appender.CONSOLE.Threshold=${zookeeper.console.threshold}
     log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
     log4j.appender.CONSOLE.layout.ConversionPattern=%d{ISO8601} [myid:%X{myid}] - %-5p [%t:%C{1}@%L] - %m%n
+  {{- if .Values.monitoring }}
+  zookeeper.yaml: |-
+    rules:
+    - pattern: "org.apache.ZooKeeperService<name0=ReplicatedServer_id(\\d)><>(\\w+)"
+      name: "zookeeper_$2"
+    - pattern: "org.apache.ZooKeeperService<name0=ReplicatedServer_id(\\d), name1=replica.(\\d)><>(\\w+)"
+      name: "zookeeper_$3"
+      labels:
+        replicaId: "$2"
+    - pattern: "org.apache.ZooKeeperService<name0=ReplicatedServer_id(\\d), name1=replica.(\\d), name2=(\\w+)><>(\\w+)"
+      name: "zookeeper_$4"
+      labels:
+        replicaId: "$2"
+        memberType: "$3"
+    - pattern: "org.apache.ZooKeeperService<name0=ReplicatedServer_id(\\d), name1=replica.(\\d), name2=(\\w+), name3=(\\w+)><>(\\w+)"
+      name: "zookeeper_$4_$5"
+      labels:
+        replicaId: "$2"
+        memberType: "$3"
+  {{- end }}
