@@ -1,0 +1,52 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: hdfs-datanode
+spec:
+  replicas: {{ .Values.dataNodeReplicas }}
+  template:
+    metadata:
+      labels:
+        name: hdfs-datanode
+      annotations:
+        pod.beta.kubernetes.io/init-containers: '[
+        {
+            "name": "wait-namenode",
+            "image": "uhopper/hadoop-datanode:2.7.2",
+            "imagePullPolicy": "IfNotPresent",
+            "command": ["bash", "-c", "while [[ $ready != 0 ]]; do curl hdfs-namenode-0.hdfs-namenode:50070; ready=$?; sleep 3; done"]
+        }]'
+    spec:
+      containers:
+        - name: datanode
+          image: uhopper/hadoop-datanode:2.7.2
+          env:
+            - name: CORE_CONF_fs_defaultFS
+              value: hdfs://hdfs-namenode-0.hdfs-namenode:8020
+            - name: HDFS_CONF_dfs_namenode_datanode_registration_ip___hostname___check
+              value: "false"
+            - name: HDFS_CONF_dfs_client_use_datanode_hostname
+              value: "false"
+            - name: HDFS_CONF_dfs_datanode_use_datanode_hostname
+              value: "false"
+          livenessProbe:
+            initialDelaySeconds: 30
+            httpGet:
+              path: /
+              port: 50075
+          volumeMounts:
+            - name: hdfs-configs
+              mountPath: /etc/hadoop/hdfs-site.xml
+              subPath: hdfs-site.xml
+          #  - name: hdfs-data
+          #    mountPath: /hadoop/dfs/data
+      volumes:
+        - configMap:
+            name: hdfs-configs
+            items:
+            - key: hdfs-site.xml
+              path: hdfs-site.xml
+          name: hdfs-configs
+      #  - name: hdfs-data
+      #    hostPath:
+      #      path: {{ .Values.dataNodeHostPath }}
