@@ -34,3 +34,4 @@ maxClientCnxns: 60
 autopurge:
   purgeInterval: 1
   snapRetainCount: 3
+monitoring: true
