@@ -19,6 +19,9 @@ spec:
         chart: "{{.Chart.Name}}-{{.Chart.Version}}"
         app: "{{ printf "kafka-%s" .Release.Name  | trunc 63 }}"
       annotations:
+        {{- if .Values.monitoring }}
+        prometheus.io/scrape: "true"
+        {{- end }}
         pod.beta.kubernetes.io/init-containers: '[
         {{- if .Values.persistence.enabled }}
         {
@@ -82,6 +85,10 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
+        {{- if .Values.monitoring }}
+        - containerPort: 7071
+          name: jmx
+        {{- end }}
         - containerPort: {{.Values.port}}
           name: port
         env:
@@ -92,6 +99,10 @@ spec:
           value: "{{- range $i, $e := until $zk_replicas }}{{- if $i -}},{{- end -}}{{printf "zk-%s" $.Release.Name | trunc 63 }}-{{ $i }}.{{ printf "zk-%s" $.Release.Name | trunc 63 }}:{{$.Values.zookeeper.clientPort}}{{- end }}"
         - name: KAFKA_HEAP_OPTS
           value: "-Xmx{{.Values.heapSize}} -Xms{{.Values.heapSize}}"
+        {{- if .Values.monitoring }}
+        - name: KAFKA_OPTS
+          value: "-javaagent:/opt/kafka/jmx_prometheus_javaagent-0.9.jar=7071:/opt/kafka/configmap/kafka-jmx.yml"
+        {{- end }}
         command:
         - entrypoint.sh
         readinessProbe:
@@ -104,11 +115,21 @@ spec:
             port: {{.Values.port | int}}
           initialDelaySeconds: {{.Values.probeInitialDelaySeconds}}
           timeoutSeconds: {{.Values.probeTimeoutSeconds}}
-        {{- if .Values.persistence.enabled }}
         volumeMounts:
+        {{- if .Values.monitoring }}
+        - name: kafka-jmx
+          mountPath: /opt/kafka/configmap
+        {{- end }}
+        {{- if .Values.persistence.enabled }}
         - name: datadir
           mountPath: /var/lib/kafka
         {{- end }}
+      {{- if .Values.monitoring }}
+      volumes:
+      - name: kafka-jmx
+        configMap:
+          name: {{ printf "cm-kafka-%s" .Release.Name | trunc 63 }}
+      {{- end }}
   {{- if .Values.persistence.enabled }}
   volumeClaimTemplates:
   - metadata:
