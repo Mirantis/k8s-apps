@@ -1,0 +1,27 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ printf "kafka-fb-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    app: {{ printf "kafka-%s" .Release.Name  | trunc 63 | trimSuffix "-" }}
+data:
+  filebeat-yml: |-
+    filebeat.prospectors:
+      - input_type: log
+        paths:
+        {{- range .Values.logCollector.logsFiles }}
+        - {{ . | quote }}
+        {{- end }}
+        fields:
+          log_host: {{ .Values.logCollector.currentHost | quote }}
+    output.logstash:
+      hosts:
+      {{- range .Values.logCollector.logstashHost }}
+      - {{ . | quote }}
+      {{- end }}
+    path:
+      data: "/usr/share/filebeat/data"
+      home: "/usr/share/filebeat"

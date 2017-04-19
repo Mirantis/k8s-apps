@@ -125,8 +125,35 @@ spec:
         {{- end }}
         - name: datadir
           mountPath: /var/lib/kafka
-      {{- if .Values.prometheus.jmxExporter.enabled }}
+        {{- if .Values.logCollector.enabled }}
+        {{- range $idx, $path := .Values.logCollector.logsPaths }}
+        - name: logdir-{{ $idx }}
+          mountPath: {{ $path }}
+        {{- end }}
+        {{- end }}
+      {{- if .Values.logCollector.enabled }}
+      - name: filebeat
+        image: "{{ .Values.logCollector.image.repository }}:{{ .Values.logCollector.image.tag }}"
+        imagePullPolicy: {{ .Values.logCollector.image.pullPolicy | quote }}
+        volumeMounts:
+        - name: filebeat-config
+          mountPath: /etc/filebeat
+        {{- range $idx, $path := .Values.logCollector.logsPaths }}
+        - name: logdir-{{ $idx }}
+          mountPath: {{ $path }}
+        {{- end }}
+        command:
+          - "filebeat"
+          - "-c"
+          - "/etc/filebeat/filebeat.yml"
+          - "-e"
+          - "-d"
+          - "\"*\""
+      {{- end }}
+      {{- if or .Values.prometheus.jmxExporter.enabled .Values.logCollector.enabled }}
       volumes:
+      {{- end }}
+      {{- if .Values.monitoring }}
       - name: kafka-jmx
         configMap:
           name: jmx-{{ template "kafka-fullname" . }}
@@ -138,6 +165,18 @@ spec:
       - name: datadir
         hostPath:
 	        path: "{{ .Values.persistence.hostPath }}"
+      {{- end }}
+      {{- if .Values.logCollector.enabled }}
+      - name: filebeat-config
+        configMap:
+          name: {{ printf "kafka-fb-%s" .Release.Name | trunc 63 }}
+          items:
+            - key: filebeat-yml
+              path: filebeat.yml
+      {{- range $idx, $path := .Values.logCollector.logsPaths }}
+      - name: logdir-{{ $idx }}
+        emptyDir: {}
+      {{- end }}
       {{- end }}
   {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
   volumeClaimTemplates:

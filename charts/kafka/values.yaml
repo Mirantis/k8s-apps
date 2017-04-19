@@ -40,3 +40,19 @@ zookeeper:
   deployChart: true
   # this address will be used if subchart deployment is disabled
   externalAddress: ""
+
+logCollector:
+  enabled: false
+  currentHost: "kafka"
+  image:
+    repository: 127.0.0.1:31500/filebeat
+    tag: latest
+    pullPolicy: Always
+  logsPaths:
+    - "/opt/kafka/logs"
+  logsFiles:
+    - "/opt/kafka/logs/*.log"
+  # external logstash hosts
+  logstashHost:
+    - "" # host:port
+  

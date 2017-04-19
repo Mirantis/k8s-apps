@@ -9,4 +9,6 @@ RUN set -x \
     && ln -s /usr/share/logstash/bin/logstash /usr/bin/logstash \
     && chown -R logstash:logstash /usr/share/logstash /usr/bin/logstash
 
+RUN /usr/share/logstash/bin/logstash-plugin update logstash-input-beats
+
 USER logstash

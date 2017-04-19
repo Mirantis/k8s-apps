@@ -10,30 +10,52 @@ metadata:
 data:
   logstash-conf: |
     input {
-      tcp {
-        port => 5000
-        type => syslog
-      }
-      udp {
-        port => 5000
-        type => syslog
-      }
+        beats {
+          port => 5043
+        }
     }
 
     filter {
-      if [type] == "syslog" {
-        grok {
-          match => { "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}" }
-          add_field => [ "received_at", "%{@timestamp}" ]
-          add_field => [ "received_from", "%{host}" ]
+        if ([fields][log_host] == "kafka") {
+            grok {
+                match => {
+                    "message" => [
+                        "\[%{TIMESTAMP_ISO8601:message_time}\] %{LOGLEVEL:log_level} \[%{GREEDYDATA:source}\]\: %{GREEDYDATA:message} \(%{GREEDYDATA:class}\)",
+                        "\[%{GREEDYDATA:server_telemetry}\]"
+                    ]
+                }
+                overwrite => [ "source", "message" ]
+                add_field => {
+                    "received_at" => "%{@timestamp}"
+                    "received_from" => "%{host}"
+                }
+                remove_field => [
+                    "beat",
+                    "input_type",
+                    "offset",
+                    "fields",
+                    "tags",
+                    "host",
+                    "type"
+                ]
+            }
+        } else {
+            grok {
+                match => {
+                    "message" => ["%{GREEDYDATA:message}"]
+                }
+                overwrite => [ "message" ]
+                add_field => {
+                    "received_from" => "%{host}"
+                }
+            }
         }
-        date {
-          match => [ "syslog_timestamp", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss" ]
-        }
-      }
     }
 
     output {
-      elasticsearch { hosts => ["{{ .Values.elasticsearch.service }}:{{ .Values.elasticsearch.port }}"] }
-      stdout { codec => json }
+        elasticsearch {
+            hosts => ["{{ .Values.elasticsearch.service }}:{{ .Values.elasticsearch.port }}"]
+            index => "%{received_from}-%{+MM.dd.YYYY}"
+        }
+        stdout { codec => json }
     }
