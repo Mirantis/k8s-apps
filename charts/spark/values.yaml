@@ -5,7 +5,7 @@
 
 Master:
   Name: spark-master
-  Image: localhost:31500/apps/spark
+  Image: localhost:31500/spark
   ImageTag: 2.1.0
   imagePullPolicy: Always
   Replicas: 1
@@ -33,7 +33,7 @@ Rest:
 
 Worker:
   Name: spark-worker
-  Image: localhost:31500/apps/spark
+  Image: localhost:31500/spark
   ImageTag: 2.1.0
   imagePullPolicy: Always
   Replicas: 3
@@ -48,7 +48,7 @@ Worker:
 
 Zeppelin:
   Name: zeppelin
-  Image: localhost:31500/apps/zeppelin
+  Image: localhost:31500/zeppelin
   ImageTag: 0.7.1
   imagePullPolicy: Always
   Replicas: 1
@@ -60,3 +60,4 @@ Zeppelin:
   #externalIPs:
   #  - ip
   # nodePort: port
+monitoring: true

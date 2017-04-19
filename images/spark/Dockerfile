@@ -17,6 +17,7 @@ ARG SPARK_VERSION=2.1.0
 ARG SPARK_BINARY_ARCHIVE_NAME=spark-${SPARK_VERSION}-bin-hadoop2.7
 ARG SPARK_BINARY_DOWNLOAD_URL=http://d3kbcqa49mib13.cloudfront.net/${SPARK_BINARY_ARCHIVE_NAME}.tgz
 
+ARG JMX_VERSION=0.9
 # Configure env variables for Scala, SBT and Spark.
 # Also configure PATH env variable to include binary folders of Java, Scala, SBT and Spark.
 ENV SCALA_HOME  /usr/local/scala
@@ -35,4 +36,5 @@ RUN apt-get -yqq update && \
     wget -qO - ${SPARK_BINARY_DOWNLOAD_URL} | tar -xz -C /usr/local/ && \
     cd /usr/local/ && \
     ln -s ${SCALA_BINARY_ARCHIVE_NAME} scala && \
-    ln -s ${SPARK_BINARY_ARCHIVE_NAME} spark
+    ln -s ${SPARK_BINARY_ARCHIVE_NAME} spark && \
+    wget -P ${SPARK_HOME} https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/$JMX_VERSION/jmx_prometheus_javaagent-$JMX_VERSION.jar

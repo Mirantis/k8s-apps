@@ -21,6 +21,10 @@ spec:
         release: {{.Release.Name | quote }}
         chart: "{{.Chart.Name}}-{{.Chart.Version}}"
         component: "{{.Release.Name}}-{{.Values.Worker.Component}}"
+      {{- if .Values.monitoring }}
+      annotations:
+        prometheus.io/scrape: "true"
+      {{- end }}
     spec:
       containers:
         - name: {{ template "worker-fullname" . }}
@@ -40,3 +44,24 @@ spec:
             value: {{ default "1g" .Values.Worker.ExecutorMemory | quote }}
           - name: SPARK_NO_DAEMONIZE
             value: "1"
+          {{- if .Values.monitoring }}
+          - name: SPARK_DAEMON_JAVA_OPTS
+            value: "-javaagent:/usr/local/spark/jmx_prometheus_javaagent-0.9.jar=7072:/usr/local/spark/conf/spark-jmx.yml"
+          {{- end }}
+          {{- if .Values.monitoring }}
+          ports:
+          - name: jmx-agent
+            containerPort: 7072
+          {{- end }}
+          {{- if .Values.monitoring }}
+          volumeMounts:
+            - name: spark-conf
+              mountPath: /usr/local/spark/conf/
+          {{- end }}
+      {{- if .Values.monitoring }}
+      volumes:
+        - name: spark-conf
+          configMap:
+            name: {{ printf "spark-conf-%s" .Release.Name | trunc 24 }}
+      {{- end }}
+
