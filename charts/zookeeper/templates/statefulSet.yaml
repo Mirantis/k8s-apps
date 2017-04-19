@@ -15,6 +15,8 @@ spec:
   template:
     metadata:
       labels:
+        release: {{.Release.Name | quote }}
+        chart: "{{.Chart.Name}}-{{.Chart.Version}}"
         app: "{{ printf "zk-%s" .Release.Name  | trunc 63 }}"
       annotations:
         {{- if .Values.persistence.enabled }}
