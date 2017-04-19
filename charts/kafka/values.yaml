@@ -20,3 +20,4 @@ persistence:
   enabled: false
   #storageClass: glusterfs
   volumeSize: "10Gi"
+monitoring: true

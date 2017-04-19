@@ -2,6 +2,7 @@ FROM java:8-jre
 
 ARG KAFKA_VERSION=0.10.2.0
 ARG KAFKA_SCALA_VERSION=2.12
+ARG JMX_VERSION=0.9
 
 COPY entrypoint.sh waitForZK.sh /usr/bin/
 
@@ -15,6 +16,7 @@ RUN set -x && \
     apt-get install -y --no-install-recommends dnsutils && \
     apt-get clean && \
     chmod +x /usr/bin/entrypoint.sh /usr/bin/waitForZK.sh && \
-    chown -R kafka:kafka /opt/kafka/
+    chown -R kafka:kafka /opt/kafka/ && \
+    wget -P /opt/kafka https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/$JMX_VERSION/jmx_prometheus_javaagent-$JMX_VERSION.jar
 
 USER kafka
