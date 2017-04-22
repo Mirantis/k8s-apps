@@ -1,0 +1,3 @@
+nameNodeHostPath: /hdfs-name
+dataNodeHostPath: /hdfs-data
+dataNodeReplicas: 3
