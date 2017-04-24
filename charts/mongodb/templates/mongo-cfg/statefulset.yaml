@@ -1,0 +1,35 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: {{ template "cfg-name" . }}
+  annotations:
+    helm.sh/created: {{ .Release.Time.Seconds | quote }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: {{ printf "%s-%s" .Chart.Name .Chart.Version | quote }}
+    app: {{ template "cfg-name" . }}
+spec:
+  serviceName: {{ template "cfg-name" . }}
+  replicas: {{ .Values.configServer.replicas }}
+  template:
+    metadata:
+      labels:
+        release: {{ .Release.Name | quote }}
+        chart: {{ printf "%s-%s" .Chart.Name .Chart.Version | quote }}
+        app: {{ template "cfg-name" . }}
+      {{ if .Values.monitoring }}
+      annotations:
+        prometheus.io/scrape: "true"
+      {{ end }}
+    spec:
+      containers:
+        - name: mongo-cfg
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - python
+            - /config_bootstrap.py
+            - {{ .Values.configServer.port | quote }}
+          ports:
+            - containerPort: {{ .Values.configServer.port }}
