@@ -1,42 +1,57 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: hdfs-namenode
+  name: {{ template "namenode-fullname" . }}
   labels:
-    app: hdfs-namenode
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    app: {{ template "namenode-fullname" . }}
 spec:
   ports:
   - port: 8020
     name: fs
   clusterIP: None
   selector:
-    app: hdfs-namenode
+    app: {{ template "namenode-fullname" . }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: hdfs-ui
+  name: "{{ printf "hdfs-ui-%s" .Release.Name  | trunc 63 | trimSuffix "-" }}"
   labels:
-    app: hdfs-ui
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    app: "{{ printf "hdfs-ui-%s" .Release.Name  | trunc 63 | trimSuffix "-" }}"
 spec:
   type: NodePort
   ports:
   - port: 50070
     name: ui
   selector:
-    app: hdfs-namenode
+    app: {{ template "namenode-fullname" . }}
 ---
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
-  name: hdfs-namenode
+  name: {{ template "namenode-fullname" . }}
+  annotations:
+    helm.sh/created: {{.Release.Time.Seconds | quote }}
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    app: {{ template "namenode-fullname" . }}
 spec:
-  serviceName: "hdfs-namenode"
+  serviceName: {{ template "namenode-fullname" . }}
   replicas: 1
   template:
     metadata:
       labels:
-        app: hdfs-namenode
+        release: {{.Release.Name | quote }}
+        chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+        app: {{ template "namenode-fullname" . }}
     spec:
       terminationGracePeriodSeconds: 0
       containers:
@@ -62,7 +77,7 @@ spec:
           #    mountPath: /hadoop/dfs/name
       volumes:
         - configMap:
-            name: hdfs-configs
+            name: {{ template "configmap-fullname" . }}
             items:
             - key: hdfs-site.xml
               path: hdfs-site.xml
