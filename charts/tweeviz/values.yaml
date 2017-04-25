@@ -1,0 +1,24 @@
+# Default values for tweeviz.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+image:
+  repository: frostman/tweeviz
+  tag: latest
+  pullPolicy: Always
+
+hdfs:
+  address: hdfs-namenode
+  port: 8020
+  path: /
+
+minPopularity: 1
+topListSize: 0
+
+servicePort: 8589
+containerPort: 8589
+serviceType: NodePort
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 512Mi
