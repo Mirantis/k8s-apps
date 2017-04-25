@@ -1,0 +1,45 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "{{ printf "tweepub-%s" .Release.Name  | trunc 63 | trimSuffix "-" }}"
+  annotations:
+    helm.sh/created: {{.Release.Time.Seconds | quote }}
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    app: "{{ printf "tweepub-%s" .Release.Name  | trunc 63 | trimSuffix "-" }}"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: "{{ printf "tweepub-%s" .Release.Name  | trunc 63 | trimSuffix "-" }}"
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: TWEEPUB_APP_KEY
+          value: "{{ .Values.twitter.appKey }}"
+        - name: TWEEPUB_APP_SECRET
+          value: "{{ .Values.twitter.appSecret }}"
+        - name: TWEEPUB_TOKEN_KEY
+          value: "{{ .Values.twitter.tokenKey }}"
+        - name: TWEEPUB_TOKEN_SECRET
+          value: "{{ .Values.twitter.tokenSecret }}"
+        - name: TWEEPUB_FOLLOW
+          value: "{{ .Values.twitter.follow }}"
+        - name: TWEEPUB_TRACK
+          value: "{{ .Values.twitter.track }}"
+        - name: TWEEPUB_LOCATIONS
+          value: "{{ .Values.twitter.locations }}"
+        - name: TWEEPUB_LANGUAGES
+          value: "{{ .Values.twitter.languages }}"
+        - name: TWEEPUB_KAFKA
+          value: "{{ .Values.kafka.servers }}"
+        - name: TWEEPUB_TOPIC
+          value: "{{ .Values.kafka.topic }}"
+        resources:
+{{ toYaml .Values.resources | indent 12 }}

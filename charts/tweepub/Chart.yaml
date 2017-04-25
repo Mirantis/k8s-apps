@@ -1,0 +1,4 @@
+apiVersion: v1
+description: A Helm chart for TweePub - Streaming tweets to Apache Kafka
+name: tweepub
+version: 0.1.0
