@@ -115,7 +115,44 @@ spec:
           volumeMounts:
             - name: spark-conf
               mountPath: /usr/local/spark/conf
+          {{- if .Values.logCollector.enabled }}
+          {{- range $idx, $path := .Values.logCollector.spark.logsPaths }}
+            - name: logdir-{{ $idx }}
+              mountPath: {{ $path }}
+          {{- end }}
+          {{- end }}
+        {{- if .Values.logCollector.enabled }}
+        - name: filebeat
+          image: "{{ .Values.logCollector.image.repository }}:{{ .Values.logCollector.image.tag }}"
+          imagePullPolicy: {{ .Values.logCollector.image.pullPolicy | quote }}
+          volumeMounts:
+          - name: filebeat-config
+            mountPath: /etc/filebeat
+          {{- range $idx, $path := .Values.logCollector.spark.logsPaths }}
+          - name: logdir-{{ $idx }}
+            mountPath: {{ $path }}
+          {{- end }}
+          command:
+            - "filebeat"
+            - "-c"
+            - "/etc/filebeat/filebeat.yml"
+            - "-e"
+            - "-d"
+            - "\"*\""
+        {{- end }}
       volumes:
         - name: spark-conf
           configMap:
             name: {{ printf "spark-conf-%s" .Release.Name | trunc 24 }}
+        {{- if .Values.logCollector.enabled }}
+        - name: filebeat-config
+          configMap:
+            name: {{ printf "fb-spark-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+            items:
+              - key: filebeat-yml
+                path: filebeat.yml
+        {{- range $idx, $path := .Values.logCollector.spark.logsPaths }}
+        - name: logdir-{{ $idx }}
+          emptyDir: {}
+        {{- end }}
+        {{- end }}

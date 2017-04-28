@@ -39,6 +39,51 @@ data:
                     "type"
                 ]
             }
+        } else if ([fields][log_host] == "zeppelin") {
+            grok {
+                match => {
+                    "message" => [
+                        "%{WORD:trace_level} \[%{TIMESTAMP_ISO8601:message_time}\] \(\{%{GREEDYDATA:thread}\} %{GREEDYDATA:source}\) - %{GREEDYDATA:message}",
+                        "%{GREEDYDATA:message}"
+                    ]
+                }
+                overwrite => [ "message", "source" ]
+                add_field => {
+                    "received_at" => "%{@timestamp}"
+                    "received_from" => "%{host}"
+                }
+                remove_field => [
+                    "beat",
+                    "input_type",
+                    "offset",
+                    "fields",
+                    "tags",
+                    "host",
+                    "type"
+                ]
+            }
+        } else if ([fields][log_host] == "spark") {
+            grok {
+              match => {
+                "message" => [
+                   "\[%{LOGLEVEL:trace_level}\] %{TIMESTAMP_ISO8601:message_time} %{GREEDYDATA:message}"
+                ]
+              }
+              overwrite => [ "message"]
+                add_field => {
+                    "received_at" => "%{@timestamp}"
+                    "received_from" => "%{host}"
+                }
+                remove_field => [
+                    "beat",
+                    "input_type",
+                    "offset",
+                    "fields",
+                    "tags",
+                    "host",
+                    "type"
+                ]
+            }
         } else {
             grok {
                 match => {

@@ -58,3 +58,42 @@ spec:
           resources:
             requests:
               cpu: {{.Values.Zeppelin.Cpu}}
+          {{- if .Values.logCollector.enabled }}
+          volumeMounts:
+            {{- range $idx, $path := .Values.logCollector.zeppelin.logsPaths }}
+            - name: logdir-{{ $idx }}
+              mountPath: {{ $path }}
+            {{- end }}
+          {{- end }}
+        {{- if .Values.logCollector.enabled }}
+        - name: filebeat
+          image: "{{ .Values.logCollector.image.repository }}:{{ .Values.logCollector.image.tag }}"
+          imagePullPolicy: {{ .Values.logCollector.image.pullPolicy | quote }}
+          volumeMounts:
+            - name: filebeat-config
+              mountPath: /etc/filebeat
+            {{- range $idx, $path := .Values.logCollector.zeppelin.logsPaths }}
+            - name: logdir-{{ $idx }}
+              mountPath: {{ $path }}
+            {{- end }}
+          command:
+            - "filebeat"
+            - "-c"
+            - "/etc/filebeat/filebeat.yml"
+            - "-e"
+            - "-d"
+            - "\"*\""
+        {{- end }}
+      {{- if .Values.logCollector.enabled }}
+      volumes:
+        - name: filebeat-config
+          configMap:
+            name: {{ printf "fb-zeppelin-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+            items:
+              - key: filebeat-yml
+                path: filebeat.yml
+        {{- range $idx, $path := .Values.logCollector.zeppelin.logsPaths }}
+        - name: logdir-{{ $idx }}
+          emptyDir: {}
+        {{- end }}
+      {{- end }}

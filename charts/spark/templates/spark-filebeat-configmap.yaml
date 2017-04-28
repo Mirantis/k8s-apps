@@ -1,0 +1,30 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ printf "fb-spark-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: "{{.Release.Name}}-{{.Values.Master.Component}}"
+data:
+  filebeat-yml: |-
+    filebeat.prospectors:
+      - input_type: log
+        paths:
+        {{- range .Values.logCollector.spark.logsFiles }}
+        - {{ . | quote }}
+        {{- end }}
+        fields:
+          log_host: {{ .Values.logCollector.spark.currentHost | quote }}
+      - input_type: stdin
+        fields:
+          log_host: {{ .Values.logCollector.spark.currentHost | quote }}
+    output.logstash:
+      hosts:
+      {{- range .Values.logCollector.hosts }}
+      - {{ . | quote }}
+      {{- end }}
+    path:
+      data: "/usr/share/filebeat/data"
+      home: "/usr/share/filebeat"

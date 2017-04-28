@@ -61,3 +61,23 @@ Zeppelin:
   #  - ip
   # nodePort: port
 monitoring: false
+
+logCollector:
+  enabled: false
+  image:
+    repository: 127.0.0.1:31500/filebeat
+    tag: latest
+    pullPolicy: Always
+  hosts: ["logstash-logstash:5043"]
+  spark:
+    currentHost: "spark"
+    logsPaths:
+      - "/var/log/spark"
+    logsFiles:
+      - "/var/log/spark/*.log"
+  zeppelin:
+    currentHost: "zeppelin"
+    logsPaths:
+      - "/zeppelin-0.7.1-bin-all/logs"
+    logsFiles:
+      - "/zeppelin-0.7.1-bin-all/logs/*.log"
