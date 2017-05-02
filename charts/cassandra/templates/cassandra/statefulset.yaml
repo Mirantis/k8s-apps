@@ -110,14 +110,35 @@ spec:
         - name: thrift
           containerPort: {{ default 9160 .Values.config.ports.thrift }}
         volumeMounts:
+        {{- if .Values.logCollector.enabled }}
+        - name: logdir
+          mountPath: /var/log/cassandra
+        {{- end }}
         {{- if .Values.prometheus.jmxExporter.enabled }}
         - name: cassandra-jmx
           mountPath: /etc/cassandra/conf
         {{- end }}
         - name: data
           mountPath: /var/lib/cassandra
+      {{- if .Values.logCollector.enabled }}
+      - name: filebeat
+        image: "{{ .Values.logCollector.image.repository }}:{{ .Values.logCollector.image.tag }}"
+        imagePullPolicy: {{ .Values.logCollector.image.pullPolicy | quote }}
+        volumeMounts:
+        - name: filebeat-config
+          mountPath: /etc/filebeat
+        - name: logdir
+          mountPath: /var/log/cassandra
+        command:
+          - "filebeat"
+          - "-c"
+          - "/etc/filebeat/filebeat.yml"
+          - "-e"
+          - "-d"
+          - "\"*\""
+      {{- end }}
       volumes:
-      {{- if eq .Values.persistence.type "emptyDir" }}
+        {{- if eq .Values.persistence.type "emptyDir" }}
         - name: data
           emptyDir: {}
         {{- else if eq .Values.persistence.type "hostPath" }}
@@ -125,11 +146,22 @@ spec:
           hostPath:
             path: "{{ .Values.persistence.hostPath }}"
         {{- end }}
-      {{- if .Values.prometheus.jmxExporter.enabled }}
-      - name: cassandra-jmx
-        configMap:
-          name: {{ template "fullname" . }}
-      {{- end }}
+        {{- if .Values.prometheus.jmxExporter.enabled }}
+        - name: cassandra-jmx
+          configMap:
+            name: {{ template "fullname" . }}
+        {{- end }}
+        {{- if .Values.logCollector.enabled }}
+        - name: filebeat-config
+          configMap:
+            name: {{ printf "cas-fb-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+            items:
+              - key: filebeat-yml
+                path: filebeat.yml
+        - name: logdir
+          emptyDir: {}
+        {{- end }}
+
   {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
   volumeClaimTemplates:
   - metadata:

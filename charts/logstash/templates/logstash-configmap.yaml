@@ -12,9 +12,14 @@ data:
     input {
         beats {
           port => 5043
+          codec =>
+            multiline {
+              pattern => "%{TIMESTAMP_ISO8601:message_time}"
+              negate => true
+              what => "previous"
+            }
         }
     }
-
     filter {
         if ([fields][log_host] == "kafka") {
             grok {
@@ -84,6 +89,26 @@ data:
                     "type"
                 ]
             }
+        } else if ([fields][log_host] == "cassandra") {
+              grok {
+                match => ["message", "%{LOGLEVEL:log_level} \s?\[%{GREEDYDATA:thread}\] %{TIMESTAMP_ISO8601:message_time} %{GREEDYDATA:message}"
+                    ]
+                overwrite => [ "message" ]
+                add_field => {
+                    "received_at" => "%{@timestamp}"
+                    "received_from" => "%{host}"
+                    "app" => "cassandra"
+                }
+                remove_field => [
+                    "beat",
+                    "input_type",
+                    "offset",
+                    "fields",
+                    "tags",
+                    "host",
+                    "type"
+                ]
+              }
         } else {
             grok {
                 match => {
