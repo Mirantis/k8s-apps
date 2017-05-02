@@ -14,14 +14,25 @@ leaderElectionPort: 3888
 clientPort: 2181
 
 image:
-  repository: 127.0.0.1:31500/zookeeper
-  tag: latest
+  repository: mirantisworkloads/zookeeper
+  tag: 3.5.3-rc1
   pullPolicy: Always
 
+resources:
+  requests:
+    cpu: 1
+    memory: 2Gi
+  #limits:
+    #cpu: 4
+    #memory: 10Gi
+
 persistence:
-  enabled: false
-  #storageClass: glusterfs
+  type: emptyDir # or hostPath or PersistentVolumeClaim
+
+  #storageClass: ""
   volumeSize: 10Gi
+
+  hostPath: ""
 
 heapSize: 1G
 logLevel: INFO
@@ -34,4 +45,7 @@ maxClientCnxns: 60
 autopurge:
   purgeInterval: 1
   snapRetainCount: 3
-monitoring: true
+
+prometheus:
+  jmxExporter:
+    enabled: true

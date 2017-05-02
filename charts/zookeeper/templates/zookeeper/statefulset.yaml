@@ -1,29 +1,26 @@
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
-  name: "{{ printf "zk-%s" .Release.Name  | trunc 63 }}"
-  annotations:
-    helm.sh/created: {{.Release.Time.Seconds | quote }}
+  name: {{ template "zk-fullname" . }}
   labels:
-    heritage: {{.Release.Service | quote }}
-    release: {{.Release.Name | quote }}
-    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
-    app: "{{ printf "zk-%s" .Release.Name  | trunc 63 }}"
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "zk-fullname" . }}
 spec:
-  serviceName: "{{ printf "zk-%s" .Release.Name | trunc 63 }}"
-  replicas: {{.Values.replicas}}
+  serviceName: {{ template "zk-fullname" . }}
+  replicas: {{ .Values.replicas }}
   template:
     metadata:
       labels:
-        release: {{.Release.Name | quote }}
-        chart: "{{.Chart.Name}}-{{.Chart.Version}}"
-        app: "{{ printf "zk-%s" .Release.Name  | trunc 63 }}"
+        release: "{{ .Release.Name }}"
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "zk-fullname" . }}
       annotations:
-        {{- if .Values.monitoring }}
+        {{- if .Values.prometheus.jmxExporter.enabled }}
         prometheus.io/scrape: "true"
         {{- end }}
-
-        {{- if .Values.persistence.enabled }}
+        {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
         pod.beta.kubernetes.io/init-containers: '[
         {
             "name": "zookeeper-init",
@@ -39,7 +36,6 @@ spec:
         }
         ]'
         {{- end }}
-        pod.alpha.kubernetes.io/initialized: "true"
         {{- if eq .Values.antiAffinity "hard"}}
         scheduler.alpha.kubernetes.io/affinity: >
             {
@@ -49,7 +45,7 @@ spec:
                     "matchExpressions": [{
                       "key": "app",
                       "operator": "In",
-                      "values": ["{{ printf "zk-%s" .Release.Name  | trunc 63 }}"]
+                      "values": ["{{ template "zk-fullname" . }}"]
                     }]
                   },
                   "topologyKey": "kubernetes.io/hostname"
@@ -66,7 +62,7 @@ spec:
                     "matchExpressions": [{
                       "key": "app",
                       "operator": "In",
-                      "values": ["{{ printf "zk-%s" .Release.Name  | trunc 63 }}"]
+                      "values": ["{{ template "zk-fullname" . }}"]
                     }]
                   },
                   "topologyKey": "kubernetes.io/hostname"
@@ -80,27 +76,29 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
-        - containerPort: {{.Values.clientPort}}
+        - containerPort: {{ .Values.clientPort }}
           name: client
-        - containerPort: {{.Values.serverPort}}
+        - containerPort: {{ .Values.serverPort }}
           name: server
-        - containerPort: {{.Values.leaderElectionPort}}
+        - containerPort: {{ .Values.leaderElectionPort }}
           name: leader-election
-        {{- if .Values.monitoring }}
+        {{- if .Values.prometheus.jmxExporter.enabled }}
         - containerPort: 7071
           name: jmx
         {{- end }}
         env:
         - name : ZK_REPLICAS
-          value: "{{.Values.replicas}}"
+          value: "{{ .Values.replicas }}"
         - name: ZK_LOG_LEVEL
-          value: "{{.Values.LogLevel}}"
+          value: "{{ .Values.logLevel }}"
         - name: ZK_CLIENT_PORT
-          value: "{{.Values.clientPort}}"
+          value: "{{ .Values.clientPort }}"
         - name: ZK_SERVER_PORT
-          value: "{{.Values.serverPort}}"
+          value: "{{ .Values.serverPort }}"
         - name: ZK_ELECTION_PORT
-          value: "{{.Values.leaderElectionPort}}"
+          value: "{{ .Values.leaderElectionPort }}"
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
         command:
         - entrypoint.sh
         lifecycle:
@@ -112,38 +110,42 @@ spec:
           exec:
             command:
             - zkCheck.sh
-          initialDelaySeconds: {{.Values.probeInitialDelaySeconds}}
-          timeoutSeconds: {{.Values.probeTimeoutSeconds}}
+          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+          timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
         livenessProbe:
           exec:
             command:
             - zkCheck.sh
-          initialDelaySeconds: {{.Values.probeInitialDelaySeconds}}
-          timeoutSeconds: {{.Values.probeTimeoutSeconds}}
+          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+          timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
         volumeMounts:
-        {{- if .Values.persistence.enabled }}
         - name: datadir
           mountPath: /var/lib/zookeeper
-        {{- end }}
         - name: zoo-cfg
           mountPath: /opt/zookeeper/configmap
       volumes:
       - name: zoo-cfg
         configMap:
-          name: "{{ printf "cm-zk-%s" .Release.Name | trunc 63 }}"
-  {{- if .Values.persistence.enabled }}
+          name: {{ template "zk-fullname" . }}
+      {{- if eq .Values.persistence.type "emptyDir" }}
+      - name: datadir
+        emptyDir: {}
+      {{- else if eq .Values.persistence.type "hostPath" }}
+      - name: datadir
+        hostPath:
+	        path: "{{ .Values.persistence.hostPath }}"
+      {{- end }}
+  {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
   volumeClaimTemplates:
   - metadata:
       name: datadir
+      {{- if .Values.persistence.storageClass }}
       annotations:
-        {{- if .Values.persistence.storageClass}}
-        volume.beta.kubernetes.io/storage-class: {{.Values.persistence.storageClass | quote}}
-        {{- else}}
-        volume.alpha.kubernetes.io/storage-class: "default"
-        {{- end}}
+        volume.beta.kubernetes.io/storage-class: "{{ .Values.persistence.storageClass }}"
+      {{- end }}
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: {{.Values.persistence.volumeSize}}
+          storage: {{ .Values.persistence.volumeSize }}
   {{- end }}
