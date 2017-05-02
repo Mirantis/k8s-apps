@@ -1,13 +1,13 @@
-{{- if .Values.monitoring }}
+{{- if .Values.prometheus.jmxExporter.enabled }}
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{ printf "cm-kafka-%s" .Release.Name | trunc 63 }}
+  name: jmx-{{ template "kafka-fullname" . }}
   labels:
-    heritage: {{ .Release.Service | quote }}
-    release: {{ .Release.Name | quote }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    app: {{ printf "kafka-%s" .Release.Name  | trunc 63 }}
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "kafka-fullname" . }}
 data:
   kafka-jmx.yml: |-
     lowercaseOutputName: true

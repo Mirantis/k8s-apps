@@ -1,29 +1,27 @@
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
-  name: "{{ printf "kafka-%s" .Release.Name  | trunc 63 }}"
-  annotations:
-    helm.sh/created: {{.Release.Time.Seconds | quote }}
+  name: {{ template "kafka-fullname" . }}
   labels:
-    heritage: {{.Release.Service | quote }}
-    release: {{.Release.Name | quote }}
-    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
-    app: "{{ printf "kafka-%s" .Release.Name  | trunc 63 }}"
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "kafka-fullname" . }}
 spec:
-  serviceName: "{{ printf "kafka-%s" .Release.Name | trunc 63 }}"
-  replicas: {{.Values.replicas}}
+  serviceName: {{ template "kafka-fullname" . }}
+  replicas: {{ .Values.replicas }}
   template:
     metadata:
       labels:
-        release: {{.Release.Name | quote }}
-        chart: "{{.Chart.Name}}-{{.Chart.Version}}"
-        app: "{{ printf "kafka-%s" .Release.Name  | trunc 63 }}"
+        release: "{{ .Release.Name }}"
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "kafka-fullname" . }}
       annotations:
-        {{- if .Values.monitoring }}
+        {{- if .Values.prometheus.jmxExporter.enabled }}
         prometheus.io/scrape: "true"
         {{- end }}
         pod.beta.kubernetes.io/init-containers: '[
-        {{- if .Values.persistence.enabled }}
+        {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
         {
             "name": "set-perm",
             "image": "busybox",
@@ -35,17 +33,21 @@ spec:
                   "mountPath": "/var/lib/kafka"
                 }
             ]
-        },
+        }
+        {{- end }}
+        {{ if .Values.zookeeper.deployChart }}
+        {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
+        ,
         {{- end }}
         {
             "name": "wait-for-zk",
             "image": "{{ .Values.image.repository }}:{{ .Values.image.tag }}",
             "imagePullPolicy": "{{ .Values.image.pullPolicy }}",
-            "command": ["sh", "-c", "waitForZK.sh {{.Values.zookeeper.replicas}} {{ printf "zk-%s" .Release.Name | trunc 63 }}"]
+            "command": ["sh", "-c", "waitForZK.sh {{ .Values.zookeeper.replicas }} {{ template "zookeeper-fullname" . }}"]
         }
+        {{- end }}
         ]'
-        pod.alpha.kubernetes.io/initialized: "true"
-        {{- if eq .Values.antiAffinity "hard"}}
+        {{- if eq .Values.antiAffinity "hard" }}
         scheduler.alpha.kubernetes.io/affinity: >
             {
               "podAntiAffinity": {
@@ -54,7 +56,7 @@ spec:
                     "matchExpressions": [{
                       "key": "app",
                       "operator": "In",
-                      "values": ["{{ printf "kafka-%s" .Release.Name  | trunc 63 }}"]
+                      "values": ["{{ template "kafka-fullname" . }}"]
                     }]
                   },
                   "topologyKey": "kubernetes.io/hostname"
@@ -71,7 +73,7 @@ spec:
                     "matchExpressions": [{
                       "key": "app",
                       "operator": "In",
-                      "values": ["{{ printf "kafka-%s" .Release.Name  | trunc 63 }}"]
+                      "values": ["{{ template "kafka-fullname" . }}"]
                     }]
                   },
                   "topologyKey": "kubernetes.io/hostname"
@@ -85,65 +87,70 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
-        {{- if .Values.monitoring }}
+        {{- if .Values.prometheus.jmxExporter.enabled }}
         - containerPort: 7071
           name: jmx
         {{- end }}
         - containerPort: {{.Values.port}}
           name: port
         env:
-        {{ $zk_replicas := int (.Values.zookeeper.replicas) }}
         - name: KAFKA_PORT
-          value: "{{.Values.port}}"
+          value: "{{ .Values.port }}"
         - name: ZK_CONNECT
-          value: "{{- range $i, $e := until $zk_replicas }}{{- if $i -}},{{- end -}}{{printf "zk-%s" $.Release.Name | trunc 63 }}-{{ $i }}.{{ printf "zk-%s" $.Release.Name | trunc 63 }}:{{$.Values.zookeeper.clientPort}}{{- end }}"
+          value: "{{ template "zookeeper-address" . }}"
         - name: KAFKA_HEAP_OPTS
-          value: "-Xmx{{.Values.heapSize}} -Xms{{.Values.heapSize}}"
-        {{- if .Values.monitoring }}
+          value: "-Xmx{{ .Values.heapSize }} -Xms{{ .Values.heapSize }}"
+        {{- if .Values.prometheus.jmxExporter.enabled }}
         - name: KAFKA_OPTS
           value: "-javaagent:/opt/kafka/jmx_prometheus_javaagent-0.9.jar=7071:/opt/kafka/configmap/kafka-jmx.yml"
         {{- end }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
         command:
         - entrypoint.sh
         readinessProbe:
           tcpSocket:
-            port: {{.Values.port | int}}
-          initialDelaySeconds: {{.Values.probeInitialDelaySeconds}}
-          timeoutSeconds: {{.Values.probeTimeoutSeconds}}
+            port: {{ .Values.port | int }}
+          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+          timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
         livenessProbe:
           tcpSocket:
-            port: {{.Values.port | int}}
-          initialDelaySeconds: {{.Values.probeInitialDelaySeconds}}
-          timeoutSeconds: {{.Values.probeTimeoutSeconds}}
+            port: {{ .Values.port | int }}
+          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+          timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
         volumeMounts:
-        {{- if .Values.monitoring }}
+        {{- if .Values.prometheus.jmxExporter.enabled }}
         - name: kafka-jmx
           mountPath: /opt/kafka/configmap
         {{- end }}
-        {{- if .Values.persistence.enabled }}
         - name: datadir
           mountPath: /var/lib/kafka
-        {{- end }}
-      {{- if .Values.monitoring }}
+      {{- if .Values.prometheus.jmxExporter.enabled }}
       volumes:
       - name: kafka-jmx
         configMap:
-          name: {{ printf "cm-kafka-%s" .Release.Name | trunc 63 }}
+          name: jmx-{{ template "kafka-fullname" . }}
       {{- end }}
-  {{- if .Values.persistence.enabled }}
+      {{- if eq .Values.persistence.type "emptyDir" }}
+      - name: datadir
+        emptyDir: {}
+      {{- else if eq .Values.persistence.type "hostPath" }}
+      - name: datadir
+        hostPath:
+	        path: "{{ .Values.persistence.hostPath }}"
+      {{- end }}
+  {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
   volumeClaimTemplates:
   - metadata:
       name: datadir
+      {{- if .Values.persistence.storageClass }}
       annotations:
-        {{- if .Values.persistence.storageClass}}
-        volume.beta.kubernetes.io/storage-class: {{.Values.persistence.storageClass | quote}}
-        {{- else}}
-        volume.alpha.kubernetes.io/storage-class: "default"
-        {{- end}}
+        volume.beta.kubernetes.io/storage-class: {{ .Values.persistence.storageClass }}
+      {{- end }}
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: {{.Values.persistence.volumeSize}}
+          storage: {{ .Values.persistence.volumeSize }}
   {{- end }}
 
