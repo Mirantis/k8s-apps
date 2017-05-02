@@ -46,12 +46,12 @@ templates
 
   Example:
 
-    .. code-block::
+  .. code-block::
 
-        templates/namenode/service.yaml
-        templates/namenode/statefulset.yaml
-        templates/datanode/service.yaml
-        templates/datanode/deployment.yaml
+      templates/namenode/service.yaml
+      templates/namenode/statefulset.yaml
+      templates/datanode/service.yaml
+      templates/datanode/deployment.yaml
 
   If there are multiple objects of the same kind under one service (directory),
   they should be prefixed to differentiate them.
@@ -102,7 +102,7 @@ _helpers.tpl
   .. code-block:: smarty
 
       {{- define "namenode-address" -}}
-      {{- printf "some address”  | trunc 63 | trimSuffix "-" -}}
+      {{- printf "some address"  | trunc 63 | trimSuffix "-" -}}
       {{- end -}}
 
 * Use for anything that will be referenced more than once
@@ -148,6 +148,7 @@ values.yaml
   repository should be used as defaults.
 
   Replicas number:
+
   .. code-block:: yaml
 
       replicas: 1
