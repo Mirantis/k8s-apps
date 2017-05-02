@@ -2,6 +2,7 @@
 
 set -eux
 
+REPO_URL="https://mirantisworkloads.storage.googleapis.com/"
 repo_dir="$(dirname "$(dirname "$(readlink -f $0)")")"
 
 # build dependencies
@@ -20,4 +21,5 @@ for d in ${repo_dir}/charts/*/; do
 done
 
 # generate index
-helm repo index .
+wget "${REPO_URL}/index.yaml"
+helm repo index --url "${REPO_URL}" --merge .
