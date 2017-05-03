@@ -1,0 +1,151 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    app: {{ template "fullname" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  serviceName: {{ template "fullname" . }}
+  replicas: {{ .Values.config.clusterSize }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+      annotations:
+        {{- if .Values.prometheus.jmxExporter.enabled }}
+        prometheus.io/scrape: "true"
+        {{- end }}
+        {{- if eq .Values.antiAffinity "hard" }}
+        scheduler.alpha.kubernetes.io/affinity: >
+          {
+            "podAntiAffinity": {
+              "requiredDuringSchedulingIgnoredDuringExecution": [{
+                "labelSelector": {
+                  "matchExpressions": [{
+                    "key": "app",
+                    "operator": "In",
+                    "values": [{{ template "fullname" . }}]
+                  }]
+                },
+                "topologyKey": "kubernetes.io/hostname"
+              }]
+            }
+          }
+        {{- else if eq .Values.antiAffinity "soft" }}
+        scheduler.alpha.kubernetes.io/affinity: >
+            {
+              "podAntiAffinity": {
+                "preferredDuringSchedulingIgnoredDuringExecution": [{
+                  "weight": 100,
+                  "preference": {
+                    "matchExpressions": [{
+                      "key": "app",
+                      "operator": "In",
+                      "values": [{{ template "fullname" . }}]
+                    }]
+                  },
+                  "topologyKey": "kubernetes.io/hostname"
+                }]
+              }
+            }
+        {{- end }}
+    spec:
+      containers:
+      - name: {{ template "fullname" . }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        env:
+        {{- $seed_size := default 1 .Values.config.seedSize | int -}}
+        {{- $global := . }}
+        - name: CASSANDRA_SEEDS
+          value: '{{- range $i, $e := until $seed_size }}{{ template "fullname" $global }}-{{ $i }}.{{ template "fullname" $global }}.{{ $global.Release.Namespace }}.svc.cluster.local,{{- end }}'
+        - name: MAX_HEAP_SIZE
+          value: {{ default "8192M" .Values.config.maxHeapSize | quote }}
+        - name: HEAP_NEWSIZE
+          value: {{ default "200M" .Values.config.heapNewSize | quote }}
+        - name: CASSANDRA_ENDPOINT_SNITCH
+          value: {{ default "SimpleSnitch" .Values.config.endpointSnitch | quote }}
+        - name: CASSANDRA_CLUSTER_NAME
+          value: {{ default "Cassandra" .Values.config.clusterName | quote }}
+        - name: CASSANDRA_DC
+          value: {{ default "DC1" .Values.config.dcName | quote }}
+        - name: CASSANDRA_RACK
+          value: {{ default "RAC1" .Values.config.rackName | quote }}
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        {{- if .Values.prometheus.jmxExporter.enabled }}
+        - name: JMX_AGENT
+          value: "-javaagent:/etc/cassandra/jmx_prometheus_javaagent-0.9.jar=7070:/etc/cassandra/conf/cassandra-jmx.yml"
+        {{- end }}
+        livenessProbe:
+          exec:
+            command: [ "/bin/sh", "-c", "nodetool status | grep -E \"^UN\\s+${POD_IP}\"" ]
+          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+          periodSeconds: {{ .Values.probePeriodSeconds }}
+        readinessProbe:
+          exec:
+            command: [ "/bin/sh", "-c", "nodetool status | grep -E \"^UN\\s+${POD_IP}\"" ]
+          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+          periodSeconds: {{ .Values.probePeriodSeconds }}
+        ports:
+        - name: intra
+          containerPort: 7000
+        - name: tls
+          containerPort: 7001
+        - name: jmx
+          containerPort: 7199
+        {{- if .Values.prometheus.jmxExporter.enabled }}
+        - name: jmx-agent
+          containerPort: 7070
+        {{- end }}
+        - name: cql
+          containerPort: {{ default 9042 .Values.config.ports.cql }}
+        - name: thrift
+          containerPort: {{ default 9160 .Values.config.ports.thrift }}
+        volumeMounts:
+        {{- if .Values.prometheus.jmxExporter.enabled }}
+        - name: cassandra-jmx
+          mountPath: /etc/cassandra/conf
+        {{- end }}
+        - name: data
+          mountPath: /var/lib/cassandra
+      volumes:
+      {{- if eq .Values.persistence.type "emptyDir" }}
+        - name: data
+          emptyDir: {}
+        {{- else if eq .Values.persistence.type "hostPath" }}
+        - name: data
+          hostPath:
+            path: "{{ .Values.persistence.hostPath }}"
+        {{- end }}
+      {{- if .Values.prometheus.jmxExporter.enabled }}
+      - name: cassandra-jmx
+        configMap:
+          name: {{ template "fullname" . }}
+      {{- end }}
+  {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      labels:
+        app: {{ template "fullname" . }}
+        chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+      {{- if .Values.persistence.storageClass }}
+      annotations:
+        volume.beta.kubernetes.io/storage-class: {{ .Values.persistence.storageClass }}
+      {{- end }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.persistence.volumeSize }}
+  {{- end }}

@@ -1,13 +1,13 @@
-{{- if .Values.monitoring }}
+{{- if .Values.prometheus.jmxExporter.enabled }}
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{ printf "cm-cas-%s" .Release.Name | trunc 24 }}
+  name: {{ template "fullname" . }}
   labels:
-    heritage: {{ .Release.Service | quote }}
-    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    app: {{ printf "cas-%s" .Release.Name  | trunc 24 }}
+    app: {{ template "fullname" . }}
 data:
   cassandra-jmx.yml: |-
     ---
