@@ -1,10 +1,3 @@
 name: zookeeper
-home: https://zookeeper.apache.org/
-version: 0.1.0
+version: 1.0.0
 description: ZooKeeper is a centralized service for maintaining configuration information, naming, providing distributed synchronization, and providing group services.
-icon: https://zookeeper.apache.org/images/zookeeper_small.gif
-sources:
-  - https://github.com/apache/zookeeper
-maintainers:
-  - name: Andrey Pavlov
-    email: apavlov@mirantis.com
