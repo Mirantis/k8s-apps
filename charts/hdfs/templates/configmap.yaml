@@ -2,12 +2,10 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ template "configmap-fullname" . }}
-  annotations:
-    helm.sh/created: {{ .Release.Time.Seconds | quote }}
   labels:
-    heritage: {{ .Release.Service | quote }}
-    release: {{ .Release.Name | quote }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     app: {{ template "configmap-fullname" . }}
 data:
   hdfs-site.xml: |

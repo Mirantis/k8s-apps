@@ -10,6 +10,10 @@
 {{- printf "hdfs-configs-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{- define "hdfs-ui-fullname" -}}
+{{- printf "hdfs-ui-%s" .Release.Name  | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
 {{- define "namenode-address" -}}
 {{- printf "hdfs-namenode-%s" .Release.Name  | trunc 63 | trimSuffix "-" }}-0.{{ printf "hdfs-namenode-%s" .Release.Name  | trunc 63 | trimSuffix "-" -}}
 {{- end -}}

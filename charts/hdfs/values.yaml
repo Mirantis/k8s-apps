@@ -1,3 +1,69 @@
-nameNodeHostPath: /hdfs-name
-dataNodeHostPath: /hdfs-data
-dataNodeReplicas: 3
+datanode:
+  replicas: 3
+  image:
+    repository: uhopper/hadoop-datanode
+    tag: 2.7.2
+    pullPolicy: Always
+
+  antiAffinity: "hard" # or "soft"
+
+  persistence:
+    type: emptyDir # or hostPath or PersistentVolumeClaim
+
+    #storageClass: ""
+    volumeSize: 10Gi
+
+    hostPath: ""
+
+  resources:
+    requests:
+      cpu: 1
+      memory: 1Gi
+    #limits:
+      #cpu: 4
+      #memory: 4Gi
+
+namenode:
+  port: 8020
+  image:
+    repository: uhopper/hadoop-namenode
+    tag: 2.7.2
+    pullPolicy: Always
+
+  persistence:
+    type: PersistentVolumeClaim # or hostPath or PersistentVolumeClaim
+
+    #storageClass: ""
+    volumeSize: 10Gi
+
+    hostPath: ""
+
+  resources:
+    requests:
+      cpu: 1
+      memory: 1Gi
+    #limits:
+      #cpu: 4
+      #memory: 4Gi
+
+  ui:
+    port: 50070
+    service:
+      type: ClusterIP # or NodePort or LoadBalancer
+
+      nodePort: ""
+
+      loadBalancerIP: ""
+      loadBalancerSourceRanges: []
+
+      annotations: {}
+
+    ingress:
+      enabled: false
+      hosts: []
+        #   - some.domain
+      tls:
+        enabled: false
+        secretName: ""
+      annotations: {}
+        #   kubernetes.io/ingress.class: nginx
