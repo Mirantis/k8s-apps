@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "component-fullname" . }}-cm
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "component-fullname" . }}
+data:
+  logstash-conf: |
+    input {
+      tcp {
+        port => 5000
+        type => syslog
+      }
+      udp {
+        port => 5000
+        type => syslog
+      }
+    }
+
+    filter {
+      if [type] == "syslog" {
+        grok {
+          match => { "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}" }
+          add_field => [ "received_at", "%{@timestamp}" ]
+          add_field => [ "received_from", "%{host}" ]
+        }
+        date {
+          match => [ "syslog_timestamp", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss" ]
+        }
+      }
+    }
+
+    output {
+      elasticsearch { hosts => ["{{ .Values.elasticsearch.service }}:{{ .Values.elasticsearch.port }}"] }
+      stdout { codec => json }
+    }
