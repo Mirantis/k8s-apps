@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ template "cluster-svc-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    app: {{ template "redis-fullname" . }}
+spec:
+  ports:
+  - port: {{ .Values.config.sentinelPort }}
+    name: sentinel
+  - port: {{ .Values.config.redisPort }}
+    name: redis
+  selector:
+    app: {{ template "redis-fullname" . }}

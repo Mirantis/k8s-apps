@@ -1,21 +1,27 @@
+replicas: 3
+antiAffinity: "hard" # or "soft" or "null"
+probeInitialDelaySeconds: 15
+probeTimeoutSeconds: 5
+
 image:
-  repository: 127.0.0.1:31500/sentinel
-  tag: latest
+  repository: mirantisworkloads/redis
+  tag: 3.2
   pullPolicy: Always
-## Serevices ports
-sentinelPort: 26379
-redisPort: 6379
+
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 100m
+
 ## Persist data to a persitent volume
 persistence:
-  enabled: false
-  ## If defined, volume.beta.kubernetes.io/storage-class: <storageClass>
-  ## Default: volume.alpha.kubernetes.io/storage-class: default
-  storageClass: generic
-  accessMode: ReadWriteOnce
-  size: 5Gi
+  type: emptyDir # or hostPath or PersistentVolumeClaim
+  hostPath: ""
+  ## storageClass: generic
+  volumeSize: 5Gi
+
 ## Change redis configuration paramaters below.
 config:
-  replicaCount: 3
-  masterData: /redis-master-data
-  port: 6379
+  redisPort: 6379
+  sentinelPort: 26379
   slaveReadOnly: "no"

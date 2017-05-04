@@ -1,0 +1,131 @@
+kind: StatefulSet
+apiVersion: apps/v1beta1
+metadata:
+  name: {{ template "redis-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    app: {{ template "redis-fullname" . }}
+spec:
+  serviceName: {{ template "sentinel-svc-fullname" . }}
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "redis-fullname" . }}
+      annotations:
+        {{- if eq .Values.antiAffinity "hard"}}
+        scheduler.alpha.kubernetes.io/affinity: >
+            {
+              "podAntiAffinity": {
+                "requiredDuringSchedulingIgnoredDuringExecution": [{
+                  "labelSelector": {
+                    "matchExpressions": [{
+                      "key": "app",
+                      "operator": "In",
+                      "values": ["{{ template "redis-fullname" . }}"]
+                    }]
+                  },
+                  "topologyKey": "kubernetes.io/hostname"
+                }]
+              }
+            }
+        {{- else if eq .Values.antiAffinity "soft"}}
+        scheduler.alpha.kubernetes.io/affinity: >
+            {
+              "podAntiAffinity": {
+                "preferredDuringSchedulingIgnoredDuringExecution": [{
+                  "weight": 100,
+                  "preference": {
+                    "matchExpressions": [{
+                      "key": "app",
+                      "operator": "In",
+                      "values": ["{{ template "redis-fullname" . }}"]
+                    }]
+                  },
+                  "topologyKey": "kubernetes.io/hostname"
+                }]
+              }
+            }
+        {{- end}}
+    spec:
+      containers:
+      - name: redis
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: MASTER_DATA
+          value: /var/lib/redis
+        - name: CLUSTER_SERVICE_NAME
+          value: {{ template "cluster-svc-fullname" . }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+          timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
+        ports:
+        - name: redis
+          containerPort: {{ default 6379 .Values.config.redisPort }}
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/redis
+        - name: redis-cfg
+          mountPath: /opt/redis/conf
+      - name: sentinel
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: SENTINEL
+          value: "true"
+        - name: CLUSTER_SERVICE_NAME
+          value: {{ template "cluster-svc-fullname" . }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+          timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
+        ports:
+        - name: sentinel
+          containerPort: {{ default 26379 .Values.config.sentinelPort }}
+        volumeMounts:
+        - name: sentinel-cfg
+          mountPath: /opt/redis/conf
+      volumes:
+      - name: redis-cfg
+        configMap:
+          name: {{ template "redis-fullname" . }}
+      - name: sentinel-cfg
+        configMap:
+          name: {{ template "sentinel-fullname" . }}
+      {{- if eq .Values.persistence.type "emptyDir" }}
+      - name: data
+        emptyDir: {}
+      {{- else if eq .Values.persistence.type "hostPath" }}
+      - name: data
+        hostPath:
+          path: "{{ .Values.persistence.hostPath }}"
+      {{- end }}
+{{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      {{- if .Values.persistence.storageClass }}
+      annotations:
+        volume.beta.kubernetes.io/storage-class: {{ .Values.persistence.storageClass | quote }}
+      {{- end }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: ReadWriteOnce
+{{- end }}
+

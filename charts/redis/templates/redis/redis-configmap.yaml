@@ -1,17 +1,17 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{ printf "cm-redis-%s" .Release.Name | trunc 24 }}
+  name: {{ template "redis-fullname" . }} 
   labels:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    app: {{ printf "red-%s" .Release.Name  | trunc 24 }}
+    app: {{ template "redis-fullname" . }}
 data:
   redis.conf: |-
     daemonize no
     pidfile var/run/redis.pid
-    port {{ .Values.config.port }}
+    port {{ .Values.config.redisPort }}
     tcp-backlog 511
     bind 0.0.0.0
     timeout 0
@@ -29,7 +29,6 @@ data:
     dir %data-dir%
     slave-serve-stale-data yes
     slave-read-only {{ .Values.config.slaveReadOnly }}
-    #slaveof %master-ip% {{ .Values.config.port }}
     repl-diskless-sync no
     repl-diskless-sync-delay 5
     repl-disable-tcp-nodelay no
