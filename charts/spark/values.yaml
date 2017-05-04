@@ -60,4 +60,4 @@ Zeppelin:
   #externalIPs:
   #  - ip
   # nodePort: port
-monitoring: true
+monitoring: false
