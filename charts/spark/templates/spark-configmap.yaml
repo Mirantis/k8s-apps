@@ -1,4 +1,3 @@
-{{- if .Values.monitoring }}
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -8,6 +7,20 @@ metadata:
     release: {{ .Release.Name | quote }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
 data:
+  log4j.properties: |-
+    log4j.rootLogger=INFO, file, console
+
+    log4j.appender.console=org.apache.log4j.ConsoleAppender
+    log4j.appender.console.layout=org.apache.log4j.PatternLayout
+    log4j.appender.console.layout.ConversionPattern=%d [%t] %-5p %c - %m%n
+
+    log4j.appender.file=org.apache.log4j.DailyRollingFileAppender
+    log4j.appender.file.File=/var/log/spark/spark.log
+    log4j.appender.file.DatePattern='.'yyyy-MM-dd
+    log4j.appender.file.layout=org.apache.log4j.PatternLayout
+    log4j.appender.file.layout.ConversionPattern=[%p] %d %c %M - %m%n
+
+  {{- if .Values.monitoring }}
   spark-jmx.yml: |-
    rules:
      # These come from the master
@@ -53,4 +66,4 @@ data:
 
   metrics.properties: |-
     *.sink.jmx.class=org.apache.spark.metrics.sink.JmxSink
-{{- end }}
+  {{- end }}

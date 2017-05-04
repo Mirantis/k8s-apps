@@ -112,14 +112,10 @@ spec:
           - name: jmx-agent
             containerPort: 7072
           {{- end }}
-          {{- if .Values.monitoring }}
           volumeMounts:
             - name: spark-conf
               mountPath: /usr/local/spark/conf
-          {{- end }}
-      {{- if .Values.monitoring }}
       volumes:
         - name: spark-conf
           configMap:
             name: {{ printf "spark-conf-%s" .Release.Name | trunc 24 }}
-      {{- end }}
