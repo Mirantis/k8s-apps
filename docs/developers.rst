@@ -73,7 +73,7 @@ templates
 
       labels:
         heritage: "{{ .Release.Service }}"
-        release: "{{ .Release.Name }}
+        release: "{{ .Release.Name }}"
         chart: "{{.Chart.Name}}-{{.Chart.Version}}"
         app: {{ template "fullname" . }}
 
@@ -277,10 +277,9 @@ values.yaml
         enabled: false
         hosts: []
           #   - some.domain
-        tls: []
-          #   - secretName: mySecret
-          #     hosts:
-          #       - some.domain
+        tls:
+          enabled: false
+          secretName: ""
         annotations: {}
           #   kubernetes.io/ingress.class: nginx
 
