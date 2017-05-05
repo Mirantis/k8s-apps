@@ -60,10 +60,8 @@ spec:
               cpu: {{.Values.Zeppelin.Cpu}}
           {{- if .Values.logCollector.enabled }}
           volumeMounts:
-            {{- range $idx, $path := .Values.logCollector.zeppelin.logsPaths }}
-            - name: logdir-{{ $idx }}
-              mountPath: {{ $path }}
-            {{- end }}
+            - name: logdir
+              mountPath: /zeppelin-0.7.1-bin-all/logs
           {{- end }}
         {{- if .Values.logCollector.enabled }}
         - name: filebeat
@@ -72,10 +70,8 @@ spec:
           volumeMounts:
             - name: filebeat-config
               mountPath: /etc/filebeat
-            {{- range $idx, $path := .Values.logCollector.zeppelin.logsPaths }}
-            - name: logdir-{{ $idx }}
-              mountPath: {{ $path }}
-            {{- end }}
+            - name: logdir
+              mountPath: /zeppelin-0.7.1-bin-all/logs
           command:
             - "filebeat"
             - "-c"
@@ -92,8 +88,6 @@ spec:
             items:
               - key: filebeat-yml
                 path: filebeat.yml
-        {{- range $idx, $path := .Values.logCollector.zeppelin.logsPaths }}
-        - name: logdir-{{ $idx }}
+        - name: logdir
           emptyDir: {}
-        {{- end }}
       {{- end }}

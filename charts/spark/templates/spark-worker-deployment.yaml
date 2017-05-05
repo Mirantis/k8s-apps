@@ -57,10 +57,8 @@ spec:
             - name: spark-conf
               mountPath: /usr/local/spark/conf/
           {{- if .Values.logCollector.enabled }}
-          {{- range $idx, $path := .Values.logCollector.spark.logsPaths }}
-            - name: logdir-{{ $idx }}
-              mountPath: {{ $path }}
-          {{- end }}
+            - name: logdir
+              mountPath: /var/log/spark
           {{- end }}
         {{- if .Values.logCollector.enabled }}
         - name: filebeat
@@ -69,10 +67,8 @@ spec:
           volumeMounts:
           - name: filebeat-config
             mountPath: /etc/filebeat
-          {{- range $idx, $path := .Values.logCollector.spark.logsPaths }}
-          - name: logdir-{{ $idx }}
-            mountPath: {{ $path }}
-          {{- end }}
+          - name: logdir
+            mountPath: /var/log/spark
           command:
             - "filebeat"
             - "-c"
@@ -92,8 +88,6 @@ spec:
             items:
               - key: filebeat-yml
                 path: filebeat.yml
-        {{- range $idx, $path := .Values.logCollector.spark.logsPaths }}
-        - name: logdir-{{ $idx }}
+        - name: logdir
           emptyDir: {}
-        {{- end }}
-        {{- end }}
+      {{- end }}

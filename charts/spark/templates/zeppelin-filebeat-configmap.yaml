@@ -12,14 +12,12 @@ data:
     filebeat.prospectors:
       - input_type: log
         paths:
-        {{- range .Values.logCollector.zeppelin.logsFiles }}
-        - {{ . | quote }}
-        {{- end }}
+        - /zeppelin-0.7.1-bin-all/logs/*.log
         fields:
-          log_host: {{ .Values.logCollector.zeppelin.currentHost | quote }}
+          log_host: "zeppelin"
     output.logstash:
       hosts:
-      {{- range .Values.logCollector.hosts }}
+      {{- range .Values.logCollector.logstashHost }}
       - {{ . | quote }}
       {{- end }}
     path:

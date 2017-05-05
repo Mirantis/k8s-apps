@@ -12,17 +12,12 @@ data:
     filebeat.prospectors:
       - input_type: log
         paths:
-        {{- range .Values.logCollector.spark.logsFiles }}
-        - {{ . | quote }}
-        {{- end }}
+        - /var/log/spark/*.log
         fields:
-          log_host: {{ .Values.logCollector.spark.currentHost | quote }}
-      - input_type: stdin
-        fields:
-          log_host: {{ .Values.logCollector.spark.currentHost | quote }}
+          log_host: "spark"
     output.logstash:
       hosts:
-      {{- range .Values.logCollector.hosts }}
+      {{- range .Values.logCollector.logstashHost }}
       - {{ . | quote }}
       {{- end }}
     path:

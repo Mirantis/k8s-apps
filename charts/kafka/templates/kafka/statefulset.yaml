@@ -126,10 +126,8 @@ spec:
         - name: datadir
           mountPath: /var/lib/kafka
         {{- if .Values.logCollector.enabled }}
-        {{- range $idx, $path := .Values.logCollector.logsPaths }}
-        - name: logdir-{{ $idx }}
-          mountPath: {{ $path }}
-        {{- end }}
+        - name: logdir
+          mountPath: /opt/kafka/logs
         {{- end }}
       {{- if .Values.logCollector.enabled }}
       - name: filebeat
@@ -138,10 +136,8 @@ spec:
         volumeMounts:
         - name: filebeat-config
           mountPath: /etc/filebeat
-        {{- range $idx, $path := .Values.logCollector.logsPaths }}
-        - name: logdir-{{ $idx }}
-          mountPath: {{ $path }}
-        {{- end }}
+        - name: logdir
+          mountPath: /opt/kafka/logs
         command:
           - "filebeat"
           - "-c"
@@ -171,10 +167,8 @@ spec:
           items:
             - key: filebeat-yml
               path: filebeat.yml
-      {{- range $idx, $path := .Values.logCollector.logsPaths }}
-      - name: logdir-{{ $idx }}
+      - name: logdir
         emptyDir: {}
-      {{- end }}
       {{- end }}
   {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
   volumeClaimTemplates:

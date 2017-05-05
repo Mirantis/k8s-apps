@@ -12,11 +12,9 @@ data:
     filebeat.prospectors:
       - input_type: log
         paths:
-        {{- range .Values.logCollector.logsFiles }}
-        - {{ . | quote }}
-        {{- end }}
+        - /opt/kafka/logs/*.log
         fields:
-          log_host: {{ .Values.logCollector.currentHost | quote }}
+          log_host: "kafka"
     output.logstash:
       hosts:
       {{- range .Values.logCollector.logstashHost }}
