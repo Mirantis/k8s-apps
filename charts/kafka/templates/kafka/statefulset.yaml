@@ -150,10 +150,8 @@ spec:
           - "-d"
           - "\"*\""
       {{- end }}
-      {{- if or .Values.prometheus.jmxExporter.enabled .Values.logCollector.enabled }}
       volumes:
-      {{- end }}
-      {{- if .Values.monitoring }}
+      {{- if .Values.prometheus.jmxExporter.enabled }}
       - name: kafka-jmx
         configMap:
           name: jmx-{{ template "kafka-fullname" . }}
@@ -164,7 +162,7 @@ spec:
       {{- else if eq .Values.persistence.type "hostPath" }}
       - name: datadir
         hostPath:
-	        path: "{{ .Values.persistence.hostPath }}"
+          path: "{{ .Values.persistence.hostPath }}"
       {{- end }}
       {{- if .Values.logCollector.enabled }}
       - name: filebeat-config
