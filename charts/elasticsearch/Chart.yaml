@@ -1,9 +1,3 @@
 name: elasticsearch
-description: Flexible and powerful open source, distributed real-time search and analytics
-  engine.
-version: 0.1.0
-home: https://www.elastic.co/products/elasticsearch
-icon: https://static-www.elastic.co/assets/blteb1c97719574938d/logo-elastic-elasticsearch-lt.svg
-maintainers:
-- email: prazumovsky@mirantis.com
-  name: Peter Razumovsky
+description: Flexible and powerful open source, distributed real-time search and analytics engine.
+version: 1.0.0

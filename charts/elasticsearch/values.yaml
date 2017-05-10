@@ -3,56 +3,66 @@
 # Declare name/value pairs to be passed into your templates.
 # name: value
 
-Elasticsearch:
-  Name: "elasticsearch"
-  PeerPort: 2380
-  ClientPort: 2379
-  Component:
-    Name: "elasticsearch"
-    Port: 9200
-  # Delay time in seconds to run liveness/readiness probes.
-  InitialDelayProbe: "300"
-  # Whether use persistence volumes to store data or not.
-  Persistence:
-    Enabled: false
-  # If Persistence.Enabled is true, specify storage class.
-  DataStorage:
-    Class: "default" # glusterfs, if Persistence.Enabled
-    ClassVersion: "alpha" # beta, if Persistence.Enabled
-    Size: "10Gi"
-  Image:
-    Name: "127.0.0.1:31500/elasticsearch"
-    Tag: "latest"
-    PullPolicy: "Always"
-  Master:
-    Replicas: 2
-    # Read details on https://www.elastic.co/guide/en/elasticsearch/reference/5.2/heap-size.html
-    HeapSize: "500m"
-    Resources:
-      requests:
-        cpu: "256m"
-        memory: "512Mi"
-      limits:
-        cpu: "512m"
-        memory: "1Gi"
-  Client:
-    Replicas: 2
-    HeapSize: "500m"
-    Resources:
-      requests:
-        cpu: "256m"
-        memory: "512Mi"
-      limits:
-        cpu: "512m"
-        memory: "1Gi"
-  Data:
-    Replicas: 3
-    HeapSize: "1536m"
-    Resources:
-      requests:
-        cpu: "256m"
-        memory: "2Gi"
-      limits:
-        cpu: "1"
-        memory: "4Gi"
+port: 9200
+transportPort: 9300
 
+probeInitialDelaySeconds: 90
+probeTimeoutSeconds: 5
+
+image:
+  repository: mirantisworkloads/elasticsearch
+  tag: 5.2.2
+  pullPolicy: Always
+
+master:
+  replicas: 2
+  heapSize: 1G
+  resources:
+    requests:
+      cpu: 256m
+      memory: 512Mi
+    #limits:
+    #  cpu: 512m
+    #  memory: 1Gi
+
+client:
+  replicas: 2
+  heapSize: 1G
+  resources:
+    requests:
+      cpu: 256m
+      memory: 512Mi
+    #limits:
+    #  cpu: 512m
+    #  memory: 1Gi
+
+data:
+  replicas: 3
+  heapSize: 1536m
+  resources:
+    requests:
+      cpu: 256m
+      memory: 2Gi
+    #limits:
+    #  cpu: 1
+    #  memory: 4Gi
+  persistence:
+    type: emptyDir # or hostPath or PersistentVolumeClaim
+    #storageClass: ""
+    volumeSize: 10Gi
+    hostPath: ""
+  service:
+    type: ClusterIP # or NodePort or LoadBalancer
+    nodePort: ""
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    annotations: {}
+  ingress:
+    enabled: false
+    hosts: []
+    #  - some.domain
+    tls:
+      enabled: false
+      secretName: ""
+    annotations: {}
+    #  kubernetes.io/ingress.class: nginx

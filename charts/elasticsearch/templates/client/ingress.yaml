@@ -1,0 +1,35 @@
+{{- if .Values.data.ingress.enabled -}}
+{{- $releaseName := .Release.Name -}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ printf "elasticsearch-ingress-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+  annotations:
+  {{- range $key, $value := .Values.data.ingress.annotations }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "fullname" . }}
+spec:
+  {{- if .Values.data.ingress.tls.enabled }}
+  tls:
+    - hosts:
+      {{- range .Values.data.ingress.hosts }}
+        - {{ . }}
+      {{- end }}
+      secretName: {{ .Values.data.ingress.tls.secretName }}
+  {{- end }}
+  rules:
+  {{- range .Values.data.ingress.hosts }}
+    - host: {{ . }}
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: {{ printf "elasticsearch-%s" $releaseName | trunc 63 | trimSuffix "-" }}
+              servicePort: {{ $.Values.port }}
+  {{- end -}}
+{{- end -}}

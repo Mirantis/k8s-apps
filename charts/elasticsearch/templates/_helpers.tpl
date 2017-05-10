@@ -1,22 +1,16 @@
-{{/*
-Create fully qualified names. We truncate at 24 chars
-because some Kubernetes name fields are limited to
-this (by the DNS naming spec).
-*/}}
 {{- define "data-fullname" -}}
-{{- printf "%s-data-%s" .Release.Name .Values.Elasticsearch.Name | trunc 24 -}}
+{{- printf "elasticsearch-data-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 
 {{- define "master-fullname" -}}
-{{- printf "%s-master-%s" .Release.Name .Values.Elasticsearch.Name | trunc 24 -}}
+{{- printf "elasticsearch-master-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "client-fullname" -}}
-{{- printf "%s-client-%s" .Release.Name .Values.Elasticsearch.Name | trunc 24 -}}
+{{- printf "elasticsearch-client-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "es-fullname" -}}
-{{- printf "%s-%s" .Release.Name .Values.Elasticsearch.Name | trunc 24 -}}
+{{- define "fullname" -}}
+{{- printf "elasticsearch-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
-

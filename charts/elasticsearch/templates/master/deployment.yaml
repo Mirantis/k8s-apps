@@ -6,24 +6,24 @@ metadata:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    component: "{{ .Release.Name }}-{{ .Values.Elasticsearch.Component.Name }}"
+    app: {{ template "fullname" . }}
     type: master
 spec:
-  replicas: {{ default 2 .Values.Elasticsearch.Master.Replicas }}
+  replicas: {{ .Values.master.replicas }}
   template:
     metadata:
       labels:
         heritage: {{ .Release.Service | quote }}
         release: {{ .Release.Name | quote }}
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-        component: "{{ .Release.Name }}-{{ .Values.Elasticsearch.Component.Name }}"
+        app: {{ template "fullname" . }}
         type: master
     spec:
       containers:
-      - name: {{ .Values.Elasticsearch.Component.Name }}
+      - name: elasticsearch
         env:
         - name: SERVICE
-          value: {{ template "es-fullname" . }}
+          value: {{ template "fullname" . }}
         - name: KUBERNETES_NAMESPACE
           valueFrom:
             fieldRef:
@@ -31,13 +31,19 @@ spec:
         - name: NODE_DATA
           value: "false"
         - name: ES_JAVA_OPTS
-          value: "-Xms{{ .Values.Elasticsearch.Master.HeapSize }} -Xmx{{ .Values.Elasticsearch.Master.HeapSize }}"
+          value: "-Xms{{ .Values.data.heapSize }} -Xmx{{ .Values.data.heapSize }}"
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
         command:
-          - elasticsearch
+        - elasticsearch
         resources:
-{{ toYaml .Values.Elasticsearch.Master.Resources | indent 12 }}
-        image: "{{ .Values.Elasticsearch.Image.Name }}:{{ .Values.Elasticsearch.Image.Tag }}"
-        imagePullPolicy: {{.Values.Elasticsearch.Image.PullPolicy | quote }}
+{{ toYaml .Values.master.resources | indent 10 }}
         ports:
-        - containerPort: 9300
+        - containerPort: {{ .Values.transportPort }}
           name: transport
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.port }}
+          timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
+          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
