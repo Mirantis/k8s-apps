@@ -6,19 +6,43 @@ image:
   tag: latest
   pullPolicy: Always
 
-hdfs:
-  address: hdfs-namenode
-  port: 8020
-  path: /
-
+port: 8589
 minPopularity: 1
 topListSize: 0
 
-servicePort: 8589
-containerPort: 8589
-serviceType: NodePort
+service:
+  type: ClusterIP # or NodePort or LoadBalancer
+
+  nodePort: ""
+
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+
+  annotations: {}
+
+ingress:
+  enabled: false
+  hosts: []
+    #- some.domain
+  tls:
+    enabled: false
+    secretName: ""
+  annotations: {}
+    #kubernetes.io/ingress.class: nginx
 
 resources:
   requests:
     cpu: 100m
     memory: 512Mi
+  #limits:
+  #  cpu: 100m
+  #  memory: 512Mi
+
+hdfs:
+  # if disabled, subchart will not be deployed
+  deployChart: true
+  path: /
+
+  # these values should be set if subchart deployment is disabled:
+  externalAddress: ""
+  externalPort: 8020
