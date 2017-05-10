@@ -10,4 +10,3 @@ spec:
       image: {{ .Values.image.repo }}:{{ .Values.image.tag }}
       command: ["cqlsh",  {{ printf "cas-%s"  .Release.Name | trunc 24 }}, "-e", "show version"]
   restartPolicy: Never
-

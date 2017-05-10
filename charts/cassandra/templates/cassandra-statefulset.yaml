@@ -45,6 +45,10 @@ spec:
     metadata:
       labels:
         app: {{ printf "cas-%s" .Release.Name | trunc 24 }}
+      {{- if .Values.monitoring }}
+      annotations:
+        prometheus.io/scrape: "true"
+      {{- end }}
     spec:
 {{- if .Values.selector }}
 {{ toYaml .Values.selector | indent 6 }}
@@ -76,6 +80,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
+        {{- if .Values.monitoring }}
+        - name: JMX_AGENT
+          value: "-javaagent:/etc/cassandra/jmx_prometheus_javaagent-0.9.jar=7070:/etc/cassandra/conf/cassandra-jmx.yml"
+        {{- end }}
         livenessProbe:
           exec:
             command: [ "/bin/sh", "-c", "nodetool status | grep -E \"^UN\\s+${POD_IP}\"" ]
@@ -93,15 +101,29 @@ spec:
           containerPort: 7001
         - name: jmx
           containerPort: 7199
+        {{- if .Values.monitoring }}
+        - name: jmx-agent
+          containerPort: 7070
+        {{- end }}
         - name: cql
           containerPort: {{ default 9042 .Values.config.ports.cql }}
         - name: thrift
           containerPort: {{ default 9160 .Values.config.ports.thrift }}
-        {{- if .Values.persistence.enabled }}
         volumeMounts:
+        {{- if .Values.monitoring }}
+        - name: cassandra-jmx
+          mountPath: /etc/cassandra/conf
+        {{- end }}
+        {{- if .Values.persistence.enabled }}
         - name: data
           mountPath: /var/lib/cassandra
         {{- end }}
+      {{- if .Values.monitoring }}
+      volumes:
+      - name: cassandra-jmx
+        configMap:
+          name: {{ printf "cm-cas-%s" .Release.Name | trunc 24 }}
+      {{- end }}
   {{- if .Values.persistence.enabled }}
   volumeClaimTemplates:
   - metadata:
