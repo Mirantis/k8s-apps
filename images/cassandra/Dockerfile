@@ -1,4 +1,4 @@
-FROM cassandra:latest
+FROM cassandra:3.0.13
 
 ARG JMX_VERSION=0.9
 
