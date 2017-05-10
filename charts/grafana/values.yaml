@@ -34,9 +34,8 @@ service:
   annotations: {}
 
 ingress:
-  enabled: true
-  hosts:
-    - some.shit
+  enabled: false
+  hosts: []
     #- some.domain
   tls:
     enabled: false

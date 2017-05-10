@@ -11,8 +11,11 @@ spec:
   ports:
     - name: http
       port: {{ .Values.port }}
-      protocol: TCP
-      targetPort: {{ .Values.port }}
+      {{- if eq .Values.namenode.ui.service.type "NodePort" }}
+      {{- if .Values.namenode.ui.service.nodePort }}
+      nodePort: {{ .Values.namenode.ui.service.nodePort }}
+      {{- end -}}
+      {{- end }}
   selector:
     app: {{ template "fullname" . }}
   type: "{{ .Values.service.type }}"
@@ -25,10 +28,5 @@ spec:
   {{- range .Values.service.loadBalancerSourceRanges }}
   - {{ . }}
   {{- end }}
-  {{- end -}}
-{{- end -}}
-{{- if eq .Values.service.type "NodePort" }}
-  {{- if .Values.service.nodePort }}
-  nodePort: {{ .Values.service.nodePort }}
   {{- end -}}
 {{- end -}}
