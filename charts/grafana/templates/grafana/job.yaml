@@ -1,0 +1,35 @@
+{{- if .Values.setDatasource.enabled -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "fullname" . }}
+  name: {{ template "fullname" . }}-set-datasource
+spec:
+  activeDeadlineSeconds: 300
+  template:
+    metadata:
+      labels:
+        release: "{{ .Release.Name }}"
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "fullname" . }}
+    spec:
+      containers:
+      - name: set-datasource
+        image: "{{ .Values.setDatasource.image.repository }}:{{ .Values.setDatasource.image.tag }}"
+        imagePullPolicy: {{ .Values.setDatasource.image.pullPolicy }}
+        args:
+          - "http://{{ .Values.adminUser }}:{{ .Values.adminPassword }}@{{ template "fullname" . }}:{{ .Values.port }}/api/datasources"
+          - "-X"
+          - POST
+          - "-H"
+          - "Content-Type: application/json;charset=UTF-8"
+          - "--data-binary"
+          {{- with .Values.setDatasource.datasource }}
+          - "{\"name\":\"{{ .name }}\",\"type\":\"{{ .type }}\",\"url\":\"{{ .url }}\",\"access\":\"{{ .access }}\",\"isDefault\":{{ .isDefault }}}"
+          {{- end }}
+      restartPolicy: {{ .Values.setDatasource.restartPolicy }}
+{{- end -}}
