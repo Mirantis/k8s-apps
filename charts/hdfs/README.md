@@ -1,1 +1,6 @@
-bla-bla-bla
+# HDFS
+
+## Deploy chart
+```console
+$ helm install .
+```

@@ -1,0 +1,4 @@
+HDFS chart has been deployed.
+
+Namenode address:
+{{ template "namenode-address" . }}
