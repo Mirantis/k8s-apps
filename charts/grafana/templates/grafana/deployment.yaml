@@ -1,0 +1,68 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "fullname" . }}
+  name: {{ template "fullname" . }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        release: "{{ .Release.Name }}"
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "fullname" . }}
+    spec:
+      containers:
+        - name: grafana
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
+                  key: grafana-admin-user
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "fullname" . }}
+                  key: grafana-admin-password
+          ports:
+            - containerPort: {{ .Values.port }}
+          readinessProbe:
+            httpGet:
+              path: /login
+              port: {{ .Values.port }}
+            initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+            timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/grafana
+            - name: dashboard-volume
+              mountPath: /var/lib/grafana/dashboards
+            - name: data
+              mountPath: /var/lib/grafana/data
+      terminationGracePeriodSeconds: 300
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ template "fullname" . }}
+        - name: dashboard-volume
+          configMap:
+            name: {{ template "fullname" . }}-dashboards
+        - name: data
+      {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
+          persistentVolumeClaim:
+            claimName: {{ template "fullname" . }}
+      {{- else if eq .Values.persistence.type "emptyDir" }}
+          emptyDir: {}
+      {{- else if eq .Values.persistence.type "hostPath" }}
+          hostPath:
+            path: "{{ .Values.persistence.hostPath }}"
+      {{- end }}
