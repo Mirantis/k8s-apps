@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: prometheus-api-test-{{ .Release.Name }}
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+    - name: prometheus-api-test-{{ .Release.Name }}
+      image: {{ .Values.server.image.testImage }}:{{ .Values.server.image.testImageTag }}
+      command: ["/bin/sh", "-c", "curl {{ template "server.fullname" . }}/api/v1/query?query=kube_node_info | [ `jq -r .status` == success ]" ]
+  restartPolicy: Never
