@@ -1,15 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "es-fullname" . }}
+  name: {{ template "fullname" . }}
   labels:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "fullname" . }}
 spec:
   clusterIP: None
   ports:
-    - port: 9300
-      targetPort: 9300
+    - port: {{ .Values.transportPort }}
+      targetPort: {{ .Values.transportPort }}
   selector:
-    component: "{{ .Release.Name }}-{{ .Values.Elasticsearch.Component.Name }}"
+    app: {{ template "fullname" . }}

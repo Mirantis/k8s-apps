@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "client-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "fullname" . }}
+  {{- if .Values.data.service.annotations }}
+  annotations:
+{{ toYaml .Values.data.service.annotations | indent 4}}
+  {{- end }}
+spec:
+  type: {{ .Values.data.service.type | quote }}
+  ports:
+    - port: {{ .Values.port }}
+      targetPort: http
+      {{- if eq .Values.data.service.type "NodePort" }}
+      {{- if .Values.data.service.nodePort }}
+      nodePort: {{ .Values.data.service.nodePort }}
+      {{- end -}}
+      {{- end }}
+  selector:
+    app: {{ template "fullname" . }}
+    type: client
+  {{- if eq .Values.data.service.type "LoadBalancer" }}
+  {{- if .Values.data.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.data.service.loadBalancerIP }}
+  {{- end }}
+  {{- if .Values.data.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+  {{- range .Values.data.service.loadBalancerSourceRanges }}
+  - {{ . }}
+  {{- end }}
+  {{- end -}}
+  {{- end -}}

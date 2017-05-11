@@ -1,0 +1,102 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: {{ template "data-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "fullname" . }}
+    type: data
+spec:
+  serviceName: {{ template "data-fullname" . }}
+  replicas: {{ .Values.data.replicas }}
+  template:
+    metadata:
+      labels:
+        heritage: {{ .Release.Service | quote }}
+        release: {{ .Release.Name | quote }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "fullname" . }}
+        type: data
+      {{- if ne .Values.data.persistence.type "emptyDir" }}
+      annotations:
+        pod.beta.kubernetes.io/init-containers: '[
+          {
+            "name": "elasticsearch-init",
+            "image": "busybox",
+            "imagePullPolicy": "IfNotPresent",
+            "command": ["sh", "-c", "chown -R 1000:1000 /usr/share/elasticsearch/data"],
+            "volumeMounts": [
+                {
+                  "name": "elasticsearch-data",
+                  "mountPath": "/usr/share/elasticsearch/data"
+                }
+            ]
+          }
+        ]'
+      {{- end }}
+    spec:
+      containers:
+      - name: elasticsearch
+        env:
+        - name: SERVICE
+          value: {{ template "fullname" . }}
+        - name: KUBERNETES_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: NODE_MASTER
+          value: "false"
+        - name: ES_JAVA_OPTS
+          value: "-Xms{{ .Values.data.heapSize }} -Xmx{{ .Values.data.heapSize }}"
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        command:
+        - elasticsearch
+        ports:
+        - containerPort: {{ .Values.transportPort }}
+          name: transport
+        resources:
+{{ toYaml .Values.data.resources | indent 10 }}
+        volumeMounts:
+        - mountPath: /usr/share/elasticsearch/data
+          name: elasticsearch-data
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/bash","/pre-stop-hook.sh"]
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.port }}
+          timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
+          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+      {{- if eq .Values.data.persistence.type "emptyDir" }}
+      volumes:
+      - name: elasticsearch-data
+        emptyDir: {}
+      {{- else if eq .Values.data.persistence.type "hostPath" }}
+      volumes:
+      - name: elasticsearch-data
+        hostPath:
+          path: {{ .Values.data.persistence.hostPath | quote }}
+      {{- end }}
+  {{- if eq .Values.data.persistence.type "PersistentVolumeClaim" }}
+  volumeClaimTemplates:
+  - metadata:
+      name: elasticsearch-data
+      {{- if .Values.data.persistence.storageClass }}
+      annotations:
+        volume.beta.kubernetes.io/storage-class: {{ .Values.data.persistence.storageClass | quote }}
+      {{- end }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.data.persistence.volumeSize }}
+  {{- end }}
