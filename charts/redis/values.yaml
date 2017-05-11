@@ -1,0 +1,21 @@
+image:
+  repository: 127.0.0.1:31500/sentinel
+  tag: latest
+  pullPolicy: Always
+## Serevices ports
+sentinelPort: 26379
+redisPort: 6379
+## Persist data to a persitent volume
+persistence:
+  enabled: false
+  ## If defined, volume.beta.kubernetes.io/storage-class: <storageClass>
+  ## Default: volume.alpha.kubernetes.io/storage-class: default
+  storageClass: generic
+  accessMode: ReadWriteOnce
+  size: 5Gi
+## Change redis configuration paramaters below.
+config:
+  replicaCount: 3
+  masterData: /redis-master-data
+  port: 6379
+  slaveReadOnly: "no"
