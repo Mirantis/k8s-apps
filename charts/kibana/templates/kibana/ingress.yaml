@@ -1,4 +1,5 @@
 {{- if .Values.ingress.enabled -}}
+{{ $serviceName := include "fullname" . }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -13,6 +14,14 @@ metadata:
     app: {{ template "fullname" . }}
   name: {{ template "ingress-fullname" . }}
 spec:
+  {{- if .Values.ingress.tls.enabled }}
+  tls:
+  - hosts:
+    {{- range .Values.ingress.hosts }}
+    - {{ . }}
+    {{- end }}
+    secretName: {{ .Values.ingress.tls.secretName }}
+  {{- end }}
   rules:
   {{- range .Values.ingress.hosts }}
     - host: {{ . }}
@@ -20,7 +29,7 @@ spec:
         paths:
           - path: /
             backend:
-              serviceName: {{ template "fullname" . }}
-              servicePort: {{ .Values.HTTPPort }}
+              serviceName: {{ $serviceName }}
+              servicePort: {{ $.Values.HTTPPort }}
   {{- end -}}
 {{- end -}}

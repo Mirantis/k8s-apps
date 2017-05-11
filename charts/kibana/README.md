@@ -22,21 +22,19 @@ helm install .
 
 | Value | Description | Default |
 | --- | --- | --- |
-| component | Service name | logstash |
 | port | Service port | 5043 |
 | HTTPPort | HTTP port for service | 80 |
-| protocol | Protocol to connect to service | TCP |
 | replicas | Deployment replicas | 1 |
-| elasticsearch.service | Elasticsearch service name to connect | elasticsearch-elasticsearch |
+| elasticsearch.host | Elasticsearch service name to connect | elasticsearch-elasticsearch |
 | elasticsearch.port | Elasticsearch service port to connect | 9200 |
 | elasticsearch.preserveHost | If "true" will send the hostname specified in elasticsearch. If "false", then the host is used to connect to *this* Kibana instance will be sent | true |
 | elasticsearch.requestTimeout | Time in milliseconds to wait for responses from the back end or Elasticsearch | 30000 |
 | elasticsearch.shardTimeout | Time in milliseconds for Elasticsearch to wait for responses from shards. Set to 0 to disable | 0 |
 | elasticsearch.startupTimeout | Time in milliseconds to wait for Elasticsearch at Kibana startup before retrying | 5000 |
-| image.repository | Container image repository | 127.0.0.1:31500/kibana |
-| image.tag | Container image tag | latest |
+| image.repository | Container image repository | mirantisworkloads/kibana |
+| image.tag | Container image tag | 5.2.2 |
 | image.pullPolicy | Container pull policy | Always |
-| resources.requests.memory | Container requested memory | 2Gi |
+| resources.requests.memory | Container requested memory | 256Mi |
 | resources.requests.cpu | Container requested cpu | 250m |
 | service.type | Type of service. Allowed values: ClusterIP, NodePort, LoadBalancer | ClusterIP |
 | service.nodePort | (Optional) If type is NodePort, service uses specified node port | - |
@@ -44,3 +42,5 @@ helm install .
 | ingress.enabled | Enable ingress for this chart or not | false |
 | ingress.annotations | (Optional) Ingress annotations | - |
 | ingress.hosts | (Optional) Ingress hostnames. Must be provided if Ingress is enabled | - |
+| ingress.tls.enabled | Enable tls ingress or not | false |
+| ingress.tls.secretName | Secret name to use for tls | - |
