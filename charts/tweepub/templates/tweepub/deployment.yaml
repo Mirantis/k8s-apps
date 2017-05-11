@@ -1,20 +1,18 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: "{{ printf "tweepub-%s" .Release.Name  | trunc 63 | trimSuffix "-" }}"
-  annotations:
-    helm.sh/created: {{.Release.Time.Seconds | quote }}
+  name: {{ template "fullname" . }}
   labels:
-    heritage: {{.Release.Service | quote }}
-    release: {{.Release.Name | quote }}
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
-    app: "{{ printf "tweepub-%s" .Release.Name  | trunc 63 | trimSuffix "-" }}"
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "fullname" . }}
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: "{{ printf "tweepub-%s" .Release.Name  | trunc 63 | trimSuffix "-" }}"
+        app: {{ template "fullname" . }}
     spec:
       containers:
       - name: {{ .Chart.Name }}
@@ -38,7 +36,7 @@ spec:
         - name: TWEEPUB_LANGUAGES
           value: "{{ .Values.twitter.languages }}"
         - name: TWEEPUB_KAFKA
-          value: "{{ .Values.kafka.servers }}"
+          value: {{ template "kafka-address" . }}
         - name: TWEEPUB_TOPIC
           value: "{{ .Values.kafka.topic }}"
         resources:

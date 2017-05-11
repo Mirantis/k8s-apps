@@ -10,13 +10,13 @@ twitter:
   # TweePub needs to authorize on Twitter Streaming API to listen for tweets
   # For creating new apps / tokens use: https://apps.twitter.com/
   # Twitter API Application Key
-  #appKey:
+  appKey: ""
   # Twitter API Application Secret
-  #appSecret:
+  appSecret: ""
   # Twitter API Token Key (w/ write permissions)
-  #tokenKey:
+  tokenKey: ""
   # Twitter API Token Secret
-  #tokenSecret:
+  tokenSecret: ""
 
   # At least one of the follow, track and locations should be specified
   # Detailed doc: https://dev.twitter.com/streaming/overview/request-parameters
@@ -33,12 +33,17 @@ twitter:
   #languages: en
 
 kafka:
-  # A comma-separated list of Kafka bootstap servers
-  #servers: localhost:9092
+  # if disabled, subchart will not be deployed
+  deployChart: true
+  # this address will be used if subchart deployment is disabled
+  externalAddress: ""
   # Kafka topic where the tweets will be published
-  #topic: twitter-stream
+  topic: twitter-stream
 
 resources:
   requests:
     cpu: 100m
     memory: 512Mi
+  #limits:
+  #  cpu: 100m
+  #  memory: 512Mi

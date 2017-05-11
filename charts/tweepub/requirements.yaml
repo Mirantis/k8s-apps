@@ -1,0 +1,5 @@
+dependencies:
+- name: kafka
+  version: ^1.x
+  repository: "file://../kafka"
+  condition: kafka.deployChart
