@@ -11,6 +11,11 @@ spec:
   ports:
   - port: {{ .Values.namenode.ui.port }}
     name: ui
+    {{- if eq .Values.namenode.ui.service.type "NodePort" }}
+    {{- if .Values.namenode.ui.service.nodePort }}
+    nodePort: {{ .Values.namenode.ui.service.nodePort }}
+    {{- end -}}
+    {{- end }}
   selector:
     app: {{ template "namenode-fullname" . }}
   type: "{{ .Values.namenode.ui.service.type }}"
@@ -23,10 +28,5 @@ spec:
   {{- range .Values.namenode.ui.service.loadBalancerSourceRanges }}
   - {{ . }}
   {{- end }}
-  {{- end -}}
-{{- end -}}
-{{- if eq .Values.namenode.ui.service.type "NodePort" }}
-  {{- if .Values.namenode.ui.service.nodePort }}
-  nodePort: {{ .Values.namenode.ui.service.nodePort }}
   {{- end -}}
 {{- end -}}

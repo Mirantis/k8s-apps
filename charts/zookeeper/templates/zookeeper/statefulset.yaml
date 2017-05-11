@@ -133,7 +133,7 @@ spec:
       {{- else if eq .Values.persistence.type "hostPath" }}
       - name: datadir
         hostPath:
-	        path: "{{ .Values.persistence.hostPath }}"
+          path: "{{ .Values.persistence.hostPath }}"
       {{- end }}
   {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
   volumeClaimTemplates:
