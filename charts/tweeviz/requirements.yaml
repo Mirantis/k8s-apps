@@ -1,0 +1,5 @@
+dependencies:
+- name: hdfs
+  version: ^1.x
+  repository: "file://../hdfs"
+  condition: hdfs.deployChart

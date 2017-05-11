@@ -1,0 +1,41 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "fullname" . }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: TWEEVIZ_HDFS_ADDRESS
+          {{- if .Values.hdfs.deployChart }}
+          value: {{ printf "hdfs-namenode-%s" .Release.Name  | trunc 63 | trimSuffix "-" }}
+          {{- else  }}
+          value: "{{ .Values.hdfs.externalAddress }}"
+          {{- end }}
+        - name: TWEEVIZ_HDFS_PORT
+          {{- if .Values.hdfs.deployChart }}
+          value: "{{ .Values.hdfs.namenode.port }}"
+          {{- else }}
+          value: "{{ .Values.hdfs.externalPort }}"
+          {{- end }}
+        - name: TWEEVIZ_HDFS_PATH
+          value: "{{ .Values.hdfs.path }}"
+        - name: TWEEVIZ_MIN_POPULARITY
+          value: "{{ .Values.minPopularity }}"
+        - name: TWEEVIZ_TOP_LIST_SIZE
+          value: "{{ .Values.topListSize }}"
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
