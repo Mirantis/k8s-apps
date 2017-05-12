@@ -35,3 +35,7 @@ You can watch the status of it by running 'kubectl get svc --namespace {{ .Relea
     kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 3000
 {{- end }}
 {{- end }}
+
+To run simple create-delete test:
+
+    helm test {{ .Release.Name }} --cleanup
