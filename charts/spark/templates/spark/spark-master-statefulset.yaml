@@ -1,0 +1,83 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: {{ template "master-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    app: {{ template "master-fullname" . }}
+spec:
+  serviceName: {{ template "master-fullname" . }}
+  replicas: {{ .Values.spark.master.replicas }}
+  template:
+    metadata:
+      labels:
+        release: {{ .Release.Name | quote }}
+        chart: {{ .Release.Name | quote }}
+        app: {{ template "master-fullname" . }}
+      {{- if .Values.prometheus.jmxExporter.enabled }}
+      annotations:
+        prometheus.io/scrape: "true"
+      {{- end }}
+    spec:
+      containers:
+        - name: {{ template "master-fullname" . }}
+          image: {{ .Values.spark.image.repository }}:{{ .Values.spark.image.tag }}
+          imagePullPolicy: {{ .Values.spark.image.pullPolicy }}
+          command:
+            - /usr/local/spark/sbin/start-master.sh
+          resources:
+{{ toYaml .Values.spark.master.resources | indent 12 }}
+          env:
+            {{- if .Values.prometheus.jmxExporter.enabled }}
+            - name: SPARK_DAEMON_JAVA_OPTS
+              value: "-javaagent:/usr/local/spark/jmx_prometheus_javaagent-0.9.jar=7072:/usr/local/spark/conf/spark-jmx.yml"
+            {{- end }}
+            - name: SPARK_DAEMON_MEMORY
+              value: {{ .Values.spark.master.daemonMemory | quote }}
+            - name: SPARK_NO_DAEMONIZE
+              value: "1"
+            - name: SPARK_DAEMON_JAVA_OPTS
+              value: "-Dspark.deploy.recoveryMode=ZOOKEEPER -Dspark.deploy.zookeeper.dir=/spark -Dspark.deploy.zookeeper.url={{ template "zookeeper-address" . }}"
+          ports:
+            - name: jmx-agent
+              containerPort: 7072
+          volumeMounts:
+            - name: spark-conf
+              mountPath: /usr/local/spark/conf
+          {{- if .Values.logCollector.enabled }}
+            - name: logdir
+              mountPath: /var/log/spark
+          {{- end }}
+        {{- if .Values.logCollector.enabled }}
+        - name: filebeat
+          image: "{{ .Values.logCollector.image.repository }}:{{ .Values.logCollector.image.tag }}"
+          imagePullPolicy: {{ .Values.logCollector.image.pullPolicy | quote }}
+          volumeMounts:
+          - name: filebeat-config
+            mountPath: /etc/filebeat
+          - name: logdir
+            mountPath: /var/log/spark
+          command:
+            - "filebeat"
+            - "-c"
+            - "/etc/filebeat/filebeat.yml"
+            - "-e"
+            - "-d"
+            - "\"*\""
+        {{- end }}
+      volumes:
+        - name: spark-conf
+          configMap:
+            name: {{ printf "spark-conf-%s" .Release.Name | trunc 24 }}
+        {{- if .Values.logCollector.enabled }}
+        - name: filebeat-config
+          configMap:
+            name: {{ printf "spark-fb-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+            items:
+              - key: filebeat-yml
+                path: filebeat.yml
+        - name: logdir
+          emptyDir: {}
+        {{- end }}

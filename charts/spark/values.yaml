@@ -3,72 +3,75 @@
 # Declare name/value pairs to be passed into your templates.
 # name: value
 
-Master:
-  Name: spark-master
-  Image: localhost:31500/spark
-  ImageTag: 2.1.0
-  imagePullPolicy: Always
-  Replicas: 1
-  Component: "spark-master"
-  Cpu: "100m"
-  Memory: "512Mi"
-  ServicePort: 7077
-  ContainerPort: 7077
-  # Set Master JVM memory. Default 1g
-  #DaemonMemory: 1g
+spark:
+  image:
+    repository: mirantisworkloads/spark
+    tag: 2.1.0
+    pullPolicy: Always
+  master:
+    replicas: 2  # 1 or 2
+    daemonMemory: "1g"
+    rpcPort: 7077
+    rpcNodePort: null
+    webuiPort: 8080
+    webuiNodePort: null
+    restPort: 6066
+    restNodePort: null
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "512Mi"
+  worker:
+    replicas: 3
+    daemonMemory: "1g"
+    executorMemory: "1g"
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "512Mi"
 
-WebUi:
-  Name: spark-webui
-  ServicePort: 8080
-  ContainerPort: 8080
-  serviceType: ClusterIP
-  #externalIPs:
-  #  - ip
-  #nodePort: port
+zeppelin:
+  image:
+    repository: mirantisworkloads/zeppelin
+    tag: 0.7.1
+    pullPolicy: Always
+  port: 8080
+  nodePort: null
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "512Mi"
 
-Rest:
-  Name: spark-restapi
-  ServicePort: 6066
-  ContainerPort: 6066
+ingress:
+  enabled: false
+  hosts: []
+  tls:
+    enabled: false
+    secretName: ""
+  annotations: {}
 
-Worker:
-  Name: spark-worker
-  Image: localhost:31500/spark
-  ImageTag: 2.1.0
-  imagePullPolicy: Always
-  Replicas: 3
-  Component: "spark-worker"
-  Cpu: "100m"
-  Memory: "512Mi"
-  ContainerPort: 8081
-  # Set Worker JVM memory. Default 1g
-  #DaemonMemory: 1g
-  # Set how much total memory workers have to give executors
-  #ExecutorMemory: 1g
+service:
+  type: ClusterIP
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  annotations: {}
 
-Zeppelin:
-  Name: zeppelin
-  Image: localhost:31500/zeppelin
-  ImageTag: 0.7.1
-  imagePullPolicy: Always
-  Replicas: 1
-  Component: "zeppelin"
-  Cpu: "100m"
-  ServicePort: 8080
-  ContainerPort: 8080
-  serviceType: ClusterIP
-  #externalIPs:
-  #  - ip
-  # nodePort: port
-monitoring: false
+prometheus:
+  jmxExporter:
+    enabled: true
 
 logCollector:
   enabled: false
   image:
-    repository: 127.0.0.1:31500/filebeat
-    tag: latest
+    repository: mirantisworkloads/filebeat
+    tag: 5.2.2
     pullPolicy: Always
   # external logstash hosts
   logstashHost:
     - "" # host:port
 
+zookeeper:
+  # if disabled, subchart will not be deployed
+  deployChart: true
+  # this address will be used if subchart deployment is disabled
+  externalAddress: ""
