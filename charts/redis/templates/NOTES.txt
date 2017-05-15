@@ -6,3 +6,7 @@ Connection string:
     {{- if $i -}},{{- end -}}
     redis-{{ $.Release.Name | trunc 63 }}-{{ $i }}.{{ $serviceName }}:{{ $.Values.config.redisPort }}
 {{- end }}
+
+To run simple test:
+
+    helm test {{ .Release.Name }} --cleanup

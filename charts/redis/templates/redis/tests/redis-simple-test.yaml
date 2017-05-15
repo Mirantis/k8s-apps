@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ printf "redis-test-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+  annotations:
+    helm.sh/hook: test-success
+spec:
+  containers:
+    - name: redis-test
+      image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+      imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+      command:
+        - sh
+        - "-cx"
+        - |
+          redis-cli -h {{ template "cluster-svc-fullname" . }} ping
+          redis-cli -h {{ template "cluster-svc-fullname" . }} set test:1:string "test string"
+          redis-cli -h {{ template "cluster-svc-fullname" . }} get test:1:string
+          redis-cli -h {{ template "cluster-svc-fullname" . }} set test:1:vlaue "487"
+          redis-cli -h {{ template "cluster-svc-fullname" . }} rename test:1:vlaue test:1:value
+          redis-cli -h {{ template "cluster-svc-fullname" . }} exists  test:1:vlaue
+          redis-cli -h {{ template "cluster-svc-fullname" . }} exists  test:1:value
+          redis-cli -h {{ template "cluster-svc-fullname" . }} keys test:1:*
+          redis-cli -h {{ template "cluster-svc-fullname" . }} del  test:1:value
+          redis-cli -h {{ template "cluster-svc-fullname" . }} keys test:1:*
+  restartPolicy: Never
