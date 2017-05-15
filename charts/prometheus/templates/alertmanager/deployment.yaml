@@ -5,12 +5,12 @@ metadata:
   labels:
     app: {{ template "name" . }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    component: "{{ .Values.alertmanager.name }}"
+    component: alertmanager
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
   name: {{ template "alertmanager.fullname" . }}
 spec:
-  replicas: {{ .Values.alertmanager.replicaCount }}
+  replicas: {{ .Values.alertmanager.replicas }}
   template:
     metadata:
     {{- if .Values.alertmanager.podAnnotations }}
@@ -19,16 +19,16 @@ spec:
     {{- end }}
       labels:
         app: {{ template "name" . }}
-        component: "{{ .Values.alertmanager.name }}"
+        component: alertmanager
         release: {{ .Release.Name }}
     spec:
       containers:
-        - name: {{ template "name" . }}-{{ .Values.alertmanager.name }}
+        - name: alertmanager
           image: "{{ .Values.alertmanager.image.repository }}:{{ .Values.alertmanager.image.tag }}"
           imagePullPolicy: "{{ .Values.alertmanager.image.pullPolicy }}"
           args:
             - --config.file=/etc/config/alertmanager.yml
-            - --storage.path={{ .Values.alertmanager.persistentVolume.mountPath }}
+            - --storage.path=/data
           {{- range $key, $value := .Values.alertmanager.extraArgs }}
             - --{{ $key }}={{ $value }}
           {{- end }}
@@ -46,10 +46,9 @@ spec:
             - name: config-volume
               mountPath: /etc/config
             - name: storage-volume
-              mountPath: "{{ .Values.alertmanager.persistentVolume.mountPath }}"
-              subPath: "{{ .Values.alertmanager.persistentVolume.subPath }}"
+              mountPath: /data
 
-        - name: {{ template "name" . }}-{{ .Values.alertmanager.name }}-{{ .Values.configmapReload.name }}
+        - name: configmap-reload
           image: "{{ .Values.configmapReload.image.repository }}:{{ .Values.configmapReload.image.tag }}"
           imagePullPolicy: "{{ .Values.configmapReload.image.pullPolicy }}"
           args:
@@ -61,19 +60,18 @@ spec:
             - name: config-volume
               mountPath: /etc/config
               readOnly: true
-    {{- if .Values.alertmanager.nodeSelector }}
-      nodeSelector:
-{{ toYaml .Values.alertmanager.nodeSelector | indent 8 }}
-    {{- end }}
       volumes:
         - name: config-volume
           configMap:
             name: {{ template "alertmanager.fullname" . }}
         - name: storage-volume
-        {{- if .Values.alertmanager.persistentVolume.enabled }}
+        {{- if eq .Values.server.persistence.type "PersistentVolumeClaim" }}
           persistentVolumeClaim:
-            claimName: {{ if .Values.alertmanager.persistentVolume.existingClaim }}{{ .Values.alertmanager.persistentVolume.existingClaim }}{{- else }}{{ template "alertmanager.fullname" . }}{{- end }}
-        {{- else }}
+            claimName: {{ template "alertmanager.fullname" . }}
+        {{- else if eq .Values.alertmanager.persistence.type "emptyDir" }}
           emptyDir: {}
-        {{- end -}}
+        {{- else if eq .Values.alertmanager.persistence.type "hostPath" }}
+          hostPath:
+            path: "{{ .Values.alertmanager.persistence.hostPath }}"
+        {{- end }}
 {{- end }}

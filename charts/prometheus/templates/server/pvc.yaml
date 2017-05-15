@@ -1,0 +1,21 @@
+{{- if eq .Values.server.persistence.type "PersistentVolumeClaim" }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+  {{- if .Values.server.persistence.storageClass }}
+    volume.beta.kubernetes.io/storage-class: "{{ .Values.server.persistence.storageClass }}"
+  {{- end }}
+  labels:
+    app: {{ template "name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: server
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+  name: {{ template "server.fullname" . }}
+spec:
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: "{{ .Values.server.persistence.volumeSize }}"
+{{- end -}}

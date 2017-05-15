@@ -1,0 +1,23 @@
+{{- if .Values.alertmanager.enabled -}}
+{{- if eq .Values.alertmanager.persistence.type "PersistentVolumeClaim" }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+  {{- if .Values.alertmanager.persistence.storageClass }}
+    volume.beta.kubernetes.io/storage-class: "{{ .Values.alertmanager.persistence.storageClass }}"
+  {{- end }}
+  labels:
+    app: {{ template "name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: alertmanager
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+  name: {{ template "alertmanager.fullname" . }}
+spec:
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: "{{ .Values.alertmanager.persistence.volumeSize }}"
+{{- end -}}
+{{- end -}}

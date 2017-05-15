@@ -1,0 +1,42 @@
+{{- if .Values.nodeExporter.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+{{- if .Values.nodeExporter.service.annotations }}
+  annotations:
+{{ toYaml .Values.nodeExporter.service.annotations | indent 4}}
+{{- end }}
+  labels:
+    app: {{ template "name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: node-exporter
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+  name: {{ template "nodeExporter.fullname" . }}
+spec:
+  ports:
+  - port: {{ .Values.nodeExporter.port }}
+    targetPort: 9100
+    name: metrics
+    {{- if eq .Values.nodeExporter.service.type "NodePort" }}
+    {{- if .Values.nodeExporter.service.nodePort }}
+    nodePort: {{ .Values.nodeExporter.service.nodePort }}
+    {{- end -}}
+    {{- end }}
+  selector:
+    app: {{ template "name" . }}
+    component: node-exporter
+    release: {{ .Release.Name }}
+  type: "{{ .Values.nodeExporter.service.type }}"
+{{- if eq .Values.nodeExporter.service.type "LoadBalancer" }}
+  {{- if .Values.nodeExporter.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.nodeExporter.service.loadBalancerIP }}
+  {{- end -}}
+  {{- if .Values.nodeExporter.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+  {{- range .Values.nodeExporter.service.loadBalancerSourceRanges }}
+  - {{ . }}
+  {{- end }}
+  {{- end -}}
+{{- end -}}
+{{- end -}}

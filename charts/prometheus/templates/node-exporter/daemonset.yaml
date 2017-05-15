@@ -5,7 +5,6 @@ metadata:
   labels:
     app: {{ template "name" . }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    component: "{{ .Values.nodeExporter.name }}"
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
   name: {{ template "nodeExporter.fullname" . }}
@@ -18,11 +17,11 @@ spec:
     {{- end }}
       labels:
         app: {{ template "name" . }}
-        component: "{{ .Values.nodeExporter.name }}"
+        component: node-exporter
         release: {{ .Release.Name }}
     spec:
       containers:
-        - name: {{ template "name" . }}-{{ .Values.nodeExporter.name }}
+        - name: node-exporter
           image: "{{ .Values.nodeExporter.image.repository }}:{{ .Values.nodeExporter.image.tag }}"
           imagePullPolicy: "{{ .Values.nodeExporter.image.pullPolicy }}"
           args:
@@ -46,10 +45,6 @@ spec:
               readOnly: true
       hostNetwork: true
       hostPID: true
-    {{- if .Values.nodeExporter.nodeSelector }}
-      nodeSelector:
-{{ toYaml .Values.nodeExporter.nodeSelector | indent 8 }}
-    {{- end }}
       volumes:
         - name: proc
           hostPath:
