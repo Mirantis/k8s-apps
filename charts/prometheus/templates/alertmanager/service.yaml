@@ -1,0 +1,42 @@
+{{- if .Values.alertmanager.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+{{- if .Values.alertmanager.service.annotations }}
+  annotations:
+{{ toYaml .Values.alertmanager.service.annotations | indent 4}}
+{{- end }}
+  labels:
+    app: {{ template "name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: alertmanager
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+  name: {{ template "alertmanager.fullname" . }}
+spec:
+  ports:
+  - port: {{ .Values.alertmanager.port }}
+    targetPort: 9093
+    name: http
+    {{- if eq .Values.alertmanager.service.type "NodePort" }}
+    {{- if .Values.alertmanager.service.nodePort }}
+    nodePort: {{ .Values.alertmanager.service.nodePort }}
+    {{- end -}}
+    {{- end }}
+  selector:
+    app: {{ template "name" . }}
+    component: alertmanager
+    release: {{ .Release.Name }}
+  type: "{{ .Values.alertmanager.service.type }}"
+{{- if eq .Values.alertmanager.service.type "LoadBalancer" }}
+  {{- if .Values.alertmanager.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.alertmanager.service.loadBalancerIP }}
+  {{- end -}}
+  {{- if .Values.alertmanager.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+  {{- range .Values.alertmanager.service.loadBalancerSourceRanges }}
+  - {{ . }}
+  {{- end }}
+  {{- end -}}
+{{- end -}}
+{{- end -}}

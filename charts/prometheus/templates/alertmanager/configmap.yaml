@@ -1,12 +1,14 @@
+{{- if .Values.alertmanager.enabled -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   labels:
     app: {{ template "name" . }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    component: "{{ .Values.server.name }}"
+    component: alertmanager
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
-  name: {{ template "server.fullname" . }}
+  name: {{ template "alertmanager.fullname" . }}
 data:
-{{ toYaml .Values.serverFiles | indent 2 }}
+{{ toYaml .Values.alertmanagerFiles | indent 2 }}
+{{- end }}

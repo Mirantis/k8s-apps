@@ -1,0 +1,42 @@
+{{- if .Values.kubeStateMetrics.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+{{- if .Values.kubeStateMetrics.service.annotations }}
+  annotations:
+{{ toYaml .Values.kubeStateMetrics.service.annotations | indent 4}}
+{{- end }}
+  labels:
+    app: {{ template "name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: kube-state-metrics
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+  name: {{ template "kubeStateMetrics.fullname" . }}
+spec:
+  ports:
+  - port: {{ .Values.kubeStateMetrics.port }}
+    targetPort: 8080
+    name: http
+    {{- if eq .Values.kubeStateMetrics.service.type "NodePort" }}
+    {{- if .Values.kubeStateMetrics.service.nodePort }}
+    nodePort: {{ .Values.kubeStateMetrics.service.nodePort }}
+    {{- end -}}
+    {{- end }}
+  selector:
+    app: {{ template "name" . }}
+    component: kube-state-metrics
+    release: {{ .Release.Name }}
+  type: "{{ .Values.kubeStateMetrics.service.type }}"
+{{- if eq .Values.kubeStateMetrics.service.type "LoadBalancer" }}
+  {{- if .Values.kubeStateMetrics.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.kubeStateMetrics.service.loadBalancerIP }}
+  {{- end -}}
+  {{- if .Values.kubeStateMetrics.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+  {{- range .Values.kubeStateMetrics.service.loadBalancerSourceRanges }}
+  - {{ . }}
+  {{- end }}
+  {{- end -}}
+{{- end -}}
+{{- end -}}
