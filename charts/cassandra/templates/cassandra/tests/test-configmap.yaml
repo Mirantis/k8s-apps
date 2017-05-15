@@ -1,0 +1,36 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: test-cm-{{ template "fullname" . }}
+  labels:
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    app: {{ template "fullname" . }}
+data:
+  test.sh: |-
+    HOST=$1
+    INPUT=/tmp/test_dir/test_cas.csv
+    touch $INPUT
+    cqlsh $HOST -e "
+    CREATE KEYSPACE test
+    WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 3 };"
+
+    cqlsh $HOST -e "
+    CREATE TABLE test.test_table (
+        name text,
+        age int,
+        role text,
+        PRIMARY KEY (name));
+    "
+    cqlsh $HOST -e "
+    INSERT INTO test.test_table (name, age, role) VALUES ('john', 37, 'dev');"
+    cqlsh $HOST -e "COPY test.test_table (name, age, role) TO '$INPUT';"
+
+    IFS=,
+    [ ! -f $INPUT ] && { echo "$INPUT file not found"; exit 1; }
+    read name age role < $INPUT
+    [[ $name=='john' ]] && \
+    [[ $age=='37' ]] && \
+    [[ $role=='dev' ]] && \
+    cqlsh $HOST -e "DROP keyspace test;"; exit 0 || exit 1
