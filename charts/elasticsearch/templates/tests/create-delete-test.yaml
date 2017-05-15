@@ -1,0 +1,26 @@
+{{ $host := include "fullname" . }}
+{{ $url := printf "%s:%.0f" $host .Values.port }}
+{{ $idx := printf "test-elasticsearch-%s" .Release.Name }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ printf "elasticsearch-cd-test-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+  annotations:
+    helm.sh/hook: test-success
+spec:
+  containers:
+  - name: elasticsearch-cd-test
+    image: "127.0.0.1:31500/test-base:1.0.0"
+    imagePullPolicy: IfNotPresent
+    command:
+      - "sh"
+      - "-c"
+      - |
+        set -x
+        curl -f {{ $url }}/_cluster/health | [ `jq -r .number_of_nodes` == {{ add .Values.data.replicas .Values.master.replicas .Values.client.replicas }} ]
+        curl -f -X PUT '{{ $url }}/{{ $idx }}?pretty'
+        curl -f '{{ $url }}/{{ $idx }}?pretty'
+        curl -f -X PUT '{{ $url }}/{{ $idx }}/external/1?pretty' --data '{"key": "value"}' | [ `jq -r .created` == true ]
+        curl -f '{{ $url }}/{{ $idx }}/external/1' | [ `jq -r .found` == true ]
+        curl -f -X DELETE '{{ $url }}/{{ $idx }}'
+  restartPolicy: Never
