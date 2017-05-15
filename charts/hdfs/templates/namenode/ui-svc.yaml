@@ -7,6 +7,10 @@ metadata:
     release: "{{ .Release.Name }}"
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     app: {{ template "hdfs-ui-fullname" . }}
+{{- if .Values.namenode.ui.service.annotations }}
+  annotations:
+{{ toYaml .Values.namenode.ui.service.annotations | indent 4}}
+{{- end }}
 spec:
   ports:
   - port: {{ .Values.namenode.ui.port }}

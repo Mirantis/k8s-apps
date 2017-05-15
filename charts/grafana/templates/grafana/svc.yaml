@@ -7,6 +7,10 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     app: {{ template "fullname" . }}
   name: {{ template "fullname" . }}
+{{- if .Values.service.annotations }}
+  annotations:
+{{ toYaml .Values.service.annotations | indent 4}}
+{{- end }}
 spec:
   ports:
     - name: http

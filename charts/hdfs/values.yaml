@@ -31,7 +31,7 @@ namenode:
     pullPolicy: Always
 
   persistence:
-    type: PersistentVolumeClaim # or hostPath or PersistentVolumeClaim
+    type: emptyDir # or hostPath or PersistentVolumeClaim
 
     #storageClass: ""
     volumeSize: 10Gi
