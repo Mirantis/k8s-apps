@@ -1,13 +1,11 @@
-component: "kibana"
 port: 5601
 HTTPPort: 80
-protocol: TCP
 
 replicas: 1
 
 # The Elasticsearch instance to use for all your queries.
 elasticsearch:
-  service: elasticsearch-elasticsearch # elasticsearch cluster svc name
+  host: "" # elasticsearch cluster svc name, e.g. elasticsearch-elasticsearch
   port: 9200
   preserveHost: true
   # Time in milliseconds to wait for responses from the back end or Elasticsearch.
@@ -18,8 +16,8 @@ elasticsearch:
   startupTimeout: 5000
 
 image:
-  repository: "127.0.0.1:31500/kibana"
-  tag: "latest"
+  repository: "mirantisworkloads/kibana"
+  tag: "5.2.2"
   pullPolicy: "Always"
 
 # Configure resource requests and limits.
@@ -27,14 +25,23 @@ resources:
   requests:
     memory: "256Mi"
     cpu: "250m"
+  #limits:
+    #cpu: "256Mi"
+    #memory: "250m"
 
 service:
   type: "ClusterIP"
-  #nodePort: ""
-  #loadBalancerIP: ""
+  nodePort: ""
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  annotations: {}
 
 ingress:
   enabled: false
-  # annotations:
-    # kubernetes.io/ingress.class: nginx
-  # hosts: []
+  hosts: []
+    #   - some.domain
+  tls:
+    enabled: false
+    secretName: ""
+  annotations: {}
+    #   kubernetes.io/ingress.class: nginx

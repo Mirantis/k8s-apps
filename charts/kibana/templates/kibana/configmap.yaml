@@ -11,8 +11,8 @@ data:
   kibana-conf: |
     server.port: {{ .Values.port }}
     server.host: 0.0.0.0
-    server.name: {{ .Values.component | quote }}
-    elasticsearch.url: "http://{{ .Values.elasticsearch.service }}:{{ .Values.elasticsearch.port }}"
+    server.name: "kibana"
+    elasticsearch.url: "http://{{ .Values.elasticsearch.host }}:{{ .Values.elasticsearch.port }}"
     elasticsearch.preserveHost: {{ .Values.elasticsearch.preserveHost }}
     elasticsearch.requestTimeout:  {{ .Values.elasticsearch.requestTimeout }}
     elasticsearch.shardTimeout: {{ .Values.elasticsearch.shardTimeout }}

@@ -9,16 +9,25 @@ metadata:
     app: {{ template "fullname" . }}
 spec:
   type: {{ .Values.service.type | quote }}
-  {{- if .Values.service.loadBalancerIP }}
-  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
-  {{- end }}
   selector:
     app: {{ template "fullname" . }}
   ports:
     - name: http
       port: {{ default 80 .Values.HTTPPort }}
       targetPort: {{ .Values.port }}
-      protocol: {{ default "TCP" .Values.protocol }}
+      {{- if eq .Values.service.type "NodePort" }}
       {{- if .Values.service.nodePort }}
       nodePort: {{ .Values.service.nodePort }}
+      {{- end -}}
       {{- end }}
+  {{- if eq .Values.service.type "LoadBalancer" }}
+  {{- if .Values.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
+  {{- end }}
+  {{- if .Values.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+  {{- range .Values.data.service.loadBalancerSourceRanges }}
+  - {{ . }}
+  {{- end }}
+  {{- end -}}
+  {{- end -}}
