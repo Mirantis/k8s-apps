@@ -1,18 +1,16 @@
-component: logstash
 port: 5043
-protocol: TCP
 
 replicas: 1
 
 # elasticsearch connection values, needed to output to ES storage
 elasticsearch:
- service: elasticsearch-elasticsearch # elasticsearch cluster svc name
+ host: "" # elasticsearch cluster svc name
  port: 9200
 
 # image values
 image:
- repository: "127.0.0.1:31500/logstash"
- tag: "latest"
+ repository: "mirantisworkloads/logstash"
+ tag: "5.2.2"
  pullPolicy: "Always"
 
 # jvm options
@@ -23,6 +21,6 @@ resources:
  requests:
    memory: "2Gi"
    cpu: "250m"
- limits:
-   memory: "4Gi"
-   cpu: "1024m"
+ #limits:
+ #  memory: "4Gi"
+ #  cpu: "1024m"

@@ -1,0 +1,45 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "fullname" . }}
+spec:
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      name: {{ template "fullname" . }}
+      labels:
+        heritage: {{ .Release.Service | quote }}
+        release: {{ .Release.Name | quote }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "fullname" . }}
+    spec:
+      containers:
+      - name: logstash
+        env:
+        - name: LS_JAVA_OPTS
+          value: "-Xms{{ .Values.heapSize }} -Xmx{{ .Values.heapSize }} -Djava.net.preferIPv4Stack=true"
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        command:
+        - "logstash"
+        - "-f"
+        - "/etc/logstash/logstash.conf"
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        ports:
+        - containerPort: {{ .Values.port }}
+        volumeMounts:
+        - name: config
+          mountPath: /etc/logstash
+      volumes:
+      - name: config
+        configMap:
+          name: {{ template "cm-fullname" . }}
+          items:
+            - key: logstash-conf
+              path: logstash.conf

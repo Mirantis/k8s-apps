@@ -9,11 +9,9 @@ $ helm install .
 
 | Value | Description | Default |
 | --- | --- | --- |
-| component | Service name | logstash |
 | port | Service port | 5043 |
-| protocol | Protocol to connect to service | TCP |
 | replicas | Deployment replicas | 1 |
-| elasticsearch.service | Elasticsearch service name to connect | elasticsearch-elasticsearch |
+| elasticsearch.host | Elasticsearch service name to connect | elasticsearch-elasticsearch |
 | elasticsearch.port | Elasticsearch service port to connect | 9200 |
 | image.repository | Container image repository | 127.0.0.1:31500/logstash |
 | image.tag | Container image tag | latest |
