@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "kafka-broker-config-{{ .Release.Name }}"
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    component: "{{.Release.Name}}-broker"
+data:
+  broker-config.json: >
+    {
+      "log_level": "debug",
+      "kafka_config": {
+        "brokers": {{.Values.config.brokers | toJson}},
+        "topic": "{{.Values.config.topic}}",
+        "zookeeperServer": "{{.Values.config.zookeeperServer}}",
+        "partitions": {{.Values.config.partitions}},
+        "replicationFactor": {{.Values.config.replicationFactor}}
+      }
+    }
