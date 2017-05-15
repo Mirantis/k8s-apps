@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ printf "zk-test-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+  annotations:
+    helm.sh/hook: test-success
+spec:
+  containers:
+    - name: zk-test
+      image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+      imagePullPolicy: {{ .Values.image.pullPolicy }}
+      command:
+        - bash
+        - -c
+        - >
+          /opt/zookeeper/bin/zkCli.sh -server {{ template "zookeeper-address" . }} create /hello world &&
+          {{- $release := (.Release.Name | trunc 63 | trimSuffix "-") -}}
+          {{ range $i, $e := until (int $.Values.replicas) }}
+          /opt/zookeeper/bin/zkCli.sh -server {{ printf "zk-%s-%d.zk-%s:%d" $release $i $release (int $.Values.clientPort) }} get /hello &&
+          {{- end }}
+          /opt/zookeeper/bin/zkCli.sh -server {{ template "zookeeper-address" . }} delete /hello
+  restartPolicy: Never
