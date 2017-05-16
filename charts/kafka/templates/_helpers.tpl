@@ -17,3 +17,11 @@
         {{- printf "%s" .Values.zookeeper.externalAddress -}}
     {{- end -}}
 {{- end -}}
+
+{{- define "kafka-address" -}}
+{{ $replicas := int (.Values.replicas)}}
+{{- range $i, $e := until $replicas -}}
+    {{- if $i -}},{{- end -}}
+    kafka-{{ $.Release.Name | trunc 63 | trimSuffix "-" }}-{{ $i }}.kafka-{{ $.Release.Name | trunc 63 | trimSuffix "-" }}:{{ $.Values.port }}
+{{- end -}}
+{{- end -}}
