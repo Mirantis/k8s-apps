@@ -20,7 +20,7 @@ spec:
         {{- if .Values.prometheus.jmxExporter.enabled }}
         prometheus.io/scrape: "true"
         {{- end }}
-        {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
+        {{- if ne .Values.data.persistence.type "emptyDir" }}
         pod.beta.kubernetes.io/init-containers: '[
         {
             "name": "zookeeper-init",

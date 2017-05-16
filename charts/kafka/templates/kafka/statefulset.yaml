@@ -21,7 +21,7 @@ spec:
         prometheus.io/scrape: "true"
         {{- end }}
         pod.beta.kubernetes.io/init-containers: '[
-        {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
+        {{- if ne .Values.data.persistence.type "emptyDir" }}
         {
             "name": "set-perm",
             "image": "busybox",
