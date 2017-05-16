@@ -1,12 +1,12 @@
 image:
   repository: mirantisworkloads/cassandra
-  tag: latest
+  tag: 3.0.13
   pullPolicy: Always
 
 antiAffinity: "null" # or soft or hard
 
-probeInitialDelaySeconds: 90
-probePeriodSeconds: 30
+probeInitialDelaySeconds: 30
+probePeriodSeconds: 10
 
 ## Persist data to a persitent volume
 persistence:
