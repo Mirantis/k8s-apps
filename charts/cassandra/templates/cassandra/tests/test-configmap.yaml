@@ -14,7 +14,7 @@ data:
     touch $INPUT
     cqlsh $HOST -e "
     CREATE KEYSPACE test
-    WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 3 };"
+    WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : {{ .Values.config.clusterSize }} };"
 
     cqlsh $HOST -e "
     CREATE TABLE test.test_table (
