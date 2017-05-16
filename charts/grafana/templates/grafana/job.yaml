@@ -28,8 +28,6 @@ spec:
           - "-H"
           - "Content-Type: application/json;charset=UTF-8"
           - "--data-binary"
-          {{- with .Values.setDatasource.datasource }}
-          - "{\"name\":\"{{ .name }}\",\"type\":\"{{ .type }}\",\"url\":\"{{ .url }}\",\"access\":\"{{ .access }}\",\"isDefault\":{{ .isDefault }}}"
-          {{- end }}
+          - {{ template "prometheus-datasource" . }}
       restartPolicy: {{ .Values.setDatasource.restartPolicy }}
 {{- end -}}
