@@ -10,7 +10,7 @@ metadata:
 spec:
   containers:
   - name: elasticsearch-cd-test
-    image: "127.0.0.1:31500/test-base:1.0.0"
+    image: mirantisworkloads/test-base:1.0.0
     imagePullPolicy: IfNotPresent
     command:
       - "sh"

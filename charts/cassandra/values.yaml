@@ -1,5 +1,5 @@
 image:
-  repository: 127.0.0.1:31500/cassandra
+  repository: mirantisworkloads/cassandra
   tag: latest
   pullPolicy: Always
 

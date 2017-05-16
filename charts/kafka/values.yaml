@@ -44,8 +44,8 @@ zookeeper:
 logCollector:
   enabled: false
   image:
-    repository: 127.0.0.1:31500/filebeat
-    tag: latest
+    repository: mirantisworkloads/filebeat
+    tag: 5.2.2
     pullPolicy: Always
   # external logstash hosts
   logstashHost:
