@@ -32,7 +32,11 @@ Expand the name of the chart.
 
 {{- define "zk-address" -}}
     {{- if .Values.zookeeper.deployChart -}}
-        {{ template "zookeeper.address" . }}
+        {{- $release := (.Release.Name | trunc 63 | trimSuffix "-") -}}
+        {{- range $i, $e := until (int $.Values.zookeeper.replicas) -}}
+            {{- if $i }},{{- end -}}
+            {{- printf "zk-%s-%d.zk-%s:%d" $release $i $release (int $.Values.zookeeper.clientPort) -}}
+        {{- end -}}
     {{- else -}}
         {{- printf .Values.zookeeper.externalAddress -}}
     {{- end -}}
