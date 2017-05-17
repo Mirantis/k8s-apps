@@ -14,10 +14,10 @@ spec:
         - -c
         - >
           path="/test-{{ randAlphaNum 10 }}" &&
-          /opt/zookeeper/bin/zkCli.sh -server {{ template "zookeeper-address" . }} create $path test &&
+          /opt/zookeeper/bin/zkCli.sh -server {{ template "zookeeper.address" . }} create $path test &&
           {{- $release := (.Release.Name | trunc 63 | trimSuffix "-") -}}
           {{ range $i, $e := until (int $.Values.replicas) }}
           /opt/zookeeper/bin/zkCli.sh -server {{ printf "zk-%s-%d.zk-%s:%d" $release $i $release (int $.Values.clientPort) }} get $path &&
           {{- end }}
-          /opt/zookeeper/bin/zkCli.sh -server {{ template "zookeeper-address" . }} delete $path
+          /opt/zookeeper/bin/zkCli.sh -server {{ template "zookeeper.address" . }} delete $path
   restartPolicy: Never

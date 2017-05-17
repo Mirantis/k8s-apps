@@ -39,7 +39,7 @@ spec:
             - name: SPARK_NO_DAEMONIZE
               value: "1"
             - name: SPARK_DAEMON_JAVA_OPTS
-              value: "-Dspark.deploy.recoveryMode=ZOOKEEPER -Dspark.deploy.zookeeper.dir=/spark -Dspark.deploy.zookeeper.url={{ template "zookeeper-address" . }}"
+              value: "-Dspark.deploy.recoveryMode=ZOOKEEPER -Dspark.deploy.zookeeper.dir=/spark -Dspark.deploy.zookeeper.url={{ template "zk-address" . }}"
           ports:
             - name: jmx-agent
               containerPort: 7072

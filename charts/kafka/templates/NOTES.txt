@@ -1,4 +1,4 @@
 Kafka chart has been deployed.
 
 Connection string:
-{{ template "kafka-address" . }}
+{{ template "kafka.address" . }}

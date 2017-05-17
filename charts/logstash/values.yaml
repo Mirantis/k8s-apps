@@ -16,6 +16,9 @@ image:
 # jvm options
 heapSize: "1536m"
 
+service:
+  annotations: {}
+
 # container required resources
 resources:
  requests:

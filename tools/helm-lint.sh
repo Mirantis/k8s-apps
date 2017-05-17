@@ -14,6 +14,7 @@ for chart in $(find $workdir/../ -name 'Chart.yaml'); do
     chart_name=$(basename "${chart_dir}")
     echo "Inspect ${chart_name}"
     pushd "${chart_dir}"
+    helm dep up
     helm lint
     popd
 done

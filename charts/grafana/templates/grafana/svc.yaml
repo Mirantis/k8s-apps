@@ -15,9 +15,9 @@ spec:
   ports:
     - name: http
       port: {{ .Values.port }}
-      {{- if eq .Values.namenode.ui.service.type "NodePort" }}
-      {{- if .Values.namenode.ui.service.nodePort }}
-      nodePort: {{ .Values.namenode.ui.service.nodePort }}
+      {{- if eq .Values.service.type "NodePort" }}
+      {{- if .Values.service.nodePort }}
+      nodePort: {{ .Values.service.nodePort }}
       {{- end -}}
       {{- end }}
   selector:
