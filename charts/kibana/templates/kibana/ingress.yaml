@@ -1,5 +1,5 @@
 {{- if .Values.ingress.enabled -}}
-{{ $serviceName := include "fullname" . }}
+{{ $serviceName := include "kib-fullname" . }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -11,8 +11,8 @@ metadata:
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: {{ template "fullname" . }}
-  name: {{ template "ingress-fullname" . }}
+    app: {{ template "kib-fullname" . }}
+  name: {{ template "kib-ingress-fullname" . }}
 spec:
   {{- if .Values.ingress.tls.enabled }}
   tls:

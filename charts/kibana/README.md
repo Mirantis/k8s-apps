@@ -25,12 +25,14 @@ helm install .
 | port | Service port | 5043 |
 | HTTPPort | HTTP port for service | 80 |
 | replicas | Deployment replicas | 1 |
-| elasticsearch.host | Elasticsearch service name to connect | elasticsearch-elasticsearch |
+| elasticsearch.external | If true, kibana uses `host` and `port` values to establish connection with elasticsearch.
+                           If false, kibana decides that elasticsearch deployed in same release and uses internal data to connect to elasticsearch. | true |
+| elasticsearch.host | Elasticsearch service name to connect | "" |
 | elasticsearch.port | Elasticsearch service port to connect | 9200 |
-| elasticsearch.preserveHost | If "true" will send the hostname specified in elasticsearch. If "false", then the host is used to connect to *this* Kibana instance will be sent | true |
-| elasticsearch.requestTimeout | Time in milliseconds to wait for responses from the back end or Elasticsearch | 30000 |
-| elasticsearch.shardTimeout | Time in milliseconds for Elasticsearch to wait for responses from shards. Set to 0 to disable | 0 |
-| elasticsearch.startupTimeout | Time in milliseconds to wait for Elasticsearch at Kibana startup before retrying | 5000 |
+| elasticsearchConfig.preserveHost | If "true" will send the hostname specified in elasticsearch. If "false", then the host is used to connect to *this* Kibana instance will be sent | true |
+| elasticsearchConfig.requestTimeout | Time in milliseconds to wait for responses from the back end or Elasticsearch | 30000 |
+| elasticsearchConfig.shardTimeout | Time in milliseconds for Elasticsearch to wait for responses from shards. Set to 0 to disable | 0 |
+| elasticsearchConfig.startupTimeout | Time in milliseconds to wait for Elasticsearch at Kibana startup before retrying | 5000 |
 | image.repository | Container image repository | mirantisworkloads/kibana |
 | image.tag | Container image tag | 5.2.2 |
 | image.pullPolicy | Container pull policy | Always |

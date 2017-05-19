@@ -12,5 +12,5 @@ spec:
       command:
         - curl
         - "-f"
-        - {{ template "fullname" . }}/app/kibana
+        - {{ template "kib-fullname" . }}/app/kibana
   restartPolicy: Never
