@@ -1,0 +1,10 @@
+dependencies:
+- name: elasticsearch
+  version: ^1.x
+  repository: "file://../elasticsearch"
+- name: logstash
+  version: ^1.x
+  repository: "file://../logstash"
+- name: kibana
+  version: ^1.x
+  repository: "file://../kibana"
