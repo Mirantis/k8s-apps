@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "cm-fullname" . }}
+  name: {{ template "ls-cm-fullname" . }}
   labels:
     heritage: {{.Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: {{ template "fullname" . }}
+    app: {{ template "ls-fullname" . }}
 data:
   logstash-conf: |
     input {
@@ -118,7 +118,7 @@ data:
 
     output {
         elasticsearch {
-            hosts => ["{{ .Values.elasticsearch.host }}:{{ .Values.elasticsearch.port }}"]
+            hosts => ["{{ template "ls-es-url" . }}"]
             index => "%{received_from}-%{+MM.dd.YYYY}"
         }
         stdout { codec => json }
