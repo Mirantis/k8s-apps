@@ -12,7 +12,7 @@ metadata:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: {{ template "fullname" . }}
+    app: {{ template "es-fullname" . }}
 spec:
   {{- if .Values.data.ingress.tls.enabled }}
   tls:

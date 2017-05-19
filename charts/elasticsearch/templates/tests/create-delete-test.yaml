@@ -1,4 +1,4 @@
-{{ $host := include "fullname" . }}
+{{ $host := include "es-fullname" . }}
 {{ $url := printf "%s:%.0f" $host .Values.port }}
 {{ $idx := printf "test-elasticsearch-%s" .Release.Name }}
 apiVersion: v1

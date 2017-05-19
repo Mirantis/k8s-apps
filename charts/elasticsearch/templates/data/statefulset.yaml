@@ -1,15 +1,15 @@
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
-  name: {{ template "data-fullname" . }}
+  name: {{ template "es-data-fullname" . }}
   labels:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: {{ template "fullname" . }}
+    app: {{ template "es-fullname" . }}
     type: data
 spec:
-  serviceName: {{ template "data-fullname" . }}
+  serviceName: {{ template "es-data-fullname" . }}
   replicas: {{ .Values.data.replicas }}
   template:
     metadata:
@@ -17,7 +17,7 @@ spec:
         heritage: {{ .Release.Service | quote }}
         release: {{ .Release.Name | quote }}
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-        app: {{ template "fullname" . }}
+        app: {{ template "es-fullname" . }}
         type: data
       {{- if ne .Values.data.persistence.type "emptyDir" }}
       annotations:
@@ -41,7 +41,7 @@ spec:
       - name: elasticsearch
         env:
         - name: SERVICE
-          value: {{ template "fullname" . }}
+          value: {{ template "es-fullname" . }}
         - name: KUBERNETES_NAMESPACE
           valueFrom:
             fieldRef:

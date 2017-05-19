@@ -1,12 +1,12 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "master-fullname" . }}
+  name: {{ template "es-master-fullname" . }}
   labels:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: {{ template "fullname" . }}
+    app: {{ template "es-fullname" . }}
     type: master
 spec:
   replicas: {{ .Values.master.replicas }}
@@ -16,14 +16,14 @@ spec:
         heritage: {{ .Release.Service | quote }}
         release: {{ .Release.Name | quote }}
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-        app: {{ template "fullname" . }}
+        app: {{ template "es-fullname" . }}
         type: master
     spec:
       containers:
       - name: elasticsearch
         env:
         - name: SERVICE
-          value: {{ template "fullname" . }}
+          value: {{ template "es-fullname" . }}
         - name: KUBERNETES_NAMESPACE
           valueFrom:
             fieldRef:

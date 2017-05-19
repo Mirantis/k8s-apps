@@ -1,16 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ template "es-fullname" . }}
   labels:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: {{ template "fullname" . }}
+    app: {{ template "es-fullname" . }}
 spec:
   clusterIP: None
   ports:
     - port: {{ .Values.transportPort }}
       targetPort: {{ .Values.transportPort }}
   selector:
-    app: {{ template "fullname" . }}
+    app: {{ template "es-fullname" . }}
