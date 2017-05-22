@@ -181,6 +181,22 @@ func doMain() int {
 	matches, err := filepath.Glob(*repoPathPtr + "/*")
 	log.Printf("Matches: %+v", matches)
 
+	var cases []string
+	if flag.NArg() != 0 {
+		testCases := flag.Args()
+		for _, match := range matches {
+			for _, testCase := range testCases {
+				if filepath.Base(match) == testCase {
+					cases = append(cases, match)
+				}
+			}
+		}
+		log.Printf("Using the following charts: %v", cases)
+	} else {
+		cases = matches
+		log.Printf("Test cases is not specified, using all charts")
+	}
+
 	defer writeXML(*junitPathPtr, time.Now())
 	if !terminate.Stop() {
 		<-terminate.C // Drain the value if necessary.
@@ -207,7 +223,7 @@ func doMain() int {
 		return initErr
 	})
 
-	for _, dir := range matches {
+	for _, dir := range cases {
 		ns := randStringRunes(10)
 		rel := randStringRunes(3)
 
