@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "fullname" . }}
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: IOTGEN_KAFKA_ADDR
+          value: "{{ template "kafka-address" . }}"
+        - name: IOTGEN_KAFKA_TOPIC
+          value: "{{ .Values.kafka.topic }}"
+        - name: IOTGEN_EVENTS_COUNT
+          value: "{{ .Values.eventsCount }}"
+        - name: IOTGEN_THREADS_COUNT
+          value: "{{ .Values.threadsCount }}"
+        - name: IOTGEN_RATE
+          value: "{{ .Values.rate }}"
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+        volumeMounts:
+        - name: template
+          mountPath: /templates
+      volumes:
+      - name: template
+        configMap:
+          name: {{ template "fullname" . }}
