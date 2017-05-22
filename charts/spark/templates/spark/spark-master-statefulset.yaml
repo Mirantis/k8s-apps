@@ -30,16 +30,13 @@ spec:
           resources:
 {{ toYaml .Values.spark.master.resources | indent 12 }}
           env:
-            {{- if .Values.prometheus.jmxExporter.enabled }}
-            - name: SPARK_DAEMON_JAVA_OPTS
-              value: "-javaagent:/usr/local/spark/jmx_prometheus_javaagent-0.9.jar=7072:/usr/local/spark/conf/spark-jmx.yml"
-            {{- end }}
             - name: SPARK_DAEMON_MEMORY
               value: {{ .Values.spark.master.daemonMemory | quote }}
             - name: SPARK_NO_DAEMONIZE
               value: "1"
             - name: SPARK_DAEMON_JAVA_OPTS
-              value: "-Dspark.deploy.recoveryMode=ZOOKEEPER -Dspark.deploy.zookeeper.dir=/spark -Dspark.deploy.zookeeper.url={{ template "zk-address" . }}"
+              value: "-Dspark.deploy.recoveryMode=ZOOKEEPER -Dspark.deploy.zookeeper.dir=/spark -Dspark.deploy.zookeeper.url={{ template "zk-address" . -}}
+                     {{- if .Values.prometheus.jmxExporter.enabled }} -javaagent:/usr/local/spark/jmx_prometheus_javaagent-0.9.jar=7072:/usr/local/spark/conf/spark-jmx.yml {{- end }}"
           ports:
             - name: jmx-agent
               containerPort: 7072
