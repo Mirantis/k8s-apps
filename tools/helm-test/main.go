@@ -69,13 +69,13 @@ func writeXML(dump string, start time.Time) {
 }
 
 // return f(), adding junit xml testcase result for name
-func xmlWrap(name string, f func() error) error {
+func xmlWrap(chartName string, name string, f func() error) error {
 	start := time.Now()
 	err := f()
 	duration := time.Since(start)
 	c := testCase{
 		Name:      name,
-		ClassName: "e2e.go",
+		ClassName: fmt.Sprintf("e2e.go.%s", chartName),
 		Time:      duration.Seconds(),
 	}
 	if err != nil {
@@ -214,7 +214,7 @@ func doMain() int {
 	// Ensure helm is completely initialized before starting tests.
 	// TODO: replace with helm init --wait after
 	// https://github.com/kubernetes/helm/issues/2114
-	xmlWrap(fmt.Sprintf("Wait for helm initialization to complete"), func() error {
+	xmlWrap("helm", "init", func() error {
 		initErr := fmt.Errorf("Not Initialized")
 		for initErr != nil {
 			_, initErr = output(exec.Command(HELM_CMD, "version"))
@@ -226,13 +226,14 @@ func doMain() int {
 	for _, dir := range cases {
 		ns := randStringRunes(10)
 		rel := randStringRunes(3)
+		chartName := path.Base(dir)
 
-		xmlWrap(fmt.Sprintf("Helm Lint %s", path.Base(dir)), func() error {
+		xmlWrap(chartName, "lint", func() error {
 			_, execErr := output(exec.Command(HELM_CMD, "lint", dir))
 			return execErr
 		})
 
-		xmlWrap(fmt.Sprintf("Helm Install %s", path.Base(dir)), func() error {
+		xmlWrap(chartName, "install", func() error {
 			o, execErr := output(exec.Command(HELM_CMD, "install", dir, "--namespace", ns, "--name", rel, "--wait"))
 			if execErr != nil {
 				return fmt.Errorf("%s Command output: %s", execErr, string(o[:]))
@@ -240,7 +241,7 @@ func doMain() int {
 			return nil
 		})
 
-		xmlWrap(fmt.Sprintf("Helm Test %s", path.Base(dir)), func() error {
+		xmlWrap(chartName, "test", func() error {
 			o, execErr := output(exec.Command(HELM_CMD, "test", rel))
 			if execErr != nil {
 				return fmt.Errorf("%s Command output: %s", execErr, string(o[:]))
@@ -248,7 +249,7 @@ func doMain() int {
 			return nil
 		})
 
-		xmlWrap(fmt.Sprintf("Delete & purge %s", path.Base(dir)), func() error {
+		xmlWrap(chartName, "delete", func() error {
 			o, execErr := output(exec.Command(HELM_CMD, "delete", rel, "--purge"))
 			if execErr != nil {
 				return fmt.Errorf("%s Command output: %s", execErr, string(o[:]))
@@ -256,7 +257,7 @@ func doMain() int {
 			return nil
 		})
 
-		xmlWrap(fmt.Sprintf("Deleting namespace for %s", path.Base(dir)), func() error {
+		xmlWrap(chartName, "delete_namespace", func() error {
 			o, execErr := output(exec.Command(KUBECTL_CMD, "delete", "ns", ns))
 			if execErr != nil {
 				return fmt.Errorf("%s Command output: %s", execErr, string(o[:]))
