@@ -4,7 +4,11 @@
 
 {{- define "kafka-address" -}}
     {{- if .Values.kafka.deployChart -}}
-        {{ template "kafka.address" . }}
+        {{- $release := (.Release.Name | trunc 63 | trimSuffix "-") -}}
+        {{- range $i, $e := until (int $.Values.kafka.replicas) -}}
+            {{- if $i }},{{- end -}}
+            {{- printf "kafka-%s-%d.kafka-%s:%d" $release $i $release (int $.Values.kafka.port) -}}
+        {{- end -}}
     {{- else -}}
         {{- printf "%s" .Values.kafka.externalAddress -}}
     {{- end -}}
