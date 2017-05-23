@@ -10,3 +10,13 @@ kibana:
   elasticsearch:
     external: false
     port: 9200
+
+testImage:
+  repository: mirantisworkloads/test-base
+  tag: 1.0.0
+  pullPolicy: IfNotPresent
+
+filebeatImage:
+  repository: mirantisworkloads/filebeat
+  tag: 5.2.2
+  pullPolicy: Always
