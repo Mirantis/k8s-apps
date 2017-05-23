@@ -8,4 +8,4 @@ metadata:
     app: {{ template "fullname" . }}
   name: {{ template "fullname" . }}-dashboards
 data:
-{{ toYaml .Values.serverDashboardFiles | indent 2 }}
+{{ (.Files.Glob "dashboards/*").AsConfig | indent 2 }}

@@ -22,7 +22,7 @@ spec:
       {{- end }}
     spec:
       containers:
-        - name: {{ template "master-fullname" . }}
+        - name: spark-master
           image: {{ .Values.spark.image.repository }}:{{ .Values.spark.image.tag }}
           imagePullPolicy: {{ .Values.spark.image.pullPolicy }}
           command:

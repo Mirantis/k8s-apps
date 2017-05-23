@@ -1,6 +1,6 @@
 image:
   repository: grafana/grafana
-  tag: latest
+  tag: master
   pullPolicy: Always
 
 probeInitialDelaySeconds: 15
@@ -47,7 +47,7 @@ adminUser: "admin"
 adminPassword: "admin"
 
 prometheus:
-  deployChart: false
+  deployChart: true
   externalAddress: "http://"
 
 # Set datasource in beginning
@@ -224,12 +224,3 @@ serverConfigFile:
     [grafana_net]
     url = https://grafana.net
 
-
-## Grafana dashboard files ConfigMap entries
-## If you'd like to preinstall prometheus dashboard on the same namespace as example, get it from:
-##
-## https://grafana.net/dashboards/2
-##
-## and add it below.
-##
-serverDashboardFiles: {}
