@@ -47,13 +47,12 @@ type TestSuite struct {
 	Cases    []testCase
 }
 
-func writeXML(dump string, start time.Time) {
+func writeXML(path string, start time.Time) {
 	suite.Time = time.Since(start).Seconds()
 	out, err := xml.MarshalIndent(&suite, "", "    ")
 	if err != nil {
 		log.Fatalf("Could not marshal XML: %s", err)
 	}
-	path := filepath.Join(dump, "report.xml")
 	f, err := os.Create(path)
 	if err != nil {
 		log.Fatalf("Could not create file: %s", err)
@@ -168,15 +167,12 @@ func main() {
 }
 
 func doMain() int {
-	repoPathPtr := flag.String("repo", "", "Path to chart repository")
-	junitPathPtr := flag.String("junit", "", "Path to output junit-xml report")
+	repoPathPtr := flag.String("repo", "charts/", "Path to charts repository")
+	junitPathPtr := flag.String("junit", "report.xml", "Path to output junit-xml report")
+	configPathPtr := flag.String("config", "tests/", "Path to charts config files")
+	paramsPtr := flag.String("params", "", "Set config values on the command line (can specify multiple or separate values with commas: key1=val1,key2=val2)")
 
 	flag.Parse()
-
-	if *repoPathPtr == "" {
-		log.Fatalf("Chart repo is not specified")
-		return INITIALIZATION_ERROR_CODE
-	}
 
 	matches, err := filepath.Glob(*repoPathPtr + "/*")
 	log.Printf("Matches: %+v", matches)
@@ -194,7 +190,7 @@ func doMain() int {
 		log.Printf("Using the following charts: %v", cases)
 	} else {
 		cases = matches
-		log.Printf("Test cases is not specified, using all charts")
+		log.Print("Test cases is not specified, using all charts")
 	}
 
 	defer writeXML(*junitPathPtr, time.Now())
@@ -207,7 +203,7 @@ func doMain() int {
 	}
 
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 		return INITIALIZATION_ERROR_CODE
 	}
 
@@ -224,8 +220,6 @@ func doMain() int {
 	})
 
 	for _, dir := range cases {
-		ns := randStringRunes(10)
-		rel := randStringRunes(3)
 		chartName := path.Base(dir)
 
 		xmlWrap(chartName, "lint", func() error {
@@ -233,37 +227,64 @@ func doMain() int {
 			return execErr
 		})
 
-		xmlWrap(chartName, "install", func() error {
-			o, execErr := output(exec.Command(HELM_CMD, "install", dir, "--namespace", ns, "--name", rel, "--wait"))
-			if execErr != nil {
-				return fmt.Errorf("%s Command output: %s", execErr, string(o[:]))
-			}
-			return nil
-		})
+		configMatches, err := filepath.Glob(path.Join(*configPathPtr, chartName, "*"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("Matches configs for %s chart %+v", chartName, configMatches)
+		configMatches = append(configMatches, "")
 
-		xmlWrap(chartName, "test", func() error {
-			o, execErr := output(exec.Command(HELM_CMD, "test", rel))
-			if execErr != nil {
-				return fmt.Errorf("%s Command output: %s", execErr, string(o[:]))
-			}
-			return nil
-		})
+		for _, testConfig := range configMatches {
+			ns := randStringRunes(10)
+			rel := randStringRunes(3)
 
-		xmlWrap(chartName, "delete", func() error {
-			o, execErr := output(exec.Command(HELM_CMD, "delete", rel, "--purge"))
-			if execErr != nil {
-				return fmt.Errorf("%s Command output: %s", execErr, string(o[:]))
+			testName := func(stage string) string {
+				if testConfig == "" {
+					return stage
+				} else {
+					return fmt.Sprintf("%s_%s", filepath.Base(testConfig), stage)
+				}
 			}
-			return nil
-		})
 
-		xmlWrap(chartName, "delete_namespace", func() error {
-			o, execErr := output(exec.Command(KUBECTL_CMD, "delete", "ns", ns))
-			if execErr != nil {
-				return fmt.Errorf("%s Command output: %s", execErr, string(o[:]))
+			installArgs := []string{"install", dir, "--namespace", ns, "--name", rel, "--wait"}
+			if testConfig != "" {
+				installArgs = append(installArgs, "--values", testConfig)
 			}
-			return nil
-		})
+			if *paramsPtr != "" {
+				installArgs = append(installArgs, "--set", *paramsPtr)
+			}
+			xmlWrap(chartName, testName("install"), func() error {
+				o, execErr := output(exec.Command(HELM_CMD, installArgs...))
+				if execErr != nil {
+					return fmt.Errorf("%s Command output: %s", execErr, string(o[:]))
+				}
+				return nil
+			})
+
+			xmlWrap(chartName, testName("test"), func() error {
+				o, execErr := output(exec.Command(HELM_CMD, "test", rel))
+				if execErr != nil {
+					return fmt.Errorf("%s Command output: %s", execErr, string(o[:]))
+				}
+				return nil
+			})
+
+			xmlWrap(chartName, testName("delete"), func() error {
+				o, execErr := output(exec.Command(HELM_CMD, "delete", rel, "--purge"))
+				if execErr != nil {
+					return fmt.Errorf("%s Command output: %s", execErr, string(o[:]))
+				}
+				return nil
+			})
+
+			xmlWrap(chartName, testName("delete_namespace"), func() error {
+				o, execErr := output(exec.Command(KUBECTL_CMD, "delete", "ns", ns))
+				if execErr != nil {
+					return fmt.Errorf("%s Command output: %s", execErr, string(o[:]))
+				}
+				return nil
+			})
+		}
 	}
 
 	if suite.Failures > 0 {
