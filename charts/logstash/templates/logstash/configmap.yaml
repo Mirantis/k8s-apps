@@ -12,12 +12,6 @@ data:
     input {
         beats {
           port => 5043
-          codec =>
-            multiline {
-              pattern => "%{TIMESTAMP_ISO8601:message_time}"
-              negate => true
-              what => "previous"
-            }
         }
     }
     filter {
@@ -26,7 +20,7 @@ data:
                 match => {
                     "message" => [
                         "\[%{TIMESTAMP_ISO8601:message_time}\] %{LOGLEVEL:log_level} \[%{GREEDYDATA:source}\]\: %{GREEDYDATA:message} \(%{GREEDYDATA:class}\)",
-                        "\[%{GREEDYDATA:server_telemetry}\]"
+                        "%{GREEDYDATA:message}"
                     ]
                 }
                 overwrite => [ "source", "message" ]

@@ -15,6 +15,10 @@ data:
         - "/var/log/cassandra/*.log"
         fields:
           log_host: "cassandra"
+        multiline:
+          pattern: '^[[:space:]]+|^Caused by:'
+          negate: false
+          match: after
     output.logstash:
       hosts:
       {{- range .Values.logCollector.logstashHost }}
