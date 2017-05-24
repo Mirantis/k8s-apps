@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+org="mirantisworkloads"
+
+if [ $# -eq 1 ]; then
+    org="$1"
+fi
+
 set -eux
 
 if [ ! -f "${GCLOUD_KEYPATH:-}" ]; then
@@ -8,6 +14,6 @@ if [ ! -f "${GCLOUD_KEYPATH:-}" ]; then
 fi
 
 gcloud auth activate-service-account --key-file "${GCLOUD_KEYPATH}"
-repo_dir="$(dirname "$(dirname "$(readlink -f $0)")")"
+repo_dir="$(dirname "$(dirname "$(realpath $0)")")"
 pushd "${repo_dir}/dist/charts"
-gsutil -m rsync ./ gs://mirantisworkloads/
+gsutil -m rsync ./ gs://${org}/

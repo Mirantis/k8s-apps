@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 
+org="mirantisworkloads"
+
+if [ $# -eq 1 ]; then
+    org="$1"
+fi
+
 set -eux
 
-REPO_URL="https://mirantisworkloads.storage.googleapis.com/"
-repo_dir="$(dirname "$(dirname "$(readlink -f $0)")")"
+REPO_URL="https://${org}.storage.googleapis.com/"
+repo_dir="$(dirname "$(dirname "$(realpath $0)")")"
 
 # build dependencies
 for d in ${repo_dir}/charts/*/; do
