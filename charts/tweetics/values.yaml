@@ -1,0 +1,56 @@
+# Default values for tweetics.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+image:
+  repository: 127.0.0.1:31500/tweetics
+  tag: latest
+  pullPolicy: Always
+
+# Filter out hashtags with less then specified count
+minHashtagCounts: 0
+
+zookeeper:
+  # if disabled, subchart will not be deployed
+  deployChart: false
+  # this address will be used if subchart deployment is disabled
+  # Required
+  externalAddress: "zk-zk-0.zk-zk:2181,zk-zk-1.zk-zk:2181,zk-zk-2.zk-zk:2181"
+
+kafka:
+  # if disabled, subchart will not be deployed
+  deployChart: true
+  # this address will be used if subchart deployment is disabled
+  externalAddress: ""
+  # Kafka topic name
+  topic: twitter-stream
+  zookeeper:
+    deployChart: false
+    # Required
+    externalAddress: "zk-zk-0.zk-zk:2181,zk-zk-1.zk-zk:2181,zk-zk-2.zk-zk:2181"
+
+spark:
+  # if disabled, subchart will not be deployed
+  deployChart: true
+  # this address will be used if subchart deployment is disabled
+  externalAddress: ""
+  # Spark streaming batch duration
+  batchDuration: 5
+  zookeeper:
+    deployChart: false
+    # Required
+    externalAddress: "zk-zk-0.zk-zk:2181,zk-zk-1.zk-zk:2181,zk-zk-2.zk-zk:2181"
+
+hdfs:
+  # if disabled, subchart will not be deployed
+  deployChart: true
+  # this address will be used if subchart deployment is disabled
+  externalAddress: ""
+  path: /demo
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 512Mi
+  #limits:
+  #  cpu: 100m
+  #  memory: 512Mi

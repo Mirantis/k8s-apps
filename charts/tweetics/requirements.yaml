@@ -1,0 +1,17 @@
+dependencies:
+- name: zookeeper
+  version: ^1.x
+  repository: "file://../zookeeper"
+  condition: zookeeper.deployChart
+- name: kafka
+  version: ^1.x
+  repository: "file://../kafka"
+  condition: kafka.deployChart
+- name: spark
+  version: ^1.x
+  repository: "file://../spark"
+  condition: spark.deployChart
+- name: hdfs
+  version: ^1.x
+  repository: "file://../hdfs"
+  condition: hdfs.deployChart

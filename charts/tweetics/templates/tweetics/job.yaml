@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "tweetics.fullname" . }}
+  labels:
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "tweetics.fullname" . }}
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ template "tweetics.fullname" . }}
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+          - "bash"
+          - "-c"
+          - "spark-submit --master spark://{{ template "tweetics.spark-address" . }} --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.1.0 spark_hashtags_count.py spark://{{ template "tweetics.spark-address" . }} {{ template "tweetics.zk-address" . }} {{ .Values.kafka.topic }} {{ .Values.minHashtagCounts }} {{ .Values.spark.batchDuration }} {{ template "tweetics.hdfs-address" . }}{{ .Values.hdfs.path }}"
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
