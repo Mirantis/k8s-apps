@@ -1,3 +1,4 @@
 *.lock
 *.tgz
 dist
+.idea
