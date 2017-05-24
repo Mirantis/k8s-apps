@@ -42,7 +42,7 @@ if __name__ == "__main__":
     batch_duration = int(sys.argv[5])
     save_to = sys.argv[6]
 
-    sc = pyspark.SparkContext("local[2]", appName="TweeTics")
+    sc = pyspark.SparkContext(spark_master, appName="TweeTics")
     ssc = streaming.StreamingContext(sc, batch_duration)
 
     tweets = kafka.KafkaUtils.createStream(ssc, zk_quorum, "tweetics-consumer", {topic_name: 1}).map(lambda x: x[1])
