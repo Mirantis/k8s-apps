@@ -1,0 +1,83 @@
+{{ $testname := printf "full-elk-test-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+{{ $es_url := include "ls-es-url" . }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ $testname }}
+  annotations:
+    helm.sh/hook: test-success
+spec:
+  containers:
+  - name: filebeat
+    image: {{ .Values.filebeatImage.repository }}:{{ .Values.filebeatImage.tag }},
+    imagePullPolicy: {{ .Values.filebeatImage.pullPolicy }},
+    command:
+    - "sh"
+    - "-cx"
+    - |
+      cat > /etc/filebeat/filebeat.yml << EOF
+      filebeat.prospectors:
+        - input_type: log
+          paths:
+            - /opt/stublogs/*.log
+          fields:
+            log_host: "stub-service"
+      output.logstash:
+        hosts:
+          - {{ template "ls-fullname" . }}:{{ .Values.logstash.port }}
+      path:
+        data: "/usr/share/filebeat/data"
+        home: "/usr/share/filebeat"
+      EOF
+      filebeat -c /etc/filebeat/filebeat.yml -e -d "*" &
+      FILEBEAT_PID=$!
+      # wait until filebeat successfully starts and send all stuff to logstash
+      sleep 60
+      kill $FILEBEAT_PID
+      exit 0
+    volumeMounts:
+    - name: logdir
+      mountPath: /opt/stublogs
+  - name: stub-service
+    image: {{ .Values.testImage.repository }}:{{ .Values.testImage.tag }},
+    imagePullPolicy: {{ .Values.testImage.pullPolicy }},
+    command:
+    - "sh"
+    - "-cx"
+    - |
+      mkdir /opt/stublogs
+      echo "Current line only for check" > /opt/stublogs/logfile.log
+      cat /opt/stublogs/logfile.log
+      # check for new elasticsearch indices of this service
+      i=0
+      until [ ! $(curl -X GET -f --silent {{ $es_url }}/_cat/indices | awk '/{{ $testname }}/{print $3}') = "" ]
+      do
+          if [ $i -gt 30 ];
+          then
+              echo "Cannot get test index name"
+              exit 1
+          fi
+          i=$((i+1))
+          sleep 5
+      done
+      STUB_INDEX=$(curl -X GET -f --silent {{ $es_url }}/_cat/indices | awk '/{{ $testname }}/{print $3}')
+      sleep 5
+      total_number=$(curl -X GET -f --silent {{ $es_url }}/$STUB_INDEX/_search?q=received_from:$STUB_INDEX | jq -r .hits.total)
+      if [ ! $total_number = 1 ];
+      then
+          exit 1
+      fi
+      check_msg=$(curl -X GET -f --silent {{ $es_url }}/$STUB_INDEX/_search?q=received_from:$STUB_INDEX | jq -r .hits.hits[0]._source.message)
+      if [ ! "$check_msg" = "Current line only for check" ]
+      then
+          exit 1
+      fi
+      curl -X DELETE -f --silent {{$es_url}}/$STUB_INDEX
+      exit 0
+    volumeMounts:
+    - name: logdir
+      mountPath: /opt/stublogs
+  volumes:
+  - name: logdir
+    emptyDir: {}
+  restartPolicy: Never
