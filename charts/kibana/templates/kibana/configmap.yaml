@@ -1,22 +1,22 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "cm-fullname" . }}
+  name: {{ template "kib-cm-fullname" . }}
   labels:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: {{ template "fullname" . }}
+    app: {{ template "kib-fullname" . }}
 data:
   kibana-conf: |
     server.port: {{ .Values.port }}
     server.host: 0.0.0.0
     server.name: "kibana"
-    elasticsearch.url: "http://{{ .Values.elasticsearch.host }}:{{ .Values.elasticsearch.port }}"
-    elasticsearch.preserveHost: {{ .Values.elasticsearch.preserveHost }}
-    elasticsearch.requestTimeout:  {{ .Values.elasticsearch.requestTimeout }}
-    elasticsearch.shardTimeout: {{ .Values.elasticsearch.shardTimeout }}
-    elasticsearch.startupTimeout: {{ .Values.elasticsearch.startupTimeout }}
+    elasticsearch.url: "http://{{ template "kib-es-url" .  }}"
+    elasticsearch.preserveHost: {{ .Values.elasticsearchConfig.preserveHost }}
+    elasticsearch.requestTimeout:  {{ .Values.elasticsearchConfig.requestTimeout }}
+    elasticsearch.shardTimeout: {{ .Values.elasticsearchConfig.shardTimeout }}
+    elasticsearch.startupTimeout: {{ .Values.elasticsearchConfig.startupTimeout }}
     elasticsearch.tribe.ssl.verify: false
     kibana.index: ".kibana"
     kibana.defaultAppId: "dashboard/Main"

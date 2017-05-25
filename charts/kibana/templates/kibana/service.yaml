@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ template "kib-fullname" . }}
   labels:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: {{ template "fullname" . }}
+    app: {{ template "kib-fullname" . }}
 {{- if .Values.service.annotations }}
   annotations:
 {{ toYaml .Values.service.annotations | indent 4}}
@@ -14,7 +14,7 @@ metadata:
 spec:
   type: {{ .Values.service.type | quote }}
   selector:
-    app: {{ template "fullname" . }}
+    app: {{ template "kib-fullname" . }}
   ports:
     - name: http
       port: {{ default 80 .Values.HTTPPort }}

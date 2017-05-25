@@ -5,8 +5,11 @@ replicas: 1
 
 # The Elasticsearch instance to use for all your queries.
 elasticsearch:
+  external: true
   host: "" # elasticsearch cluster svc name, e.g. elasticsearch-elasticsearch
   port: 9200
+
+elasticsearchConfig:
   preserveHost: true
   # Time in milliseconds to wait for responses from the back end or Elasticsearch.
   requestTimeout: 30000
@@ -19,6 +22,11 @@ image:
   repository: "mirantisworkloads/kibana"
   tag: "5.2.2"
   pullPolicy: "Always"
+
+testImage:
+  repository: "mirantisworkloads/test-base"
+  tag: "1.0.0"
+  pullPolicy: "IfNotPresent"
 
 # Configure resource requests and limits.
 resources:
