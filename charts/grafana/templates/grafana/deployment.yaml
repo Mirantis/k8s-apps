@@ -44,8 +44,6 @@ spec:
           volumeMounts:
             - name: config-volume
               mountPath: /etc/grafana
-            - name: dashboard-volume
-              mountPath: /var/lib/grafana/dashboards
             - name: data
               mountPath: /var/lib/grafana/data
       terminationGracePeriodSeconds: 300
@@ -53,9 +51,6 @@ spec:
         - name: config-volume
           configMap:
             name: {{ template "fullname" . }}
-        - name: dashboard-volume
-          configMap:
-            name: {{ template "fullname" . }}-dashboards
         - name: data
       {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
           persistentVolumeClaim:
