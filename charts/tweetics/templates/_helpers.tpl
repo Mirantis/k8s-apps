@@ -40,7 +40,7 @@
 
 {{- define "tweetics.hdfs-address" -}}
     {{- if .Values.hdfs.deployChart -}}
-        {{- printf "hdfs-namenode-%s" .Release.Name  | trunc 63 | trimSuffix "-" }}-0.{{ printf "hdfs-namenode-%s" .Release.Name  | trunc 63 | trimSuffix "-" -}}
+        {{- printf "hdfs-namenode-%s" .Release.Name  | trunc 63 | trimSuffix "-" }}-0.{{ printf "hdfs-namenode-%s" .Release.Name  | trunc 63 | trimSuffix "-" -}}:{{ .Values.hdfs.namenode.port }}
     {{- else -}}
         {{- printf "%s" .Values.hdfs.externalAddress -}}
     {{- end -}}
