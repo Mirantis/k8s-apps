@@ -21,6 +21,6 @@ spec:
         command:
           - "bash"
           - "-c"
-          - "spark-submit --master spark://{{ template "tweetics.spark-address" . }} --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.1.0 spark_hashtags_count.py spark://{{ template "tweetics.spark-address" . }} {{ template "tweetics.zk-address" . }} {{ .Values.kafka.topic }} {{ .Values.minHashtagCounts }} {{ .Values.spark.batchDuration }} {{ template "tweetics.hdfs-address" . }}{{ .Values.hdfs.path }}"
+          - "spark-submit --master spark://{{ template "tweetics.spark-address" . }} --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.1.0 spark_hashtags_count.py spark://{{ template "tweetics.spark-address" . }} {{ template "tweetics.zk-address" . }} {{ .Values.kafka.topic }} {{ .Values.minHashtagCounts }} {{ .Values.spark.batchDuration }} hdfs://{{ template "tweetics.hdfs-address" . }}{{ .Values.hdfs.path }}"
         resources:
 {{ toYaml .Values.resources | indent 12 }}
