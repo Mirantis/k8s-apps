@@ -1,0 +1,12 @@
+elasticsearch:
+  port: 9200
+
+logstash:
+  elasticsearch:
+    external: false
+    port: 9200
+
+kibana:
+  elasticsearch:
+    external: false
+    port: 9200
