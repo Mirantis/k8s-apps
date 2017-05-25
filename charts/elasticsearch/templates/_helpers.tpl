@@ -1,16 +1,16 @@
-{{- define "data-fullname" -}}
+{{- define "es-data-fullname" -}}
 {{- printf "elasticsearch-data-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 
-{{- define "master-fullname" -}}
+{{- define "es-master-fullname" -}}
 {{- printf "elasticsearch-master-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "client-fullname" -}}
+{{- define "es-client-fullname" -}}
 {{- printf "elasticsearch-client-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "fullname" -}}
+{{- define "es-fullname" -}}
 {{- printf "elasticsearch-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}

@@ -3,17 +3,17 @@ kind: Service
 metadata:
   annotations:
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
-  name: {{ template "data-fullname" . }}
+  name: {{ template "es-data-fullname" . }}
   labels:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: {{ template "fullname" . }}
+    app: {{ template "es-fullname" . }}
 spec:
   clusterIP: None
   ports:
     - port: {{ .Values.transportPort }}
       targetPort: {{ .Values.transportPort }}
   selector:
-    app: {{ template "fullname" . }}
+    app: {{ template "es-fullname" . }}
     type: data
