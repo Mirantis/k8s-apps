@@ -1,22 +1,32 @@
+{{ $url := include "ls-es-url" . }}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ template "ls-fullname" . }}
   labels:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: {{ template "fullname" . }}
+    app: {{ template "ls-fullname" . }}
 spec:
   replicas: {{ .Values.replicas }}
   template:
     metadata:
-      name: {{ template "fullname" . }}
+      name: {{ template "ls-fullname" . }}
       labels:
         heritage: {{ .Release.Service | quote }}
         release: {{ .Release.Name | quote }}
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-        app: {{ template "fullname" . }}
+        app: {{ template "ls-fullname" . }}
+      annotations:
+        pod.beta.kubernetes.io/init-containers: '[
+          {
+              "name": "wait-for-es",
+              "image": "{{ .Values.testImage.repository }}:{{ .Values.testImage.tag }}",
+              "imagePullPolicy": {{ .Values.testImage.pullPolicy | quote }},
+              "command": ["sh", "-c", "until [ $(curl -o /dev/null --silent -f {{ $url }}/; echo $?) -eq 0 ]; do sleep 10; done"]
+          }
+        ]'
     spec:
       containers:
       - name: logstash
@@ -39,7 +49,7 @@ spec:
       volumes:
       - name: config
         configMap:
-          name: {{ template "cm-fullname" . }}
+          name: {{ template "ls-cm-fullname" . }}
           items:
             - key: logstash-conf
               path: logstash.conf

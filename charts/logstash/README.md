@@ -11,6 +11,8 @@ $ helm install .
 | --- | --- | --- |
 | port | Service port | 5043 |
 | replicas | Deployment replicas | 1 |
+| elasticsearch.external | If true, logstash uses `host` and `port` values to establish connection with elasticsearch.
+                           If false, logstash decides that elasticsearch deployed in same release and uses internal data to connect to elasticsearch. | true |
 | elasticsearch.host | Elasticsearch service name to connect | elasticsearch-elasticsearch |
 | elasticsearch.port | Elasticsearch service port to connect | 9200 |
 | image.repository | Container image repository | 127.0.0.1:31500/logstash |
