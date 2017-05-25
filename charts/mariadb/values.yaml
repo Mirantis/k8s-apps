@@ -1,0 +1,70 @@
+port: 3306
+
+image:
+ repository: bitnami/
+ name: mariadb
+ tag: 10.1.23-r2
+ pullPolicy: IfNotPresent
+
+## Create a database user
+## ref: https://github.com/bitnami/bitnami-docker-mariadb/blob/master/README.md#creating-a-database-user-on-first-run
+##
+credentials:
+  # NOTE: If you want to create custom user, you need to specify dbDatabase value!
+  user: ""
+  password: ""
+  rootPassword: "root"
+
+## Create a database
+## ref: https://github.com/bitnami/bitnami-docker-mariadb/blob/master/README.md#creating-a-database-on-first-run
+##
+dbDatabase: ""
+
+probeInitialDelaySeconds: 30
+probeTimeoutSeconds: 5
+
+## Kubernetes service type
+service:
+  type: ClusterIP # or NodePort or LoadBalancer
+  nodePort: ""
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  annotations: {}
+
+ingress:
+  enabled: false
+  hosts: []
+    #   - some.domain
+  tls:
+    enabled: false
+    secretName: ""
+  annotations: {}
+    #   kubernetes.io/ingress.class: nginx
+
+## Enable persistence using Persistent Volume Claims
+## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+##
+persistence:
+  type: emptyDir # or hostPath or PersistentVolumeClaim
+  #storageClass: ""
+  volumeSize: 10Gi
+  hostPath: ""
+
+## Configure resource requests and limits
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 250m
+
+mysqlExporter:
+  enabled: false
+  image:
+    repository: prom/
+    name: mysqld-exporter
+    tag: v0.10.0
+    pullPolicy: IfNotPresent
+  flags:
+  - collect.global_status
+  #- flags - add here observing flags. All flags could be found at https://github.com/prometheus/mysqld_exporter#collector-flags

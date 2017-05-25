@@ -1,0 +1,20 @@
+{{- if eq .Values.persistence.type "PersistentVolumeClaim" -}}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ template "mariadb-fullname-pvc" . }}
+  labels:
+    app: {{ template "mariadb-fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+  {{- if .Values.persistence.storageClass }}
+  annotations:
+    volume.beta.kubernetes.io/storage-class: {{ .Values.persistence.storageClass | quote }}
+  {{- end }}
+spec:
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: {{ .Values.persistence.volumeSize | quote }}
+{{- end -}}
