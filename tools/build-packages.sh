@@ -28,4 +28,4 @@ done
 
 # generate index
 wget "${REPO_URL}/index.yaml"
-helm repo index --url "${REPO_URL}" --merge .
+helm repo index --url "${REPO_URL}" --merge index.yaml .
