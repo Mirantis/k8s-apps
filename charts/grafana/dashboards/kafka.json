@@ -158,7 +158,7 @@
             "tableColumn": "",
             "targets": [
               {
-                "expr": "count(kube_pod_container_status_ready{container=\"kafka\", namespace=\"$namespace\",pod=~\"$app-.*\"}==1)",
+                "expr": "count(kube_pod_container_status_ready{container=\"kafka\", namespace=\"$namespace\",pod=~\"$app-.*\",release!=\"prom\"}==1)",
                 "format": "time_series",
                 "intervalFactor": 2,
                 "refId": "A",
