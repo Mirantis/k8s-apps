@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "cfg-name" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: {{ printf "%s-%s" .Chart.Name .Chart.Version }}
+    app: {{ template "cfg-name" . }}
+spec:
+  ports:
+    - port: {{ .Values.configServer.port }}
+  clusterIP: None
+  selector:
+    app: {{ template "cfg-name" . }}
