@@ -48,7 +48,7 @@ adminPassword: "admin"
 
 prometheus:
   deployChart: true
-  externalAddress: "http://"
+  externalAddress: "http://url:port"
 
 # Set datasource in beginning
 setDatasource:

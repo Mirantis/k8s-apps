@@ -4,7 +4,7 @@
 
 {{- define "prometheus-datasource" -}}
 {{- if .Values.prometheus.deployChart -}}
-{{- $url := printf "http://prometheus-server-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- $url := printf "http://prometheus-server-%s:%d" (.Release.Name | trunc 63 | trimSuffix "-") (int .Values.prometheus.server.port) -}}
 {{- printf `"{\"name\":\"prometheus\",\"type\":\"prometheus\",\"url\":\"%s\",\"access\":\"proxy\",\"isDefault\":true}"` $url -}}
 {{- else -}}
 {{- $url := (.Values.prometheus.externalAddress) -}}
