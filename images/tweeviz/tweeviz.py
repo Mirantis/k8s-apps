@@ -17,7 +17,7 @@ top_list_len = int(os.getenv('TWEEVIZ_TOP_LIST_SIZE', 0))
 
 
 hashtags = {}
-stats = {'popularity': [], 'top': []}
+stats = {'popularity': []}
 processed_results = set()
 
 
@@ -27,7 +27,7 @@ def update_stats():
     parts = []
     for result in sorted([r['path'] for r in hdfs.ls([results_dir])]):
         if not hdfs.test(result + "/_SUCCESS", exists=True):
-            print "No _SUCCESS in %s" % result
+            continue
         if result in processed_results:
             continue
         processed_results.add(result)
@@ -36,19 +36,19 @@ def update_stats():
     if not parts:
         return
 
-    print "New data in: %s" % parts
-
     for part in hdfs.text(parts):
-        part_stats = eval("[" + ",".join(part.split('\n')) + "]")
+        part_stats = part.split('\n')
         for stat in part_stats:
-            hashtag = stat[0].lower()
-            hashtags[hashtag] = hashtags.get(hashtag, 0) + stat[1][0]
+            if not stat:
+                continue
+            hashtag, count = stat.split(' ')
+            hashtags[hashtag] = hashtags.get(hashtag, 0) + int(count)
 
-    stats['popularity'] = to_jqcloud_format(filter(lambda x: x[1] >= min_popularity, hashtags.items()))
+    sorted_stats = to_jqcloud_format(sorted(hashtags.items(), key=lambda x: x[1], reverse=True))
     max_top = min(len(hashtags), top_list_len)
-    if not max_top:
-        return
-    stats['top'] = to_jqcloud_format(sorted(hashtags.items(), key=lambda x: x[1], reverse=True)[:max_top])
+    stats['popularity'] = sorted_stats if top_list_len == 0 else sorted_stats[:max_top]
+
+    print "Processed data in: %s" % parts
 
 
 def to_jqcloud_format(keypairs):
@@ -65,6 +65,11 @@ app = flask.Flask(__name__)
 @app.route('/index.html')
 def index():
     return flask.render_template('index.html')
+
+
+@app.route('/index2.html')
+def index2():
+    return flask.render_template('index2.html')
 
 
 @app.route('/stats')

@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+<head>
+    <title>Twitter Analytics Visualization</title>
+    <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='jqcloud.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='jqcloud.min.css') }}">
+    <script>
+        $(function() {
+            $("#hashtags_cloud").jQCloud([], {
+                width: 800,
+                height: 550
+            });
+
+            function update_stats() {
+                $.getJSON("/stats").done(function(data) {
+                    $("#hashtags_cloud").jQCloud('update', data['popularity']);
+                }).always(function() {
+                    setTimeout(update_stats, 1000);
+                });
+            }
+            update_stats();
+        });
+    </script>
+</head>
+<body>
+    <h2>Twitter Analytics Visualization</h2>
+    <div id="hashtags_cloud"></div>
+</body>
+</html>
