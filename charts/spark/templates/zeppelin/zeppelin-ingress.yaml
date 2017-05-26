@@ -1,3 +1,4 @@
+{{- if .Values.zeppelin.enabled -}}
 {{- if .Values.ingress.enabled -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -28,4 +29,5 @@ spec:
               serviceName: {{ template "zeppelin-fullname" . }}
               servicePort: {{ $.Values.zeppelin.port }}
     {{- end -}}
+{{- end -}}
 {{- end -}}

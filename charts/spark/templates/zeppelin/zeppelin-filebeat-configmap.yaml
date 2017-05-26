@@ -1,3 +1,4 @@
+{{- if .Values.zeppelin.enabled -}}
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -23,3 +24,4 @@ data:
     path:
       data: "/usr/share/filebeat/data"
       home: "/usr/share/filebeat"
+{{- end -}}
