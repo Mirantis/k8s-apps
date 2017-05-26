@@ -75,3 +75,5 @@ zookeeper:
   deployChart: true
   # this address will be used if subchart deployment is disabled
   externalAddress: ""
+  # this path will be used as prefix for spark deployment, useful for multiple sparks per single zookeeper
+  path: "/spark"
