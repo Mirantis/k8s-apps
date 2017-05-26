@@ -67,7 +67,7 @@ spec:
       volumes:
         - name: spark-conf
           configMap:
-            name: {{ printf "spark-conf-%s" .Release.Name | trunc 24 }}
+            name: {{ printf "spark-conf-%s" .Release.Name | trunc 63 }}
         {{- if .Values.logCollector.enabled }}
         - name: filebeat-config
           configMap:
