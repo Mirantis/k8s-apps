@@ -2,8 +2,6 @@ apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
   name: {{ template "cfg-name" . }}
-  annotations:
-    helm.sh/created: {{ .Release.Time.Seconds | quote }}
   labels:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
@@ -29,7 +27,8 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             - python
-            - /config_bootstrap.py
+            - /bootstrap.py
             - {{ .Values.configServer.port | quote }}
+            - config
           ports:
             - containerPort: {{ .Values.configServer.port }}

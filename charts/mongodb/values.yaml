@@ -4,15 +4,15 @@
 image:
   repository: mirantisworkloads/
   name: mongodb
-  tag: "3.4"
+  tag: "3.4-r1"
   pullPolicy: Always
 configServer:
   replicas: 3
   port: 27019
+shard:
+  replicas: 3
+  port: 27019
 resources:
-  limits:
-    cpu: 100m
-    memory: 128Mi
   requests:
     cpu: 100m
     memory: 128Mi

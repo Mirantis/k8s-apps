@@ -6,6 +6,7 @@ import sys
 import time
 
 import bson
+import bson.objectid
 import pymongo
 
 
@@ -67,22 +68,31 @@ def wait_local_mongo(port):
             time.sleep(0.2)
 
 
-def start_mongo(port):
+def _start_mongo(command):
     params = {
         "shell": True,
         "stdin": sys.stdin,
         "stdout": sys.stdout,
         "stderr": sys.stderr
     }
-    command = "mongod --configsvr --replSet config --port %d" % port
     return subprocess.Popen(command, **params)
 
 
-def init_replicaset(master_address):
+def start_shard(port):
+    command = "mongod --shardsvr --replSet shard --port %d" % port
+    return _start_mongo(command)
+
+
+def start_configsvr(port):
+    command = "mongod --configsvr --replSet config --port %d" % port
+    return _start_mongo(command)
+
+
+def init_replicaset(master_address, replicaset):
     LOG.info("Init replicaset")
     client = pymongo.MongoClient(host=[master_address])
     init_config = {
-        "_id": "config",
+        "_id": replicaset,
         "members": [
             {"_id": 0, "host": master_address}
         ]
@@ -91,13 +101,14 @@ def init_replicaset(master_address):
     LOG.debug("Replicaset was initialized, status:\n%s" % prettyjson(res))
 
 
-def join_to_replicaset(master_address, host_id, port):
+def join_to_replicaset(master_address, host_id, port, replicaset,
+                       is_configsvr=False):
     client = pymongo.MongoClient(host=[master_address],
-                                    replicaset="config")
+                                 replicaset=replicaset)
     current_config = client.admin.command("replSetGetConfig")
     new_config = {
-        "_id": "config",
-        "configsvr": True,
+        "_id": replicaset,
+        "configsvr": is_configsvr,
         "version": current_config["config"]["version"] + 1,
         "members": []
     }
@@ -124,14 +135,21 @@ def join_to_replicaset(master_address, host_id, port):
 
 def main():
     port = int(sys.argv[1])
-    daemon = start_mongo(port)
+    replicaset = sys.argv[2]
+    if replicaset == "config":
+        daemon = start_configsvr(port)
+        is_configsvr = True
+    elif replicaset == "shard":
+        daemon = start_shard(port)
+        is_configsvr = False
     wait_local_mongo(port)
     master_address = get_master_address(port)
     host_id = get_host_id()
     if host_id == 0:
-        init_replicaset(master_address)
+        init_replicaset(master_address, replicaset)
     else:
-        join_to_replicaset(master_address, host_id, port)
+        join_to_replicaset(master_address, host_id, port, replicaset,
+                           is_configsvr)
     daemon.wait()
     daemon.communicate()
 

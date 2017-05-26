@@ -1,0 +1,30 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: {{ template "shard-name" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: {{ printf "%s-%s" .Chart.Name .Chart.Version | quote }}
+    app: {{ template "shard-name" . }}
+spec:
+  serviceName: {{ template "shard-name" . }}
+  replicas: {{ .Values.shard.replicas }}
+  template:
+    metadata:
+      labels:
+        release: {{ .Release.Name | quote }}
+        chart: {{ printf "%s-%s" .Chart.Name .Chart.Version | quote }}
+        app: {{ template "shard-name" . }}
+    spec:
+      containers:
+        - name: mongo-shard
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - python
+            - /bootstrap.py
+            - {{ .Values.shard.port | quote }}
+            - shard
+          ports:
+            - containerPort: {{ .Values.shard.port }}
