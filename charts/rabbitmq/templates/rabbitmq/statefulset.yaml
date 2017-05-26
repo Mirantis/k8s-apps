@@ -1,0 +1,131 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: {{ template "rabbitmq.fullname" . }}
+  labels:
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "rabbitmq.fullname" . }}
+spec:
+  serviceName: {{ template "rabbitmq.fullname" . }}
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      labels:
+        release: "{{ .Release.Name }}"
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "rabbitmq.fullname" . }}
+      annotations:
+        {{- if eq .Values.antiAffinity "hard"}}
+        scheduler.alpha.kubernetes.io/affinity: >
+            {
+              "podAntiAffinity": {
+                "requiredDuringSchedulingIgnoredDuringExecution": [{
+                  "labelSelector": {
+                    "matchExpressions": [{
+                      "key": "app",
+                      "operator": "In",
+                      "values": ["{{ template "rabbitmq.fullname" . }}"]
+                    }]
+                  },
+                  "topologyKey": "kubernetes.io/hostname"
+                }]
+              }
+            }
+        {{- else if eq .Values.antiAffinity "soft"}}
+        scheduler.alpha.kubernetes.io/affinity: >
+            {
+              "podAntiAffinity": {
+                "preferredDuringSchedulingIgnoredDuringExecution": [{
+                  "weight": 100,
+                  "preference": {
+                    "matchExpressions": [{
+                      "key": "app",
+                      "operator": "In",
+                      "values": ["{{ template "rabbitmq.fullname" . }}"]
+                    }]
+                  },
+                  "topologyKey": "kubernetes.io/hostname"
+                }]
+              }
+            }
+        {{- end}}
+    spec:
+      containers:
+      - name: rabbitmq
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: epmd
+          containerPort: 4369
+        - name: ampq
+          containerPort: {{ .Values.amqpPort }}
+        - name: dist
+          containerPort: {{ .Values.amqpPort | add 20000 }}
+        env:
+        - name: RABBITMQ_NODE_PORT
+          value: "{{ .Values.amqpPort }}"
+        - name: K8S_SERVICE_NAME
+          value: {{ template "rabbitmq.fullname" . }}
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: RABBITMQ_ERLANG_COOKIE
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "rabbitmq.fullname" . }}
+              key: erlang.cookie
+        - name: RABBITMQ_DEFAULT_PASS
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "rabbitmq.fullname" . }}
+              key: password
+        - name: RABBITMQ_DEFAULT_USER
+          value: {{ .Values.user }}
+        - name: AUTOCLUSTER_CLEANUP
+          value: "true"
+        - name: CLEANUP_INTERVAL
+          value: "30"
+        - name: CLEANUP_WARN_ONLY
+          value: "false"
+        - name: AUTOCLUSTER_FAILURE
+          value: "stop"
+        - name: AUTOCLUSTER_DELAY
+          value: "0"
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        livenessProbe:
+          exec:
+            command:
+            - rabbitmqctl
+            - status
+          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+          timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
+        volumeMounts:
+        - name: datadir
+          mountPath: /var/lib/rabbitmq
+      volumes:
+      {{- if eq .Values.persistence.type "emptyDir" }}
+      - name: datadir
+        emptyDir: {}
+      {{- else if eq .Values.persistence.type "hostPath" }}
+      - name: datadir
+        hostPath:
+          path: "{{ .Values.persistence.hostPath }}"
+      {{- end }}
+  {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+      {{- if .Values.persistence.storageClass }}
+      annotations:
+        volume.beta.kubernetes.io/storage-class: "{{ .Values.persistence.storageClass }}"
+      {{- end }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.persistence.volumeSize }}
+  {{- end }}
