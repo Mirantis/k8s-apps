@@ -31,6 +31,7 @@ spark:
         memory: "512Mi"
 
 zeppelin:
+  enabled: true
   image:
     repository: mirantisworkloads/zeppelin
     tag: 0.7.1
