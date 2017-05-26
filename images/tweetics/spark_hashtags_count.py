@@ -23,7 +23,9 @@ def get_hashtags(tweet):
     return hashtags
 
 
-if __name__ == "__main__":
+def main():
+    if len(sys.argv) == 2 and sys.argv[1] == "noop":
+        return
     if len(sys.argv) != 7:
         print "Usage: spark_hashtags_count.py <spark_master> <zk_quorum> <topic_name> <min_hashtag_counts> <batch_duration> <save_to>"
         print "Example: spark_hashtags_count.py local[4] zk-kafka-1-0.zk-kafka-1:2181,zk-kafka-1-1.zk-kafka-1:2181,zk-kafka-1-2.zk-kafka-1:2181 twitter-stream 0 5 hdfs://hdfs-namenode:8020/demo"
@@ -55,3 +57,7 @@ if __name__ == "__main__":
 
     ssc.start()
     ssc.awaitTermination()
+
+
+if __name__ == "__main__":
+    main()
