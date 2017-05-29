@@ -1,0 +1,4 @@
+RabbitMQ chart has been deployed.
+
+Connection string:
+{{ template "rabbitmq.address" . }}
