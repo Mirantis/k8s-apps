@@ -63,6 +63,8 @@ spec:
           containerPort: {{ .Values.amqpPort }}
         - name: dist
           containerPort: {{ .Values.amqpPort | add 20000 }}
+        - name: management
+          containerPort: 15672
         env:
         - name: RABBITMQ_NODE_PORT
           value: "{{ .Values.amqpPort }}"
@@ -106,7 +108,16 @@ spec:
         volumeMounts:
         - name: datadir
           mountPath: /var/lib/rabbitmq
+        - name: plugins
+          mountPath: /etc/rabbitmq/enabled_plugins
+          subPath: enabled_plugins
       volumes:
+      - configMap:
+          name: {{ template "rabbitmq.fullname" . }}
+          items:
+          - key: enabled_plugins
+            path: enabled_plugins
+        name: plugins
       {{- if eq .Values.persistence.type "emptyDir" }}
       - name: datadir
         emptyDir: {}

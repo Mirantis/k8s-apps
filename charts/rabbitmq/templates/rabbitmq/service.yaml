@@ -18,6 +18,9 @@ spec:
   - name: dist
     port: {{ .Values.amqpPort | add 20000 }}
     targetPort: dist
+  - name: management
+    port: 15672
+    targetPort: management
   clusterIP: None
   selector:
     app: {{ template "rabbitmq.fullname" . }}

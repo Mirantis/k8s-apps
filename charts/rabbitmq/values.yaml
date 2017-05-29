@@ -33,3 +33,24 @@ resources:
   requests:
     memory: 256Mi
     cpu: 100m
+
+management:
+  service:
+    type: ClusterIP # or NodePort or LoadBalancer
+
+    nodePort: ""
+
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+
+    annotations: {}
+
+  ingress:
+    enabled: false
+    hosts: []
+      #   - some.domain
+    tls:
+      enabled: false
+      secretName: ""
+    annotations: {}
+      #   kubernetes.io/ingress.class: nginx

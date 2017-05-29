@@ -1,0 +1,32 @@
+{{- if .Values.management.ingress.enabled -}}
+{{ $svc := include "rabbitmq-management.fullname" . }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "rabbitmq-management.fullname" . }}
+  labels:
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "rabbitmq-management.fullname" . }}
+  annotations:
+{{ toYaml .Values.management.ingress.annotations | indent 4 }}
+spec:
+  {{- if .Values.management.ingress.tls.enabled }}
+  tls:
+    - hosts:
+      {{- range .Values.management.ingress.hosts }}
+      - {{ . }}
+      {{- end }}
+      secretName: {{ .Values.management.ingress.tls.secretName }}
+  {{- end }}
+  rules:
+    {{- range .Values.management.ingress.hosts }}
+    - host: {{ . }}
+      http:
+        paths:
+          - backend:
+              serviceName: {{ $svc }}
+              servicePort: 15672
+    {{- end -}}
+{{- end -}}
