@@ -17,6 +17,10 @@ spec:
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         app: {{ template "rabbitmq.fullname" . }}
       annotations:
+        {{- if .Values.prometheus.exporter.enabled }}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        {{- end }}
         {{- if eq .Values.antiAffinity "hard"}}
         scheduler.alpha.kubernetes.io/affinity: >
             {
@@ -53,6 +57,19 @@ spec:
         {{- end}}
     spec:
       containers:
+      {{- if .Values.prometheus.exporter.enabled }}
+      - name: exporter
+        image: "{{ .Values.prometheus.exporter.image.repository }}:{{ .Values.prometheus.exporter.image.tag }}"
+        imagePullPolicy: {{ .Values.prometheus.exporter.image.pullPolicy }}
+        env:
+        - name: RABBIT_USER
+          value: {{ .Values.user }}
+        - name: RABBIT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "rabbitmq.fullname" . }}
+              key: password
+      {{- end }}
       - name: rabbitmq
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}

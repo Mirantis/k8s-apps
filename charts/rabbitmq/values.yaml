@@ -54,3 +54,11 @@ management:
       secretName: ""
     annotations: {}
       #   kubernetes.io/ingress.class: nginx
+
+prometheus:
+  exporter:
+    enabled: true
+    image:
+      repository: kbudde/rabbitmq-exporter
+      tag: latest
+      pullPolicy: Always
