@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: worker
-          image: {{ .Values.spark.image.repository }}:{{ .Values.spark.image.tag }}
+          image: {{ .Values.spark.image.repository }}{{ .Values.spark.image.name }}:{{ .Values.spark.image.tag }}
           imagePullPolicy: {{ .Values.spark.image.pullPolicy }}
           command:
             - /usr/local/spark/sbin/start-slave.sh
@@ -54,7 +54,7 @@ spec:
           {{- end }}
         {{- if .Values.logCollector.enabled }}
         - name: filebeat
-          image: "{{ .Values.logCollector.image.repository }}:{{ .Values.logCollector.image.tag }}"
+          image: "{{ .Values.logCollector.image.repository }}{{ .Values.logCollector.image.name }}:{{ .Values.logCollector.image.tag }}"
           imagePullPolicy: {{ .Values.logCollector.image.pullPolicy | quote }}
           volumeMounts:
           - name: filebeat-config

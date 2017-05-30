@@ -22,7 +22,7 @@ spec:
         pod.beta.kubernetes.io/init-containers: '[
           {
               "name": "wait-for-es",
-              "image": "{{ .Values.testImage.repository }}:{{ .Values.testImage.tag }}",
+              "image": "{{ .Values.testImage.repository }}{{ .Values.testImage.name }}:{{ .Values.testImage.tag }}",
               "imagePullPolicy": {{ .Values.testImage.pullPolicy | quote }},
               "command": ["sh", "-c", "until [ $(curl -o /dev/null --silent -f {{ $url }}/; echo $?) -eq 0 ]; do sleep 10; done"]
           }
@@ -33,7 +33,7 @@ spec:
         env:
         - name: LS_JAVA_OPTS
           value: "-Xms{{ .Values.heapSize }} -Xmx{{ .Values.heapSize }} -Djava.net.preferIPv4Stack=true"
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
         command:
         - "logstash"

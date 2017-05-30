@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: grafana
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: GF_SECURITY_ADMIN_USER

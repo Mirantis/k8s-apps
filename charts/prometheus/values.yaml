@@ -6,7 +6,8 @@ alertmanager:
   ## alertmanager container image
   ##
   image:
-    repository: prom/alertmanager
+    repository: prom/
+    name: alertmanager
     tag: v0.5.1
     pullPolicy: IfNotPresent
 
@@ -66,7 +67,8 @@ configmapReload:
   ## configmap-reload container image
   ##
   image:
-    repository: jimmidyson/configmap-reload
+    repository: jimmidyson/
+    name: configmap-reload
     tag: v0.1
     pullPolicy: IfNotPresent
 
@@ -84,7 +86,8 @@ kubeStateMetrics:
   ## kube-state-metrics container image
   ##
   image:
-    repository: gcr.io/google_containers/kube-state-metrics
+    repository: gcr.io/google_containers/
+    name: kube-state-metrics
     tag: v0.4.1
     pullPolicy: IfNotPresent
 
@@ -130,7 +133,8 @@ nodeExporter:
   ## node-exporter container image
   ##
   image:
-    repository: prom/node-exporter
+    repository: prom/
+    name: node-exporter
     tag: v0.13.0
     pullPolicy: IfNotPresent
 
@@ -171,7 +175,8 @@ server:
   ## Prometheus server container image
   ##
   image:
-    repository: prom/prometheus
+    repository: prom/
+    name: prometheus
     tag: v1.5.2
     pullPolicy: IfNotPresent
     testImage: mirantisworkloads/test-base

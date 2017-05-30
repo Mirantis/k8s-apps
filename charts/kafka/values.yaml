@@ -10,7 +10,8 @@ probeTimeoutSeconds: 5
 port: 9092
 
 image:
-  repository: mirantisworkloads/kafka
+  repository: mirantisworkloads/
+  name: kafka
   tag: 0.10.2.0
   pullPolicy: Always
 
@@ -44,7 +45,8 @@ zookeeper:
 logCollector:
   enabled: false
   image:
-    repository: mirantisworkloads/filebeat
+    repository: mirantisworkloads/
+    name: filebeat
     tag: 5.2.2
     pullPolicy: Always
   # external logstash hosts

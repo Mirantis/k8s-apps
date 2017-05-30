@@ -12,11 +12,13 @@ kibana:
     port: 9200
 
 testImage:
-  repository: mirantisworkloads/test-base
+  repository: mirantisworkloads/
+  name: test-base
   tag: 1.0.0
   pullPolicy: IfNotPresent
 
 filebeatImage:
-  repository: mirantisworkloads/filebeat
+  repository: mirantisworkloads/
+  name: filebeat
   tag: 5.2.2
   pullPolicy: Always

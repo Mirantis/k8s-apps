@@ -140,7 +140,8 @@ values.yaml
   .. code-block:: yaml
 
       image:
-        repository: mirantisworkloads/zookeeper
+        repository: mirantisworkloads/
+        name: zookeeper
         tag: 3.5.3-rc1
         pullPolicy: Always
 

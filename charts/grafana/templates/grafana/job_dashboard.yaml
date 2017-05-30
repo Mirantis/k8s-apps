@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: cassandra-dashboard
-        image: "{{ .Values.setDatasource.image.repository }}:{{ .Values.setDatasource.image.tag }}"
+        image: "{{ .Values.setDatasource.image.repository }}{{ .Values.setDatasource.image.name }}:{{ .Values.setDatasource.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         args:
           - "http://{{ .Values.adminUser }}:{{ .Values.adminPassword }}@{{ template "fullname" . }}:{{ .Values.port }}/api/dashboards/db"
@@ -32,7 +32,7 @@ spec:
           - name: dashboards
             mountPath: /etc/dashboards
       - name: spark-dashboard
-        image: "{{ .Values.setDatasource.image.repository }}:{{ .Values.setDatasource.image.tag }}"
+        image: "{{ .Values.setDatasource.image.repository }}{{ .Values.setDatasource.image.name }}:{{ .Values.setDatasource.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         args:
           - "http://{{ .Values.adminUser }}:{{ .Values.adminPassword }}@{{ template "fullname" . }}:{{ .Values.port }}/api/dashboards/db"
@@ -47,7 +47,7 @@ spec:
             mountPath: /etc/dashboards
 
       - name: kafka-dashboard
-        image: "{{ .Values.setDatasource.image.repository }}:{{ .Values.setDatasource.image.tag }}"
+        image: "{{ .Values.setDatasource.image.repository }}{{ .Values.setDatasource.image.name }}:{{ .Values.setDatasource.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         args:
           - "http://{{ .Values.adminUser }}:{{ .Values.adminPassword }}@{{ template "fullname" . }}:{{ .Values.port }}/api/dashboards/db"
@@ -62,7 +62,7 @@ spec:
             mountPath: /etc/dashboards
 
       - name: zookeeper-dashboard
-        image: "{{ .Values.setDatasource.image.repository }}:{{ .Values.setDatasource.image.tag }}"
+        image: "{{ .Values.setDatasource.image.repository }}{{ .Values.setDatasource.image.name }}:{{ .Values.setDatasource.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         args:
           - "http://{{ .Values.adminUser }}:{{ .Values.adminPassword }}@{{ template "fullname" . }}:{{ .Values.port }}/api/dashboards/db"

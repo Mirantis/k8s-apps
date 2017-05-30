@@ -59,7 +59,7 @@ spec:
       containers:
       {{- if .Values.prometheus.exporter.enabled }}
       - name: exporter
-        image: "{{ .Values.prometheus.exporter.image.repository }}:{{ .Values.prometheus.exporter.image.tag }}"
+        image: "{{ .Values.prometheus.exporter.image.repository }}{{ .Values.prometheus.exporter.image.name }}:{{ .Values.prometheus.exporter.image.tag }}"
         imagePullPolicy: {{ .Values.prometheus.exporter.image.pullPolicy }}
         env:
         - name: RABBIT_USER
@@ -71,7 +71,7 @@ spec:
               key: password
       {{- end }}
       - name: rabbitmq
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - name: epmd

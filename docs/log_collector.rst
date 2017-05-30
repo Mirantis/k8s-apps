@@ -21,7 +21,8 @@ Add filebeat to chart
       logCollector:
         enabled: false
         image:
-          repository: mirantisworkloads/filebeat
+          repository: mirantisworkloads/
+          name: filebeat
           tag: 5.2.2
           pullPolicy: Always
         logstashHosts: [] # external logstash hosts with ports; override with actual data
@@ -36,7 +37,7 @@ Add filebeat to chart
 
       {{- if .Values.logCollector.enabled }}
       - name: filebeat
-        image: "{{ .Values.logCollector.image.repository }}:{{ .Values.logCollector.image.tag }}"
+        image: "{{ .Values.logCollector.image.repository }}{{ .Values.logCollector.image.name }}:{{ .Values.logCollector.image.tag }}"
         imagePullPolicy: {{ .Values.logCollector.image.pullPolicy | quote }}
         volumeMounts:
         - name: filebeat-config

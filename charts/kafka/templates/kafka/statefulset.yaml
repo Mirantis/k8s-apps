@@ -41,7 +41,7 @@ spec:
         {{- end }}
         {
             "name": "wait-for-zk",
-            "image": "{{ .Values.image.repository }}:{{ .Values.image.tag }}",
+            "image": "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}",
             "imagePullPolicy": "{{ .Values.image.pullPolicy }}",
             "command": ["sh", "-c", "waitForZK.sh {{ .Values.zookeeper.replicas }} {{ template "zookeeper-fullname" . }}"]
         }
@@ -84,7 +84,7 @@ spec:
     spec:
       containers:
       - name: kafka
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         {{- if .Values.prometheus.jmxExporter.enabled }}
@@ -131,7 +131,7 @@ spec:
         {{- end }}
       {{- if .Values.logCollector.enabled }}
       - name: filebeat
-        image: "{{ .Values.logCollector.image.repository }}:{{ .Values.logCollector.image.tag }}"
+        image: "{{ .Values.logCollector.image.repository }}{{ .Values.logCollector.image.name }}:{{ .Values.logCollector.image.tag }}"
         imagePullPolicy: {{ .Values.logCollector.image.pullPolicy | quote }}
         volumeMounts:
         - name: filebeat-config

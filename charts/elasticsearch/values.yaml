@@ -10,7 +10,8 @@ probeInitialDelaySeconds: 90
 probeTimeoutSeconds: 5
 
 image:
-  repository: mirantisworkloads/elasticsearch
+  repository: mirantisworkloads/
+  name: elasticsearch
   tag: 5.2.2
   pullPolicy: Always
 

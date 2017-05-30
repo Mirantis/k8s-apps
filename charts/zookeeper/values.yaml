@@ -14,7 +14,8 @@ leaderElectionPort: 3888
 clientPort: 2181
 
 image:
-  repository: mirantisworkloads/zookeeper
+  repository: mirantisworkloads/
+  name: zookeeper
   tag: 3.5.3-rc1
   pullPolicy: Always
 

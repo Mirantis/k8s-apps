@@ -20,7 +20,7 @@ spec:
         pod.beta.kubernetes.io/init-containers: '[
         {
             "name": "wait-namenode",
-            "image": "{{ .Values.datanode.image.repository }}:{{ .Values.datanode.image.tag }}",
+            "image": "{{ .Values.datanode.image.repository }}{{ .Values.datanode.image.name }}:{{ .Values.datanode.image.tag }}",
             "imagePullPolicy": "{{ .Values.datanode.image.pullPolicy }}",
             "command": ["bash", "-c", "while [[ $ready != 0 ]]; do curl {{ template "namenode-fullname" . }}:50070; ready=$?; sleep 3; done"]
         }]'
@@ -61,7 +61,7 @@ spec:
     spec:
       containers:
         - name: datanode
-          image: "{{ .Values.datanode.image.repository }}:{{ .Values.datanode.image.tag }}"
+          image: "{{ .Values.datanode.image.repository }}{{ .Values.datanode.image.name }}:{{ .Values.datanode.image.tag }}"
           imagePullPolicy: "{{ .Values.datanode.image.pullPolicy }}"
           env:
             - name: CORE_CONF_fs_defaultFS

@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: hdfs-namenode
-          image: "{{ .Values.namenode.image.repository }}:{{ .Values.namenode.image.tag }}"
+          image: "{{ .Values.namenode.image.repository }}{{ .Values.namenode.image.name }}:{{ .Values.namenode.image.tag }}"
           imagePullPolicy: "{{ .Values.namenode.image.pullPolicy }}"
           env:
             - name: CLUSTER_NAME

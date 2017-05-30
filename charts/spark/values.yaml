@@ -5,7 +5,8 @@
 
 spark:
   image:
-    repository: mirantisworkloads/spark
+    repository: mirantisworkloads/
+    name: spark
     tag: 2.1.0
     pullPolicy: Always
   master:
@@ -33,7 +34,8 @@ spark:
 zeppelin:
   enabled: true
   image:
-    repository: mirantisworkloads/zeppelin
+    repository: mirantisworkloads/
+    name: zeppelin
     tag: 0.7.1
     pullPolicy: Always
   port: 8080
@@ -64,7 +66,8 @@ prometheus:
 logCollector:
   enabled: false
   image:
-    repository: mirantisworkloads/filebeat
+    repository: mirantisworkloads/
+    name: filebeat
     tag: 5.2.2
     pullPolicy: Always
   # external logstash hosts

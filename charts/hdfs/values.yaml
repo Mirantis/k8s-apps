@@ -1,7 +1,8 @@
 datanode:
   replicas: 3
   image:
-    repository: uhopper/hadoop-datanode
+    repository: uhopper/
+    name: hadoop-datanode
     tag: 2.7.2
     pullPolicy: Always
 
@@ -26,7 +27,8 @@ datanode:
 namenode:
   port: 8020
   image:
-    repository: uhopper/hadoop-namenode
+    repository: uhopper/
+    name: hadoop-namenode
     tag: 2.7.2
     pullPolicy: Always
 

@@ -34,7 +34,7 @@ spec:
           value: "false"
         - name: ES_JAVA_OPTS
           value: "-Xms{{ .Values.client.heapSize }} -Xmx{{ .Values.client.heapSize }}"
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
         command:
         - elasticsearch

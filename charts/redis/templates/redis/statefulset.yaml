@@ -52,7 +52,7 @@ spec:
     spec:
       containers:
       - name: redis
-        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        image: {{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         - name: MASTER_DATA
@@ -77,7 +77,7 @@ spec:
         - name: redis-cfg
           mountPath: /opt/redis/conf
       - name: sentinel
-        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        image: {{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         - name: SENTINEL

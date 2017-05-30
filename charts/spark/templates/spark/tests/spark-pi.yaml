@@ -7,7 +7,7 @@ metadata:
 spec:
   containers:
     - name: spark-pi
-      image: {{ .Values.spark.image.repository }}:{{ .Values.spark.image.tag }}
+      image: {{ .Values.spark.image.repository }}{{ .Values.spark.image.name }}:{{ .Values.spark.image.tag }}
       imagePullPolicy: {{ .Values.spark.image.pullPolicy }}
       command:
         - bash

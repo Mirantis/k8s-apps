@@ -9,7 +9,7 @@ metadata:
 spec:
   containers:
   - name: filebeat
-    image: {{ .Values.filebeatImage.repository }}:{{ .Values.filebeatImage.tag }},
+    image: {{ .Values.filebeatImage.repository }}{{ .Values.filebeatImage.name }}:{{ .Values.filebeatImage.tag }},
     imagePullPolicy: {{ .Values.filebeatImage.pullPolicy }},
     command:
     - "sh"
@@ -39,7 +39,7 @@ spec:
     - name: logdir
       mountPath: /opt/stublogs
   - name: stub-service
-    image: {{ .Values.testImage.repository }}:{{ .Values.testImage.tag }},
+    image: {{ .Values.testImage.repository }}{{ .Values.testImage.name }}:{{ .Values.testImage.tag }},
     imagePullPolicy: {{ .Values.testImage.pullPolicy }},
     command:
     - "sh"

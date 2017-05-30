@@ -17,7 +17,8 @@ user: rabbit
 password: ""
 
 image:
-  repository: kuberstack/kubernetes-rabbitmq-autocluster
+  repository: kuberstack/
+  name: kubernetes-rabbitmq-autocluster
   tag: latest
   pullPolicy: Always
 
@@ -59,6 +60,7 @@ prometheus:
   exporter:
     enabled: true
     image:
-      repository: kbudde/rabbitmq-exporter
+      repository: kbudde/
+      name: rabbitmq-exporter
       tag: latest
       pullPolicy: Always

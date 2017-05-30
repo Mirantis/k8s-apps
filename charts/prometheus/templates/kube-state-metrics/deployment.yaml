@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
         - name: kube-state-metrics
-          image: "{{ .Values.kubeStateMetrics.image.repository }}:{{ .Values.kubeStateMetrics.image.tag }}"
+          image: "{{ .Values.kubeStateMetrics.image.repository }}{{ .Values.kubeStateMetrics.image.name }}:{{ .Values.kubeStateMetrics.image.tag }}"
           imagePullPolicy: "{{ .Values.kubeStateMetrics.image.pullPolicy }}"
           ports:
             - containerPort: 8080

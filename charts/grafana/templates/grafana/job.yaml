@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: set-datasource
-        image: "{{ .Values.setDatasource.image.repository }}:{{ .Values.setDatasource.image.tag }}"
+        image: "{{ .Values.setDatasource.image.repository }}{{ .Values.setDatasource.image.name }}:{{ .Values.setDatasource.image.tag }}"
         imagePullPolicy: {{ .Values.setDatasource.image.pullPolicy }}
         args:
           - "http://{{ .Values.adminUser }}:{{ .Values.adminPassword }}@{{ template "fullname" . }}:{{ .Values.port }}/api/datasources"

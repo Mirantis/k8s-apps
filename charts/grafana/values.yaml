@@ -1,5 +1,6 @@
 image:
-  repository: grafana/grafana
+  repository: grafana/
+  name: grafana
   tag: master
   pullPolicy: Always
 
@@ -66,7 +67,8 @@ setDatasource:
   ## Default: appropriate/curl:latest
   ##
   image:
-    repository: appropriate/curl
+    repository: appropriate/
+    name: curl
     tag: latest
     pullPolicy: Always
 
