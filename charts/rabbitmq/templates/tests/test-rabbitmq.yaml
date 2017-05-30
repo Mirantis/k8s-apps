@@ -1,0 +1,32 @@
+{{ $host := include "es-fullname" . }}
+{{ $url := printf "%s:%.0f" $host .Values.port }}
+{{ $idx := printf "test-elasticsearch-%s" .Release.Name }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ printf "rabbitmq-test-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+  annotations:
+    helm.sh/hook: test-success
+spec:
+  containers:
+  - name: rabbitmq-test
+    image: mirantisworkloads/test-base:1.0.0
+    imagePullPolicy: IfNotPresent
+    env:
+    - name: PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: {{ template "rabbitmq.fullname" . }}
+          key: password
+    command:
+      - "sh"
+      - "-cx"
+      - |
+        {{- $release := (.Release.Name | trunc 63 | trimSuffix "-") -}}
+        {{ range $i, $e := until (int $.Values.replicas) }}
+        curl -u {{ $.Values.user }}:$PASSWORD -f {{ printf "rabbitmq-%s-%d.rabbitmq-%s:15672" $release $i $release }}/api/aliveness-test/%2F | [ `jq -r .status` == ok ]
+        {{ range $j, $er := until (int $.Values.replicas) }}
+        curl -u {{ $.Values.user }}:$PASSWORD -f {{ printf "rabbitmq-%s-%d.rabbitmq-%s:15672" $release $i $release }}/api/nodes | [ `jq -r .[{{ $j }}].running` == true ]
+        {{- end }}
+        {{- end }}
+  restartPolicy: Never
