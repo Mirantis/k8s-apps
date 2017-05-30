@@ -1,0 +1,8 @@
+apiVersion: servicecatalog.k8s.io/v1alpha1
+kind: Instance
+metadata:
+  name: "kafka-instance"
+  namespace: "test-ns"
+spec:
+  serviceClassName: "kafka"
+  planName: "default"

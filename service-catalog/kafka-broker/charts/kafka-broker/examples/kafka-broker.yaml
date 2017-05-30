@@ -1,0 +1,6 @@
+apiVersion: servicecatalog.k8s.io/v1alpha1
+kind: Broker
+metadata:
+  name: kafka-broker
+spec:
+  url: http://kafka-broker-kafka-broker.kafka-broker.svc.cluster.local

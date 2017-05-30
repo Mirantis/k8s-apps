@@ -1,0 +1,16 @@
+image:
+  registry: mirantisworkloads/kafka-broker
+  tag: 1.0
+  pullPolicy: Always
+app:
+  name: kafka-broker
+  port: 8080
+  broker_name: kafka
+config:
+  brokers:
+    - 127.0.0.1:9092
+  topic: "TestTopic"
+  zookeeperServer: "127.0.0.1:2181"
+  partitions: 1
+  replicationFactor: 1
+
