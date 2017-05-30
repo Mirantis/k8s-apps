@@ -68,3 +68,12 @@ mysqlExporter:
   flags:
   - collect.global_status
   #- flags - add here observing flags. All flags could be found at https://github.com/prometheus/mysqld_exporter#collector-flags
+
+logCollector:
+  enabled: false
+  image:
+    repository: mirantisworkloads/
+    name: filebeat
+    tag: 5.2.2
+    pullPolicy: Always
+  logstashHosts: [] # external logstash hosts with ports; override with actual data

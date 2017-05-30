@@ -8,5 +8,3 @@ RUN curl -o /tmp/filebeat.tgz https://artifacts.elastic.co/downloads/beats/fileb
     && ln -s /usr/share/filebeat/filebeat /usr/bin/filebeat \
     && mkdir -p /etc/filebeat \
     && chown -R filebeat:filebeat /usr/share/filebeat /usr/bin/filebeat /etc/filebeat
-
-USER filebeat

@@ -9,6 +9,26 @@ metadata:
     app: {{ template "mariadb-fullname" . }}
 data:
   my.cnf: |-
-{{- if .Values.config }}
-{{ .Values.config | indent 4 }}
-{{- end }}
+    [mysqld]
+    general-log = 1
+    general-log-file = /opt/bitnami/mariadb/logs/mysqld.log
+    log-error = /opt/bitnami/mariadb/logs/mysqld-error.log
+    slow-query-log = 1
+    long-query-time = 1
+    slow-query-log-file = /opt/bitnami/mariadb/logs/mysqld-slow_query.log
+    log-queries-not-using-indexes = 1
+  filebeat-yml: |-
+    filebeat.prospectors:
+      - input_type: log
+        paths:
+        - /opt/bitnami/mariadb/logs/mysqld*.log
+        fields:
+          log_host: "mariadb"
+    output.logstash:
+      hosts:
+      {{- range .Values.logCollector.logstashHost }}
+      - {{ . | quote }}
+      {{- end }}
+    path:
+      data: "/usr/share/filebeat/data"
+      home: "/usr/share/filebeat"

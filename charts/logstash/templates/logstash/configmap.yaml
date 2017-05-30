@@ -103,6 +103,31 @@ data:
                     "type"
                 ]
               }
+        } else if ([fields][log_host] == "mariadb") {
+            grok {
+                match => {
+                  "message" => [
+                      "(?m)^%{NUMBER:date}\s+%{NOTSPACE:time}\s+%{GREEDYDATA:message}",
+                      "(?m)\[%{NOTSPACE:severity}\] %{GREEDYDATA:message}",
+                      "(?m)(\s)+%{NOTSPACE:severity} %{GREEDYDATA:message}",
+                      "%{GREEDYDATA:message}"
+                  ]
+                }
+                overwrite => [ "message" ]
+                add_field => {
+                    "received_at" => "%{@timestamp}"
+                    "received_from" => "%{host}"
+                }
+                remove_field => [
+                    "beat",
+                    "input_type",
+                    "offset",
+                    "fields",
+                    "tags",
+                    "host",
+                    "type"
+                ]
+            }
         } else {
             grok {
                 match => {
