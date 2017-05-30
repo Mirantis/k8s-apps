@@ -1,0 +1,48 @@
+{{ $host := include "mariadb-fullname" . }}
+{{ $port := .Values.port }}
+{{ $rand := printf "%s-%s" .Release.Name (randAlpha 6) }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ printf "mariadb-test-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+    app: {{ template "mariadb-fullname" . }}
+  annotations:
+    helm.sh/hook: test-success
+spec:
+  containers:
+  - name: mariadb-test
+    image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+    imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+    env:
+    - name: ROOT_PASS
+      valueFrom:
+        secretKeyRef:
+          name: {{ template "mariadb-fullname" . }}
+          key: mariadb-root-password
+    command:
+      - "sh"
+      - "-cx"
+      - |
+        cat > query.sql << EOF
+        create database {{ $rand }}_test;
+        use {{ $rand }}_test;
+        create table test(value int);
+        insert into test(value) values
+        (4),
+        (8),
+        (15),
+        (16),
+        (23),
+        (42);
+        select * from test;
+        drop table test;
+        drop database {{ $rand }}_test;
+        EOF
+        cat query.sql
+        mysqladmin -h {{ $host }} -P {{ $port }} -u root -p$ROOT_PASS ping
+        mysql -h {{ $host }} -P {{ $port }} -u root -p$ROOT_PASS < query.sql
+  restartPolicy: Never
