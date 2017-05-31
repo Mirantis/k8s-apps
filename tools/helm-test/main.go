@@ -207,18 +207,6 @@ func doMain() int {
 		return INITIALIZATION_ERROR_CODE
 	}
 
-	// Ensure helm is completely initialized before starting tests.
-	// TODO: replace with helm init --wait after
-	// https://github.com/kubernetes/helm/issues/2114
-	xmlWrap("helm", "init", func() error {
-		initErr := fmt.Errorf("Not Initialized")
-		for initErr != nil {
-			_, initErr = output(exec.Command(HELM_CMD, "version"))
-			time.Sleep(2 * time.Second)
-		}
-		return initErr
-	})
-
 	for _, dir := range cases {
 		chartName := path.Base(dir)
 
