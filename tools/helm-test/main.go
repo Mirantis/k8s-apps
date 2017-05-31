@@ -101,8 +101,8 @@ var (
 	TEST_FAILURE_CODE         = 2
 
 	// external utils.
-	HELM_CMD    = "helm"
-	KUBECTL_CMD = "kubectl"
+	DEFAULT_HELM_CMD    = "helm"
+	DEFAULT_KUBECTL_CMD = "kubectl"
 )
 
 func init() {
@@ -166,6 +166,15 @@ func main() {
 	os.Exit(ret)
 }
 
+func LookupEnvDefault(key string, def string) string {
+	val, ok := os.LookupEnv(key)
+	if ok {
+		return val
+	} else {
+		return def
+	}
+}
+
 func doMain() int {
 	repoPathPtr := flag.String("repo", "charts/", "Path to charts repository")
 	junitPathPtr := flag.String("junit", "report.xml", "Path to output junit-xml report")
@@ -206,6 +215,9 @@ func doMain() int {
 		log.Fatal(err)
 		return INITIALIZATION_ERROR_CODE
 	}
+
+	HELM_CMD := LookupEnvDefault("HELM_CMD", DEFAULT_HELM_CMD)
+	KUBECTL_CMD := LookupEnvDefault("KUBECTL_CMD", DEFAULT_KUBECTL_CMD)
 
 	for _, dir := range cases {
 		chartName := path.Base(dir)
