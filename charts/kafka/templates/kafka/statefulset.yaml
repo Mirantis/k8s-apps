@@ -17,7 +17,7 @@ spec:
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         app: {{ template "kafka-fullname" . }}
       annotations:
-        {{- if .Values.prometheus.jmxExporter.enabled }}
+        {{- if .Values.prometheusExporter.enabled }}
         prometheus.io/scrape: "true"
         {{- end }}
         pod.beta.kubernetes.io/init-containers: '[
@@ -87,7 +87,7 @@ spec:
         image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
-        {{- if .Values.prometheus.jmxExporter.enabled }}
+        {{- if .Values.prometheusExporter.enabled }}
         - containerPort: 7071
           name: jmx
         {{- end }}
@@ -100,7 +100,7 @@ spec:
           value: "{{ template "zk-address" . }}"
         - name: KAFKA_HEAP_OPTS
           value: "-Xmx{{ .Values.heapSize }} -Xms{{ .Values.heapSize }}"
-        {{- if .Values.prometheus.jmxExporter.enabled }}
+        {{- if .Values.prometheusExporter.enabled }}
         - name: KAFKA_OPTS
           value: "-javaagent:/opt/kafka/jmx_prometheus_javaagent-0.9.jar=7071:/opt/kafka/configmap/kafka-jmx.yml"
         {{- end }}
@@ -119,7 +119,7 @@ spec:
           initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
           timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
         volumeMounts:
-        {{- if .Values.prometheus.jmxExporter.enabled }}
+        {{- if .Values.prometheusExporter.enabled }}
         - name: kafka-jmx
           mountPath: /opt/kafka/configmap
         {{- end }}
@@ -147,7 +147,7 @@ spec:
           - "\"*\""
       {{- end }}
       volumes:
-      {{- if .Values.prometheus.jmxExporter.enabled }}
+      {{- if .Values.prometheusExporter.enabled }}
       - name: kafka-jmx
         configMap:
           name: jmx-{{ template "kafka-fullname" . }}

@@ -15,7 +15,7 @@ spec:
         release: {{ .Release.Name | quote }}
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         app: {{ template "worker-fullname" . }}
-      {{- if .Values.prometheus.jmxExporter.enabled }}
+      {{- if .Values.prometheusExporter.enabled }}
       annotations:
         prometheus.io/scrape: "true"
       {{- end }}
@@ -36,11 +36,11 @@ spec:
             value: {{ .Values.spark.worker.executorMemory | quote }}
           - name: SPARK_NO_DAEMONIZE
             value: "1"
-          {{- if .Values.prometheus.jmxExporter.enabled }}
+          {{- if .Values.prometheusExporter.enabled }}
           - name: SPARK_DAEMON_JAVA_OPTS
             value: "-javaagent:/usr/local/spark/jmx_prometheus_javaagent-0.9.jar=7072:/usr/local/spark/conf/spark-jmx.yml"
           {{- end }}
-          {{- if .Values.prometheus.jmxExporter.enabled }}
+          {{- if .Values.prometheusExporter.enabled }}
           ports:
           - name: jmx-agent
             containerPort: 7072

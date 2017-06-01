@@ -17,7 +17,7 @@ spec:
         heritage: "{{ .Release.Service }}"
         app: {{ template "mariadb-fullname" . }}
       annotations:
-        {{- if .Values.mysqlExporter.enabled }}
+        {{- if .Values.prometheusExporter.enabled }}
         prometheus.io/scrape: "true"
         prometheus.io/port: "9104"
         {{- end }}
@@ -88,10 +88,10 @@ spec:
         - name: logdir
           mountPath: /opt/bitnami/mariadb/logs
         {{- end }}
-      {{- if .Values.mysqlExporter.enabled }}
+      {{- if .Values.prometheusExporter.enabled }}
       - name: mysql-exporter
-        image: "{{ .Values.mysqlExporter.image.repository }}{{ .Values.mysqlExporter.image.name }}:{{ .Values.mysqlExporter.image.tag }}"
-        imagePullPolicy: {{ .Values.mysqlExporter.image.pullPolicy | quote }}
+        image: "{{ .Values.prometheusExporter.image.repository }}{{ .Values.prometheusExporter.image.name }}:{{ .Values.prometheusExporter.image.tag }}"
+        imagePullPolicy: {{ .Values.prometheusExporter.image.pullPolicy | quote }}
         command:
         - sh
         - -cx
@@ -104,7 +104,7 @@ spec:
           host={{ template "mariadb-fullname" . }}
           port={{ .Values.port }}
           EOF
-          ./bin/mysqld_exporter{{ range .Values.mysqlExporter.flags }} {{ . }}{{ end }}
+          ./bin/mysqld_exporter{{ range .Values.prometheusExporter.flags }} {{ . }}{{ end }}
         # this port hardcoded in mysqld_exporter
         ports:
         - containerPort: 9104

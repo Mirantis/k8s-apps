@@ -16,7 +16,7 @@ spec:
         release: {{ .Release.Name | quote }}
         chart: {{ .Release.Name | quote }}
         app: {{ template "master-fullname" . }}
-      {{- if .Values.prometheus.jmxExporter.enabled }}
+      {{- if .Values.prometheusExporter.enabled }}
       annotations:
         prometheus.io/scrape: "true"
       {{- end }}
@@ -36,7 +36,7 @@ spec:
               value: "1"
             - name: SPARK_DAEMON_JAVA_OPTS
               value: "-Dspark.deploy.recoveryMode=ZOOKEEPER -Dspark.deploy.zookeeper.dir={{ .Values.zookeeper.path }} -Dspark.deploy.zookeeper.url={{ template "zk-address" . -}}
-                     {{- if .Values.prometheus.jmxExporter.enabled }} -javaagent:/usr/local/spark/jmx_prometheus_javaagent-0.9.jar=7072:/usr/local/spark/conf/spark-jmx.yml {{- end }}"
+                     {{- if .Values.prometheusExporter.enabled }} -javaagent:/usr/local/spark/jmx_prometheus_javaagent-0.9.jar=7072:/usr/local/spark/conf/spark-jmx.yml {{- end }}"
           ports:
             - name: jmx-agent
               containerPort: 7072

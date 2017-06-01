@@ -301,9 +301,8 @@ values.yaml
 
   .. code-block:: yaml
 
-      prometheus:
-        jmxExporter:
-          enabled: true
+      prometheusExporter:
+        enabled: false
 
 requirements.yaml
 ~~~~~~~~~~~~~~~~~

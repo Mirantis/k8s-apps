@@ -20,7 +20,7 @@ data:
     log4j.appender.file.layout=org.apache.log4j.PatternLayout
     log4j.appender.file.layout.ConversionPattern=[%p] %d %c %M - %m%n
 
-  {{- if .Values.prometheus.jmxExporter.enabled }}
+  {{- if .Values.prometheusExporter.enabled }}
   spark-jmx.yml: |-
    rules:
      # These come from the master

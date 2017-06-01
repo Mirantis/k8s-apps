@@ -23,9 +23,8 @@ persistence:
 
   hostPath: ""
 
-prometheus:
-  jmxExporter:
-    enabled: true
+prometheusExporter:
+  enabled: false
 
 heapSize: 1G
 resources:

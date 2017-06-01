@@ -15,7 +15,7 @@ spec:
       labels:
         app: {{ template "fullname" . }}
       annotations:
-        {{- if .Values.prometheus.jmxExporter.enabled }}
+        {{- if .Values.prometheusExporter.enabled }}
         prometheus.io/scrape: "true"
         {{- end }}
         {{- if eq .Values.antiAffinity "hard" }}
@@ -80,7 +80,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
-        {{- if .Values.prometheus.jmxExporter.enabled }}
+        {{- if .Values.prometheusExporter.enabled }}
         - name: JMX_AGENT
           value: "-javaagent:/etc/cassandra/jmx_prometheus_javaagent-0.9.jar=7070:/etc/cassandra/conf/cassandra-jmx.yml"
         {{- end }}
@@ -101,7 +101,7 @@ spec:
           containerPort: 7001
         - name: jmx
           containerPort: 7199
-        {{- if .Values.prometheus.jmxExporter.enabled }}
+        {{- if .Values.prometheusExporter.enabled }}
         - name: jmx-agent
           containerPort: 7070
         {{- end }}
@@ -114,7 +114,7 @@ spec:
         - name: logdir
           mountPath: /var/log/cassandra
         {{- end }}
-        {{- if .Values.prometheus.jmxExporter.enabled }}
+        {{- if .Values.prometheusExporter.enabled }}
         - name: cassandra-jmx
           mountPath: /etc/cassandra/conf
         {{- end }}
@@ -146,7 +146,7 @@ spec:
           hostPath:
             path: "{{ .Values.persistence.hostPath }}"
         {{- end }}
-        {{- if .Values.prometheus.jmxExporter.enabled }}
+        {{- if .Values.prometheusExporter.enabled }}
         - name: cassandra-jmx
           configMap:
             name: {{ template "fullname" . }}

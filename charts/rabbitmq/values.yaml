@@ -56,9 +56,8 @@ management:
     annotations: {}
       #   kubernetes.io/ingress.class: nginx
 
-prometheus:
-  exporter:
-    enabled: true
+prometheusExporter:
+    enabled: false
     image:
       repository: kbudde/
       name: rabbitmq-exporter

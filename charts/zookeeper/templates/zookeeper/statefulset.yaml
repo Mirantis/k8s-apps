@@ -17,7 +17,7 @@ spec:
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         app: {{ template "zk-fullname" . }}
       annotations:
-        {{- if .Values.prometheus.jmxExporter.enabled }}
+        {{- if .Values.prometheusExporter.enabled }}
         prometheus.io/scrape: "true"
         {{- end }}
         {{- if ne .Values.persistence.type "emptyDir" }}
@@ -82,7 +82,7 @@ spec:
           name: server
         - containerPort: {{ .Values.leaderElectionPort }}
           name: leader-election
-        {{- if .Values.prometheus.jmxExporter.enabled }}
+        {{- if .Values.prometheusExporter.enabled }}
         - containerPort: 7071
           name: jmx
         {{- end }}

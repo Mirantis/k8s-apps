@@ -59,9 +59,8 @@ service:
   loadBalancerSourceRanges: []
   annotations: {}
 
-prometheus:
-  jmxExporter:
-    enabled: true
+prometheusExporter:
+  enabled: false
 
 logCollector:
   enabled: false

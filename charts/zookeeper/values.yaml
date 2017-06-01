@@ -47,6 +47,5 @@ autopurge:
   purgeInterval: 1
   snapRetainCount: 3
 
-prometheus:
-  jmxExporter:
-    enabled: true
+prometheusExporter:
+  enabled: false

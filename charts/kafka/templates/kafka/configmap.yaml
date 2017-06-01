@@ -1,4 +1,4 @@
-{{- if .Values.prometheus.jmxExporter.enabled }}
+{{- if .Values.prometheusExporter.enabled }}
 kind: ConfigMap
 apiVersion: v1
 metadata:

@@ -17,7 +17,7 @@ spec:
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         app: {{ template "rabbitmq.fullname" . }}
       annotations:
-        {{- if .Values.prometheus.exporter.enabled }}
+        {{- if .Values.prometheusExporter.enabled }}
         prometheus.io/scrape: "true"
         prometheus.io/port: "9090"
         {{- end }}
@@ -57,10 +57,10 @@ spec:
         {{- end}}
     spec:
       containers:
-      {{- if .Values.prometheus.exporter.enabled }}
+      {{- if .Values.prometheusExporter.enabled }}
       - name: exporter
-        image: "{{ .Values.prometheus.exporter.image.repository }}{{ .Values.prometheus.exporter.image.name }}:{{ .Values.prometheus.exporter.image.tag }}"
-        imagePullPolicy: {{ .Values.prometheus.exporter.image.pullPolicy }}
+        image: "{{ .Values.prometheusExporter.image.repository }}{{ .Values.prometheuExporter.image.name }}:{{ .Values.prometheusExporter.image.tag }}"
+        imagePullPolicy: {{ .Values.prometheusExporter.image.pullPolicy }}
         env:
         - name: RABBIT_USER
           value: {{ .Values.user }}
