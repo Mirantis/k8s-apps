@@ -1,0 +1,18 @@
+{{- if .Values.cassandra.enabled }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ printf "spark-cassandra-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+  annotations:
+    helm.sh/hook: test-success
+spec:
+  containers:
+    - name: spark-casandra
+      image: {{ .Values.spark.image.repository }}{{ .Values.spark.image.name }}:{{ .Values.spark.image.tag }}
+      imagePullPolicy: {{ .Values.spark.image.pullPolicy }}
+      command:
+        - bash
+        - -c
+        - "spark-submit --master spark://{{ template "spark-address" . }} --conf spark.cassandra.connection.host={{- if .Values.cassandra.deployChart }} {{- printf "%s-%s" "cassandra" .Release.Name | trunc 63 | trimSuffix "-" -}} {{- else -}} {{- .Values.cassandra.externalAddress -}} {{- end }} /usr/local/spark/jars/simple-project_2.11-1.0.jar"
+  restartPolicy: Never
+{{- end }}

@@ -3,3 +3,7 @@ dependencies:
   version: 1.0.0
   repository: "file://../zookeeper"
   condition: zookeeper.deployChart
+- name: cassandra
+  version: 1.0.0
+  repository: "file://../cassandra"
+  condition: cassandra.enabled,cassandra.deployChart
