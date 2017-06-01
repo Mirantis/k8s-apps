@@ -8,7 +8,7 @@ MariaDB chart has been deployed!
 
 1. Run a pod that you can use as a client:
 
-    kubectl run {{ template "mariadb-fullname" . }}-client --rm --tty -i --image {{ .Values.image.repository }}:{{ .Values.image.tag }} --command -- bash
+    kubectl run {{ template "mariadb-fullname" . }}-client --rm --tty -i --image {{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }} --command -- bash
 
 2. Connect using the mysql cli, then provide your password:
 
