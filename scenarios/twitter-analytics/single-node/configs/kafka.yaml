@@ -1,0 +1,6 @@
+replicas: 1
+antiAffinity: "soft"
+
+zookeeper:
+  deployChart: false
+  externalAddress: zk-zookeeper-1-0.zk-zookeeper-1:2181

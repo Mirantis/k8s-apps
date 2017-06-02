@@ -1,0 +1,25 @@
+minHashtagCounts: 0
+
+zookeeper:
+  deployChart: false
+  externalAddress: zk-zookeeper-1-0.zk-zookeeper-1:2181,zk-zookeeper-1-1.zk-zookeeper-1:2181,zk-zookeeper-1-2.zk-zookeeper-1:2181
+
+kafka:
+  deployChart: false
+  externalAddress: kafka-kafka-1-0.kafka-kafka-1:9092,kafka-kafka-1-1.kafka-kafka-1:9092,kafka-kafka-1-2.kafka-kafka-1:9092
+  topic: twitter-stream
+  zookeeper:
+    deployChart: false
+    externalAddress: zk-zookeeper-1-0.zk-zookeeper-1:2181,zk-zookeeper-1-1.zk-zookeeper-1:2181,zk-zookeeper-1-2.zk-zookeeper-1:2181
+
+spark:
+  deployChart: false
+  externalAddress: spark-master-spark-1-0.spark-master-spark-1:7077,spark-master-spark-1-1.spark-master-spark-1:7077
+  zookeeper:
+    deployChart: false
+    externalAddress: zk-zookeeper-1-0.zk-zookeeper-1:2181,zk-zookeeper-1-1.zk-zookeeper-1:2181,zk-zookeeper-1-2.zk-zookeeper-1:2181
+
+hdfs:
+  deployChart: false
+  externalAddress: hdfs-namenode-hdfs-1-0.hdfs-namenode-hdfs-1
+  path: /twitter

@@ -1,0 +1,12 @@
+minPopularity: 1
+topListSize: 0
+
+service:
+  type: NodePort
+
+hdfs:
+  deployChart: false
+  path: /
+
+  externalAddress: hdfs-namenode-hdfs-1-0.hdfs-namenode-hdfs-1
+  externalPort: 8020
