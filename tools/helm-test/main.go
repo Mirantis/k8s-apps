@@ -246,7 +246,7 @@ func doMain() int {
 				}
 			}
 
-			installArgs := []string{"install", dir, "--namespace", ns, "--name", rel, "--wait"}
+			installArgs := []string{"install", dir, "--namespace", ns, "--name", rel, "--wait", "--timeout", "600"}
 			if testConfig != "" {
 				installArgs = append(installArgs, "--values", testConfig)
 			}
