@@ -1,0 +1,42 @@
+{{ $host := include "postgres-fullname" . }}
+{{ $port := .Values.port }}
+{{ $rand := printf "%s-%s" .Release.Name (randAlpha 6) }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ printf "postgresql-test-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+    app: {{ template "postgres-fullname" . }}
+  annotations:
+    helm.sh/hook: test-success
+spec:
+  containers:
+  - name: postgres-test
+    image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
+    imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+    env:
+    - name: PGPASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: {{ template "postgres-fullname" . }}
+          key: postgres-password
+    command:
+      - sh
+      - -cx
+      - |
+        cat > {{ $rand }}.sql << EOF
+        create table {{ $rand }}-journal(name varchar(30), mark int);
+        insert into {{ $rand }}-journal values
+        ('John', 5),
+        ('Jack', 4),
+        ('Jill', 3),
+        ('Peter', 2);
+        select * from {{ $rand }}-journal where name like 'J%';
+        drop table {{ $rand }}-journal;
+        \dt;
+        EOF
+        psql -U {{ .Values.credentials.user }} -h {{ template "postgres-fullname" . }} {{ .Values.postgresDatabase }} -a -f {{ $rand }}.sql
+  restartPolicy: Never
