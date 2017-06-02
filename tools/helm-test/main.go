@@ -180,6 +180,7 @@ func doMain() int {
 	junitPathPtr := flag.String("junit", "report.xml", "Path to output junit-xml report")
 	configPathPtr := flag.String("config", "tests/", "Path to charts config files")
 	paramsPtr := flag.String("params", "", "Set config values on the command line (can specify multiple or separate values with commas: key1=val1,key2=val2)")
+	excludePtr := flag.String("exclude", "", "List of charts to exclude from run")
 
 	flag.Parse()
 
@@ -187,20 +188,27 @@ func doMain() int {
 	log.Printf("Matches: %+v", matches)
 
 	var cases []string
-	if flag.NArg() != 0 {
-		testCases := flag.Args()
-		for _, match := range matches {
-			for _, testCase := range testCases {
-				if filepath.Base(match) == testCase {
-					cases = append(cases, match)
-				}
-			}
+	useAll := flag.NArg() == 0
+	include := make(map[string]bool)
+	if !useAll {
+		args := flag.Args()
+		for _, arg := range args {
+			include[arg] = true
 		}
-		log.Printf("Using the following charts: %v", cases)
 	} else {
-		cases = matches
 		log.Print("Test cases is not specified, using all charts")
 	}
+	exclude := make(map[string]bool)
+	for _, e := range strings.Split(*excludePtr, ",") {
+		exclude[e] = true
+	}
+	for _, match := range matches {
+		base := filepath.Base(match)
+		if (useAll || include[base]) && !exclude[base] {
+			cases = append(cases, match)
+		}
+	}
+	log.Printf("Using the following charts: %v", cases)
 
 	defer writeXML(*junitPathPtr, time.Now())
 	if !terminate.Stop() {
