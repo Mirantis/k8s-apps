@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "router-name" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "router-name" . }}
+spec:
+  replicas: {{ .Values.router.replicas }}
+  template:
+    metadata:
+      labels:
+        heritage: {{ .Release.Service | quote }}
+        release: {{ .Release.Name | quote }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "router-name" . }}
+    spec:
+      containers:
+      - name: mongo-router
+        image: {{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        env:
+          - name: MONGO_CONFIGDB_ADDRESS
+            value: {{ template "cfg-address" . }}
+        command:
+        - python
+        - /bootstrap.py
+        - {{ .Values.router.port | quote }}
+        - "router"
+        resources:
+{{ toYaml .Values.resources | indent 10 }}

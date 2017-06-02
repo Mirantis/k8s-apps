@@ -21,6 +21,9 @@ spec:
         - name: mongo-shard
           image: {{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: MONGO_ROUTER_ADDRESS
+              value: {{ template "router-address" . }}
           command:
             - python
             - /bootstrap.py

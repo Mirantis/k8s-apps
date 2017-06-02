@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import socket
 import subprocess
 import sys
@@ -88,6 +89,12 @@ def start_configsvr(port):
     return _start_mongo(command)
 
 
+def start_router(port, configdb_address):
+    command = "mongos --configdb config/%s --port %d" % (configdb_address,
+                                                         port)
+    return _start_mongo(command)
+
+
 def init_replicaset(master_address, replicaset):
     LOG.info("Init replicaset")
     client = pymongo.MongoClient(host=[master_address])
@@ -128,8 +135,21 @@ def join_to_replicaset(master_address, host_id, port, replicaset,
         try:
             res = client.admin.command("replSetReconfig", new_config)
             LOG.debug("Replicaset status:\n%s" % prettyjson(res))
+            break
         except Exception:
             LOG.exception("Reconfig failed, retrying...")
+            time.sleep(0.2)
+
+
+def add_shard(router_address, master_address):
+    while True:
+        try:
+            client = pymongo.MongoClient(host=[router_address])
+            res = client.admin.command("addShard", "shard/%s" % master_address)
+            LOG.debug("Shard status:\n%s" % prettyjson(res))
+            break
+        except Exception:
+            LOG.exception("Adding shard failed, retrying...")
             time.sleep(0.2)
 
 
@@ -142,14 +162,29 @@ def main():
     elif replicaset == "shard":
         daemon = start_shard(port)
         is_configsvr = False
-    wait_local_mongo(port)
-    master_address = get_master_address(port)
-    host_id = get_host_id()
-    if host_id == 0:
-        init_replicaset(master_address, replicaset)
-    else:
-        join_to_replicaset(master_address, host_id, port, replicaset,
-                           is_configsvr)
+    elif replicaset == "router":
+        config_address = os.environ.get("MONGO_CONFIGDB_ADDRESS")
+        if config_address is None:
+            LOG.error("Config DB address is not specified"
+                      "in MONGO_CONFIGDB_ADDRESS environment variable")
+            sys.exit(1)
+        daemon = start_router(port, config_address)
+    if replicaset != "router":
+        wait_local_mongo(port)
+        master_address = get_master_address(port)
+        host_id = get_host_id()
+        if host_id == 0:
+            init_replicaset(master_address, replicaset)
+            if replicaset == "shard":
+                router_address = os.environ.get("MONGO_ROUTER_ADDRESS")
+                if router_address is None:
+                    LOG.error("Router address is not specified in "
+                              "MONGO_ROUTER_ADDRESS environment variable")
+                    sys.exit(1)
+                add_shard(router_address, master_address)
+        else:
+            join_to_replicaset(master_address, host_id, port, replicaset,
+                            is_configsvr)
     daemon.wait()
     daemon.communicate()
 
