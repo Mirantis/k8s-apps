@@ -1,0 +1,8 @@
+datanode:
+  replicas: 1
+  antiAffinity: "soft"
+
+namenode:
+  ui:
+    service:
+      type: NodePort
