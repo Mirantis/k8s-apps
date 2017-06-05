@@ -26,6 +26,8 @@ spec:
           image: {{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
+            - dumb-init
+            - "--"
             - python
             - /bootstrap.py
             - {{ .Values.configServer.port | quote }}

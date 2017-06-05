@@ -4,5 +4,5 @@ COPY bootstrap.py /
 
 RUN apt update && \
     apt install -y python python-pip build-essential python-dev && \
-    pip install pymongo && \
+    pip install pymongo dumb-init && \
     apt purge -y build-essential python-dev

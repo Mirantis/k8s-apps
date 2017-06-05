@@ -25,9 +25,11 @@ spec:
           - name: MONGO_CONFIGDB_ADDRESS
             value: {{ template "cfg-address" . }}
         command:
-        - python
-        - /bootstrap.py
-        - {{ .Values.router.port | quote }}
-        - "router"
+          - dumb-init
+          - "--"
+          - python
+          - /bootstrap.py
+          - {{ .Values.router.port | quote }}
+          - "router"
         resources:
 {{ toYaml .Values.resources | indent 10 }}

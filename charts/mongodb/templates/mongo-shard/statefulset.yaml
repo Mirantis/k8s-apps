@@ -25,6 +25,8 @@ spec:
             - name: MONGO_ROUTER_ADDRESS
               value: {{ template "router-address" . }}
           command:
+            - dumb-init
+            - "--"
             - python
             - /bootstrap.py
             - {{ .Values.shard.port | quote }}
