@@ -7,30 +7,30 @@ metadata:
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     app: {{ template "es-fullname" . }}
-  {{- if .Values.data.service.annotations }}
+  {{- if .Values.client.service.annotations }}
   annotations:
-{{ toYaml .Values.data.service.annotations | indent 4}}
+{{ toYaml .Values.client.service.annotations | indent 4}}
   {{- end }}
 spec:
-  type: {{ .Values.data.service.type | quote }}
+  type: {{ .Values.client.service.type | quote }}
   ports:
     - port: {{ .Values.port }}
       targetPort: http
-      {{- if eq .Values.data.service.type "NodePort" }}
-      {{- if .Values.data.service.nodePort }}
-      nodePort: {{ .Values.data.service.nodePort }}
+      {{- if eq .Values.client.service.type "NodePort" }}
+      {{- if .Values.client.service.nodePort }}
+      nodePort: {{ .Values.client.service.nodePort }}
       {{- end -}}
       {{- end }}
   selector:
     app: {{ template "es-fullname" . }}
     type: client
-  {{- if eq .Values.data.service.type "LoadBalancer" }}
-  {{- if .Values.data.service.loadBalancerIP }}
-  loadBalancerIP: {{ .Values.data.service.loadBalancerIP }}
+  {{- if eq .Values.client.service.type "LoadBalancer" }}
+  {{- if .Values.client.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.client.service.loadBalancerIP }}
   {{- end }}
-  {{- if .Values.data.service.loadBalancerSourceRanges }}
+  {{- if .Values.client.service.loadBalancerSourceRanges }}
   loadBalancerSourceRanges:
-  {{- range .Values.data.service.loadBalancerSourceRanges }}
+  {{- range .Values.client.service.loadBalancerSourceRanges }}
   - {{ . }}
   {{- end }}
   {{- end -}}

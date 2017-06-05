@@ -1,11 +1,11 @@
-{{- if .Values.data.ingress.enabled -}}
+{{- if .Values.client.ingress.enabled -}}
 {{- $releaseName := .Release.Name -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: {{ printf "elasticsearch-ingress-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
   annotations:
-  {{- range $key, $value := .Values.data.ingress.annotations }}
+  {{- range $key, $value := .Values.client.ingress.annotations }}
     {{ $key }}: {{ $value | quote }}
   {{- end }}
   labels:
@@ -14,16 +14,16 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     app: {{ template "es-fullname" . }}
 spec:
-  {{- if .Values.data.ingress.tls.enabled }}
+  {{- if .Values.client.ingress.tls.enabled }}
   tls:
     - hosts:
-      {{- range .Values.data.ingress.hosts }}
+      {{- range .Values.client.ingress.hosts }}
         - {{ . }}
       {{- end }}
-      secretName: {{ .Values.data.ingress.tls.secretName }}
+      secretName: {{ .Values.client.ingress.tls.secretName }}
   {{- end }}
   rules:
-  {{- range .Values.data.ingress.hosts }}
+  {{- range .Values.client.ingress.hosts }}
     - host: {{ . }}
       http:
         paths:
