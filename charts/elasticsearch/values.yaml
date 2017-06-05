@@ -16,7 +16,7 @@ image:
   pullPolicy: Always
 
 master:
-  replicas: 2
+  replicas: 1
   heapSize: 1G
   resources:
     requests:
@@ -27,7 +27,7 @@ master:
     #  memory: 1Gi
 
 client:
-  replicas: 2
+  replicas: 1
   heapSize: 1G
   resources:
     requests:
@@ -36,6 +36,21 @@ client:
     #limits:
     #  cpu: 512m
     #  memory: 1Gi
+  service:
+    type: ClusterIP # or NodePort or LoadBalancer
+    nodePort: ""
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    annotations: {}
+  ingress:
+    enabled: false
+    hosts: []
+    #  - some.domain
+    tls:
+      enabled: false
+      secretName: ""
+    annotations: {}
+    #  kubernetes.io/ingress.class: nginx
 
 data:
   replicas: 3
@@ -52,18 +67,3 @@ data:
     #storageClass: ""
     volumeSize: 10Gi
     hostPath: ""
-  service:
-    type: ClusterIP # or NodePort or LoadBalancer
-    nodePort: ""
-    loadBalancerIP: ""
-    loadBalancerSourceRanges: []
-    annotations: {}
-  ingress:
-    enabled: false
-    hosts: []
-    #  - some.domain
-    tls:
-      enabled: false
-      secretName: ""
-    annotations: {}
-    #  kubernetes.io/ingress.class: nginx

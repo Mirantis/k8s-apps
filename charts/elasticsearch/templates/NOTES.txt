@@ -4,33 +4,33 @@ Elasticsearch can be accessed via port {{ .Values.port }} on the following DNS n
 
     {{ template "es-client-fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
 
-{{- if .Values.data.ingress.enabled }}
+{{- if .Values.client.ingress.enabled }}
 
 From outside the cluster, the cluster URL(s) are:
-{{ if .Values.data.ingress.tls.enabled }}
-{{- range .Values.data.ingress.hosts }}
+{{ if .Values.client.ingress.tls.enabled }}
+{{- range .Values.client.ingress.hosts }}
     https://{{ . }}
 {{- end -}}
 {{- else }}
-{{- range .Values.data.ingress.hosts }}
+{{- range .Values.client.ingress.hosts }}
     http://{{ . }}
 {{- end -}}
 {{- end }}
 {{ else }}
 Get the Elasticsearch URL to visit by running these commands in the same shell:
 
-{{ if contains "NodePort" .Values.data.service.type -}}
+{{ if contains "NodePort" .Values.client.service.type -}}
     export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "es-client-fullname" . }})
     export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
     echo http://$NODE_IP:$NODE_PORT
-{{ else if contains "LoadBalancer" .Values.data.service.type -}}
+{{ else if contains "LoadBalancer" .Values.client.service.type -}}
 NOTE: It may take a few minutes for the LoadBalancer IP to be available.
 
 You can watch the status of it by running 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "es-client-fullname" . }}'
 
     export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "es-client-fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
     echo http://$SERVICE_IP:{{ .Values.port }}
-{{ else if contains "ClusterIP" .Values.data.service.type }}
+{{ else if contains "ClusterIP" .Values.client.service.type }}
     export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app={{ template "es-fullname" . }},type=client" -o jsonpath="{.items[0].metadata.name}")
     kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 3000
 {{- end }}
