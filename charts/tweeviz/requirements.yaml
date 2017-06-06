@@ -3,3 +3,7 @@ dependencies:
   version: ^1.x
   repository: "file://../hdfs"
   condition: hdfs.deployChart
+- name: cassandra
+  version: ^1.x
+  repository: "file://../cassandra"
+  condition: cassandra.deployChart

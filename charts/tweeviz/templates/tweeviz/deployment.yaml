@@ -19,6 +19,18 @@ spec:
         image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
+        - name: TWEEVIZ_STORAGE
+          value: {{ .Values.storage }}
+        - name: TWEEVIZ_CASSANDRA_ADDRESS
+          {{- if .Values.cassandra.deployChart }}
+          value: {{- printf "cassandra-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+          {{- else }}
+          value: "{{ .Values.cassandra.externalAddress }}"
+          {{- end }}
+        - name: TWEEVIZ_CASSANDRA_KEYSPACE
+          value: "{{ .Values.cassandra.keyspace }}"
+        - name: TWEEVIZ_CASSANDRA_TABLE
+          value: "{{ .Values.cassandra.table }}"
         - name: TWEEVIZ_HDFS_ADDRESS
           {{- if .Values.hdfs.deployChart }}
           value: {{ printf "hdfs-namenode-%s" .Release.Name  | trunc 63 | trimSuffix "-" }}
