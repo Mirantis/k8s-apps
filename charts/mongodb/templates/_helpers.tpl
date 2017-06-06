@@ -24,3 +24,11 @@
 {{- $release := (.Release.Name | trunc 63 | trimSuffix "-") -}}
 {{ printf "mongo-router-%s:%d" $release (int .Values.router.port) }}
 {{- end -}}
+
+{{- define "shard-address" -}}
+{{- $release := (.Release.Name | trunc 63 | trimSuffix "-") -}}
+{{- range $i, $e := until (int $.Values.shard.replicas) -}}
+    {{- if $i }},{{- end -}}
+    {{ printf "mongo-shard-%s-%d.mongo-shard-%s:%d" $release $i $release (int $.Values.shard.port) -}}
+{{- end -}}
+{{- end -}}

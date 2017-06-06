@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ printf "mongo-test-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+  annotations:
+    helm.sh/hook: test-success
+spec:
+  containers:
+    - name: mongo-test
+      image: {{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}
+      imagePullPolicy: {{ .Values.image.pullPolicy }}
+      env:
+        - name: MONGO_CONFIGDB_ADDRESS
+          value: {{ template "cfg-address" . }}
+        - name: MONGO_CONFIGDB_REPLICAS
+          value: {{ .Values.configServer.replicas | quote }}
+        - name: MONGO_ROUTER_ADDRESS
+          value: {{ template "router-address" . }}
+        - name: MONGO_ROUTER_REPLICAS
+          value: {{ .Values.router.replicas | quote }}
+        - name: MONGO_SHARD_ADDRESS
+          value: {{ template "shard-address" . }}
+        - name: MONGO_SHARD_REPLICAS
+          value: {{ .Values.shard.replicas | quote }}
+      command:
+        - python
+        - test.py
+  restartPolicy: Never
