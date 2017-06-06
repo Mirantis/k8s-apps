@@ -7,7 +7,7 @@ spark:
   image:
     repository: mirantisworkloads/
     name: spark
-    tag: 2.1.0
+    tag: 2.1.1
     pullPolicy: Always
   master:
     replicas: 2  # 1 or 2
@@ -80,3 +80,8 @@ zookeeper:
   externalAddress: ""
   # this path will be used as prefix for spark deployment, useful for multiple sparks per single zookeeper
   path: "/spark"
+
+cassandra:
+  enabled: false
+  deployChart: true
+  externalAddress: ""
