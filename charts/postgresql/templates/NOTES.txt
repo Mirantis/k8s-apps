@@ -45,5 +45,8 @@ To connect to your database run the following command (using the env variable fr
     export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app={{ template "postgres-fullname" . }}" -o jsonpath="{.items[0].metadata.name}")
     kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 3000
 {{- end -}}
-{{- end -}}
+{{- end }}
 
+To run simple test:
+
+    helm test {{ .Release.Name }} --cleanup
