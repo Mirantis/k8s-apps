@@ -1,6 +1,6 @@
 FROM mongo:3.4
 
-COPY bootstrap.py /
+COPY bootstrap.py test.py /
 
 RUN apt update && \
     apt install -y python python-pip build-essential python-dev && \

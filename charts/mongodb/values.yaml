@@ -4,7 +4,7 @@
 image:
   repository: mirantisworkloads/
   name: mongodb
-  tag: "3.4-r3"
+  tag: "3.4-r4"
   pullPolicy: Always
 
 configServer:
