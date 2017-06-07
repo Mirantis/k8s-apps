@@ -181,6 +181,7 @@ func doMain() int {
 	configPathPtr := flag.String("config", "tests/", "Path to charts config files")
 	paramsPtr := flag.String("params", "", "Set config values on the command line (can specify multiple or separate values with commas: key1=val1,key2=val2)")
 	excludePtr := flag.String("exclude", "", "List of charts to exclude from run")
+	prefixPtr := flag.String("prefix", "", "Prefix to prepend to object names (releases, namespaces)")
 
 	flag.Parse()
 
@@ -243,8 +244,8 @@ func doMain() int {
 		configMatches = append(configMatches, "")
 
 		for _, testConfig := range configMatches {
-			ns := randStringRunes(10)
-			rel := randStringRunes(3)
+			ns := *prefixPtr + randStringRunes(10)
+			rel := *prefixPtr + randStringRunes(3)
 
 			testName := func(stage string) string {
 				if testConfig == "" {
