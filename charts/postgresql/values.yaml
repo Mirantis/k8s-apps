@@ -1,0 +1,58 @@
+port: 5432
+
+image:
+ repository: ""
+ name: "postgres"
+ tag: "9.6.2"
+ pullPolicy: "IfNotPresent"
+
+credentials:
+  user: "postgres"
+  password: "postgres"
+
+postgresDatabase: ""
+
+probeInitialDelaySeconds: 60
+probeTimeoutSeconds: 5
+probeFailureThreshold: 6
+
+## Persist data to a persitent volume
+persistence:
+  type: emptyDir # or hostPath or PersistentVolumeClaim
+  #storageClass: ""
+  volumeSize: 10Gi
+  hostPath: ""
+
+service:
+  type: ClusterIP # or NodePort or LoadBalancer
+  nodePort: ""
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  annotations: {}
+
+ingress:
+  enabled: false
+  hosts: []
+    #   - some.domain
+  tls:
+    enabled: false
+    secretName: ""
+  annotations: {}
+    #- kubernetes.io/ingress.class: nginx
+
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 100m
+
+prometheusExporter:
+  enabled: false
+  image:
+    repository: wrouesnel/
+    name: postgres_exporter
+    tag: v0.1.1
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
