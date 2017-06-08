@@ -11,6 +11,9 @@ port: 8589
 minPopularity: 1
 topListSize: 0
 
+# Set custom header to be displayed in viz page
+header: "Twitter Stats"
+
 service:
   type: ClusterIP # or NodePort or LoadBalancer
 

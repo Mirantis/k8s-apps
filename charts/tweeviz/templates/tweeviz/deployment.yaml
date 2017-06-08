@@ -37,5 +37,7 @@ spec:
           value: "{{ .Values.minPopularity }}"
         - name: TWEEVIZ_TOP_LIST_SIZE
           value: "{{ .Values.topListSize }}"
+        - name: TWEEVIZ_HEADER
+          value: "{{ .Values.header }}"
         resources:
 {{ toYaml .Values.resources | indent 10 }}
