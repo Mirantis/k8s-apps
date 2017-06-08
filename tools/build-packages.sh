@@ -27,5 +27,5 @@ for d in ${repo_dir}/charts/*/; do
 done
 
 # generate index
-wget "${REPO_URL}/index.yaml"
+wget "${REPO_URL}/index.yaml" -O index.yaml
 helm repo index --url "${REPO_URL}" --merge index.yaml .
