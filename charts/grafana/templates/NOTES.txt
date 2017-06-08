@@ -1,1 +1,34 @@
 Grafana chart has been deployed.
+
+Internal URL:
+    grafana: {{ template "grafana-address" . }}
+
+External URL:
+{{- if .Values.ingress.enabled }}
+{{ if .Values.ingress.tls.enabled }}
+{{- range .Values.ingress.hosts }}
+    grafana: https://{{ . }}
+{{- end -}}
+{{- else }}
+{{- range .Values.ingress.hosts }}
+    grafana: http://{{ . }}
+{{- end -}}
+{{- end }}
+{{ else }}
+{{ if contains "NodePort" .Values.service.type -}}
+Get the Grafana URL to visit by running these commands in the same shell:
+
+    {{- if .Values.service.nodePort }}
+    export NODE_PORT={{ .Values.service.nodePort }}
+    {{- else }}
+    export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "fullname" . }})
+    {{- end -}}
+    export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+    echo http://$NODE_IP:$NODE_PORT
+{{ else if contains "LoadBalancer" .Values.service.type -}}
+NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+You can watch the status of it by running in the same shell 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "fullname" . }}'
+
+    grafana: http://{{ .Values.service.loadBalancerIP }}:{{ .Values.port }}
+{{- end }}
+{{- end }}

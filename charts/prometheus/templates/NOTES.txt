@@ -1,1 +1,102 @@
 Prometheus chart has been deployed.
+
+Internal URL:
+    alertmanager: {{ template "alertmanager.address" . }}
+    kube-state-metrics: {{ template "kubeStateMetrics.address" . }}
+    node-exporter: {{ template "nodeExporter.address" . }}
+    server: {{ template "server.address" . }}
+
+External URL:
+{{- if .Values.alertmanager.ingress.enabled }}
+From outside the cluster, the Alert Magager URL(s) are:
+{{ if .Values.alertmanager.ingress.tls.enabled }}
+{{- range .Values.namenode.ui.ingress.hosts }}
+    alertmanager: https://{{ . }}
+{{- end -}}
+{{- else }}
+{{- range .Values.alertmanager.ingress.hosts }}
+    alertmanager: http://{{ . }}
+{{- end -}}
+{{- end }}
+{{ else }}
+{{ if contains "NodePort" .Values.alertmanager.service.type -}}
+Get the Alert Magager URL to visit by running these commands in the same shell:
+
+    {{- if .Values.alertmanager.service.nodePort }}
+    export NODE_PORT={{ .Values.alertmanager.service.nodePort }}
+    {{- else }}
+    export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "alertmanager.fullname" . }})
+    {{- end -}}
+    export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+    echo http://$NODE_IP:$NODE_PORT
+{{ else if contains "LoadBalancer" .Values.alertmanager.service.type -}}
+NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+You can watch the status of it by running in the same shell 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "alertmanager.fullname" . }}'
+
+    alertmanager: http://{{ .Values.alertmanager.service.loadBalancerIP }}:{{ .Values.alertmanager.port }}
+{{- end }}
+{{- end }}
+
+{{ if contains "NodePort" .Values.kubeStateMetrics.service.type -}}
+Get the Kube State Metrics URL to visit by running these commands in the same shell:
+
+    {{- if .Values.kubeStateMetrics.service.nodePort }}
+    export NODE_PORT={{ .Values.kubeStateMetrics.service.nodePort }}
+    {{- else }}
+    export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "kubeStateMetrics.fullname" . }})
+    {{- end -}}
+    export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+    echo http://$NODE_IP:$NODE_PORT
+{{ else if contains "LoadBalancer" .Values.kubeStateMetrics.service.type -}}
+NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+You can watch the status of it by running in the same shell 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "kubeStateMetrics.fullname" . }}'
+
+    kubeStateMetrics: http://{{ .Values.kubeStateMetrics.service.loadBalancerIP }}:{{ .Values.kubeStateMetrics.port }}
+{{- end }}
+
+{{ if contains "NodePort" .Values.nodeExporter.service.type -}}
+Get the Node Exporter URL to visit by running these commands in the same shell:
+
+    {{- if .Values.nodeExporter.service.nodePort }}
+    export NODE_PORT={{ .Values.nodeExporter.service.nodePort }}
+    {{- else }}
+    export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "nodeExporter.fullname" . }})
+    {{- end -}}
+    export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+    echo http://$NODE_IP:$NODE_PORT
+{{ else if contains "LoadBalancer" .Values.nodeExporter.service.type -}}
+NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+You can watch the status of it by running in the same shell 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "nodeExporter.fullname" . }}'
+
+    nodeExporter: http://{{ .Values.nodeExporter.service.loadBalancerIP }}:{{ .Values.nodeExporter.port }}
+{{- end }}
+
+{{- if .Values.server.ingress.enabled }}
+{{ if .Values.server.ingress.tls.enabled }}
+{{- range .Values.server.ingress.hosts }}
+    server: https://{{ . }}
+{{- end -}}
+{{- else }}
+{{- range .Values.server.ingress.hosts }}
+    server: http://{{ . }}
+{{- end -}}
+{{- end }}
+{{ else }}
+{{ if contains "NodePort" .Values.server.service.type -}}
+Get the Server URL to visit by running these commands in the same shell:
+
+    {{- if .Values.server.service.nodePort }}
+    export NODE_PORT={{ .Values.server.service.nodePort }}
+    {{- else }}
+    export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "server.fullname" . }})
+    {{- end -}}
+    export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+    echo http://$NODE_IP:$NODE_PORT
+{{ else if contains "LoadBalancer" .Values.server.service.type -}}
+NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+You can watch the status of it by running in the same shell 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "server.fullname" . }}'
+
+    server: http://{{ .Values.namenode.server.loadBalancerIP }}:{{ .Values.server.port }}
+{{- end }}
+{{- end }}
+

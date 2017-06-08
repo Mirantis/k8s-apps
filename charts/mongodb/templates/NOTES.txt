@@ -1,0 +1,25 @@
+MongoDB chart has been deployed.
+
+Internal URL:
+    mongo-cfg: {{ template "cfg-address" . }}
+    mongo-router: {{ template "router-address" . }}
+    mongo-shard: {{ template "shard-address" . }}
+
+External URL:
+{{ if contains "NodePort" .Values.router.service.type -}}
+Get the Mongo Router URL to visit by running these commands in the same shell:
+
+    {{ if .Values.router.service.nodePort }}
+    export NODE_PORT={{ .Values.router.service.nodePort }}
+    {{- else }}
+    export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "router-name" . }})
+    {{- end -}}
+    export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+    echo http://$NODE_IP:$NODE_PORT
+{{ else if contains "LoadBalancer" .Values.router.service.type -}}
+
+NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+You can watch the status of it by running in the same shell 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "router-name" . }}'
+
+    mongo-router: http://{{ .Values.router.service.loadBalancerIP }}:{{ .Values.router.port }}
+{{- end }}

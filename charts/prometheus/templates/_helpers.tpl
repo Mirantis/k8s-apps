@@ -50,3 +50,20 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- $name := default .Chart.Name .Values.nameOverride -}}
 {{- printf "prometheus-server-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
+
+{{- define "alertmanager.address" -}}
+{{ template "alertmanager.fullname" . }}:{{ .Values.alertmanager.port }}
+{{- end -}}
+
+{{- define "kubeStateMetrics.address" -}}
+{{ template "kubeStateMetrics.fullname" . }}:{{ .Values.kubeStateMetrics.port }}
+{{- end -}}
+
+{{- define "nodeExporter.address" -}}
+{{ template "nodeExporter.fullname" . }}:{{ .Values.nodeExporter.port }}
+{{- end -}}
+
+{{- define "server.address" -}}
+{{ template "server.fullname" . }}:{{ .Values.server.port }}
+{{- end -}}
+

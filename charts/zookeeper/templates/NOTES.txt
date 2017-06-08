@@ -1,8 +1,4 @@
 ZooKeeper chart has been deployed.
 
-Connection string:
-{{ $replicas := int (.Values.replicas)}}
-{{- range $i, $e := until $replicas -}}
-    {{- if $i -}},{{- end -}}
-    zk-{{ $.Release.Name | trunc 63 }}-{{$i}}.zk-{{ $.Release.Name | trunc 63 }}:{{$.Values.clientPort}}
-{{- end -}}
+Internal URL:
+    zookeeper: {{ template "zookeeper.address" . }}

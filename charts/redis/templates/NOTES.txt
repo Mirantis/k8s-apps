@@ -1,12 +1,6 @@
 Redis has been deployed!
 
-Connection string:
-{{ $serviceName := include "sentinel-svc-fullname" . }}
-{{- range $i, $e := until (int .Values.replicas) -}}
-    {{- if $i -}},{{- end -}}
-    redis-{{ $.Release.Name | trunc 63 }}-{{ $i }}.{{ $serviceName }}:{{ $.Values.config.redisPort }}
-{{- end }}
-
+Internal URL:
+    redis: {{ template "redis-address" . }}
 To run simple test:
-
     helm test {{ .Release.Name }} --cleanup

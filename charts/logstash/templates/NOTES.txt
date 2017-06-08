@@ -1,1 +1,4 @@
 Logstash chart has been deployed.
+
+Internal URL:
+    logstash: {{ template "ls-address" . }}

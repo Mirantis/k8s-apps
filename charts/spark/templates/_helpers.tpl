@@ -30,6 +30,10 @@ Expand the name of the chart.
 {{- end -}}
 {{- end -}}
 
+{{- define "zeppelin-address" -}}
+{{ template "zeppelin-fullname" . }}:{{ .Values.zeppelin.port }}
+{{- end -}}
+
 {{- define "zk-address" -}}
     {{- if .Values.zookeeper.deployChart -}}
         {{- $release := (.Release.Name | trunc 63 | trimSuffix "-") -}}

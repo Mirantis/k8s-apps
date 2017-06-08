@@ -2,6 +2,10 @@
 {{- printf "grafana-%s" .Release.Name  | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{- define "grafana-address" -}}
+{{ template "fullname" . }}:{{ .Values.port }}
+{{- end -}}
+
 {{- define "prometheus-datasource" -}}
 {{- if .Values.prometheus.deployChart -}}
 {{- $url := printf "http://prometheus-server-%s:%d" (.Release.Name | trunc 63 | trimSuffix "-") (int .Values.prometheus.server.port) -}}

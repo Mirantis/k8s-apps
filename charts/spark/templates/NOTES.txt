@@ -1,4 +1,36 @@
 Spark chart has been deployed.
 
-Connection string:
-{{ template "spark-address" . }}
+Internal URL:
+    spark: {{ template "spark-address" . }}
+    zeppelin: {{ template "zeppelin-address" . }}
+
+External URL:
+{{ if .Values.ingress.enabled -}}
+{{ if .Values.ingress.tls.enabled }}
+{{- range .Values.ingress.hosts }}
+    spark: https://{{ . }}/webui
+    zeppelin: https://{{ . }}
+{{- end -}}
+{{- else }}
+{{- range .Values.ingress.hosts }}
+    spark: http://{{ . }}/webui
+    zeppelin: http://{{ . }}
+{{- end -}}
+{{- end }}
+{{- else -}}
+{{- if contains "NodePort" .Values.service.type -}}
+To get the Spark and Zeppelin URL to visit by running these commands in the same shell:
+
+    export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+    export SPARK_NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[1].nodePort}" services {{ template "spark-fullname" . }})
+    export ZEPPELIN_NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "zeppelin-fullname" . }})
+    echo http://$NODE_IP:$SPARK_NODE_PORT
+    echo http://$NODE_IP:$ZEPPELIN_NODE_PORT
+{{- else if contains "LoadBalancer" .Values.service.type -}}
+NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+You can watch the status of it by running in the same shell 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "spark-fullname" . }} {{ template "zeppelin-fullname" . }}'
+
+    spark: http://{{ .Values.service.loadBalancerIP }}:{{ .Values.spark.master.webuiPort }}
+    zeppelin: http://{{ .Values.service.loadBalancerIP }}:{{ .Values.zeppelin.port }}
+{{- end -}}
+{{- end -}}

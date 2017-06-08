@@ -1,4 +1,4 @@
 RabbitMQ chart has been deployed.
 
-Connection string:
-{{ template "rabbitmq.address" . }}
+Internal URL:
+    rabbitmq: {{ template "rabbitmq.address" . }}

@@ -17,3 +17,7 @@
         {{- printf "%s:%d" ( include "es-fullname" . ) ( int .Values.elasticsearch.port ) }}
     {{- end -}}
 {{- end -}}
+
+{{- define "kib-address" -}}
+{{ template "kib-fullname" . }}:{{ .Values.port }}
+{{- end -}}

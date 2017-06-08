@@ -14,3 +14,7 @@
 {{- define "es-fullname" -}}
 {{- printf "elasticsearch-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
+
+{{- define "es-address" -}}
+{{ template "es-client-fullname" . }}:{{ .Values.port }}
+{{- end -}}

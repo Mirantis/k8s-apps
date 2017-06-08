@@ -5,3 +5,7 @@
 {{- define "postgres-pvc-fullname" -}}
 {{- printf "postgresql-pvc-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
+
+{{- define "postgres-address" -}}
+{{ template "postgres-fullname" . }}:{{ .Values.port }}
+{{- end -}}

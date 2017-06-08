@@ -13,3 +13,7 @@
         {{- printf "%s:%d" ( include "es-fullname" . ) ( int .Values.elasticsearch.port ) }}
     {{- end -}}
 {{- end -}}
+
+{{- define "ls-address" -}}
+{{ template "ls-fullname" . }}:{{ .Values.port }}
+{{- end -}}

@@ -1,6 +1,7 @@
-PostgreSQL can be accessed via port {{ .Values.port }} on the following DNS name from within your cluster:
+PostgreSQL chart has been deployed!
 
-    {{ template "postgres-fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+Internal URL:
+    mariadb: {{ template "postgres-address" . }}
 
 To get your user password run:
 
@@ -13,8 +14,9 @@ To connect to your database run the following command (using the env variable fr
    --command -- psql -U {{ .Values.credentials.user }} \
    -h {{ template "postgres-fullname" . }} {{ .Values.postgresDatabase }}
 
+External URL:
 {{ if .Values.ingress.enabled -}}
-## From outside the cluster, the cluster URL(s) are:
+From outside the cluster, the cluster URL(s) are:
 {{ if .Values.ingress.tls.enabled }}
 {{- range .Values.ingress.hosts }}
     https://{{ . }}
@@ -26,24 +28,19 @@ To connect to your database run the following command (using the env variable fr
 {{- end }}
 {{- else -}}
 {{- if contains "NodePort" .Values.service.type -}}
-## To get the PostgreSQL to visit by running these commands in the same shell:
-
+To get the PostgreSQL to visit by running these commands in the same shell:
+    {{- if .Values.service.nodePort }}
+    export NODE_PORT={{ .Values.service.nodePort }}
+    {{- else }}
     export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "postgres-fullname" . }})
+    {{- end -}}
     export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
     echo http://$NODE_IP:$NODE_PORT
 {{- else if contains "LoadBalancer" .Values.service.type -}}
-# NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-        You can watch the status of it by running 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "postgres-fullname" . }}'
+NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+You can watch the status of it by running 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "postgres-fullname" . }}'
 
-## To get the PostgreSQL to visit by running these commands in the same shell:
-
-    export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "postgres-fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-    echo http://$SERVICE_IP:{{ .Values.port }}
-{{- else if contains "ClusterIP" .Values.service.type -}}
-## To get the PostgreSQL to visit by running these commands in the same shell:
-
-    export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app={{ template "postgres-fullname" . }}" -o jsonpath="{.items[0].metadata.name}")
-    kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 3000
+    echo http://{{ .Values.service.loadBalancerIP }}:{{ .Values.port }}
 {{- end -}}
 {{- end }}
 
