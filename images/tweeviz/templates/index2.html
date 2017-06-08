@@ -4,6 +4,7 @@
     <title>Twitter Analytics Visualization</title>
     <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='jqcloud.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='moment.min.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='jqcloud.min.css') }}">
     <script>
         $(function() {
@@ -12,19 +13,38 @@
                 height: 550
             });
 
+            var updated_at_text = "Loading..."
+            var updated_at_time = null
+
             function update_stats() {
-                $.getJSON("/stats").done(function(data) {
-                    $("#hashtags_cloud").jQCloud('update', data['popularity']);
+                $.getJSON("stats").done(function(data) {
+                    var popl = data['popularity']
+                    if (popl.length == 0) {
+                        updated_at_text = "No data"
+                    } else {
+                        updated_at_text = "Loaded"
+                    }
+                    updated_at_time = moment()
+                    $("#hashtags_cloud").jQCloud('update', popl);
                 }).always(function() {
-                    setTimeout(update_stats, 1000);
+                    setTimeout(update_stats, 5000);
                 });
             }
             update_stats();
+
+            var selector = $("#updated_at")
+            setInterval(function() {
+                var res = updated_at_text
+                if (updated_at_time != null) {
+                    res += " | Updated " + moment().diff(updated_at_time, 'seconds') + " sec ago"
+                }
+                selector.text(res)
+            }, 500)
         });
     </script>
 </head>
 <body>
-    <h2>Twitter Analytics Visualization</h2>
+    <h2>{{ header }} | <span id="updated_at"></span></h2>
     <div id="hashtags_cloud"></div>
 </body>
 </html>

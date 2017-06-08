@@ -6,18 +6,22 @@
         <script type="text/javascript" src="{{ url_for('static', filename='jquery2.min.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='d3.min.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='d3.layout.cloud.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='moment.min.js') }}"></script>
         <script type="text/javascript">
             var API_URL="stats"
              ,  REFRESH_INTERVAL=10
              ,  DATA_FIELD="popularity"
-             ,  MAX_DATA=50;
+             ,  MAX_DATA=20;
+
+            var updated_at_text = "Loading..."
+            var updated_at_time = null
 
             var visualization = function(visualization){
                 var data, layout, svg,  vis, w, h
                     , fill = d3.scale.category20b();
                 visualization.init = function(){
                     w = window.innerWidth;
-                    h = window.innerHeight;
+                    h = window.innerHeight - 30;
                     layout = d3.layout.cloud()
                             .timeInterval(Infinity)
                             .size([w, h])
@@ -100,6 +104,14 @@
                         }else{
                             data = res;
                         }
+
+                        if (data.length == 0) {
+                            updated_at_text = "No data"
+                        } else {
+                            updated_at_text = "Loaded"
+                        }
+                        updated_at_time = moment()
+
                         // sort data by weight
                         data.sort(function(a,b){
                            return b.weight - a.weight;
@@ -117,7 +129,7 @@
                             }
                         });
                         // patch data weights
-                        var maxSize = 250;
+                        var maxSize = 60;
                         var minSize = 15;
                         data.forEach(function(val){
                             val.size = ((val.weight - minWeight) / maxWeight) * maxSize + minSize;
@@ -134,9 +146,21 @@
 
             $(visualization.fetchData);
             setInterval(visualization.fetchData.bind(null, true), REFRESH_INTERVAL*1000)
+
+            $(function() {
+                var selector = $("#updated_at")
+                setInterval(function() {
+                    var res = updated_at_text
+                    if (updated_at_time != null) {
+                        res += " | Updated " + moment().diff(updated_at_time, 'seconds') + " sec ago"
+                    }
+                    selector.text(res)
+                }, 500)
+            })
         </script>
     </head>
     <body>
+        <h2>{{ header }} | <span id="updated_at"></span></h2>
         <div id="vis"></div>
     </body>
 </html>

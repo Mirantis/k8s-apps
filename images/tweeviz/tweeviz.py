@@ -14,6 +14,7 @@ hdfs_port = int(os.getenv('TWEEVIZ_HDFS_PORT', 8020))
 results_dir = os.getenv('TWEEVIZ_HDFS_PATH', '/')
 min_popularity = int(os.getenv('TWEEVIZ_MIN_POPULARITY', 2))
 top_list_len = int(os.getenv('TWEEVIZ_TOP_LIST_SIZE', 0))
+header = os.getenv('TWEEVIZ_HEADER', 'Twitter stats')
 
 
 hashtags = {}
@@ -64,12 +65,12 @@ app = flask.Flask(__name__)
 @app.route('/')
 @app.route('/index.html')
 def index():
-    return flask.render_template('index.html')
+    return flask.render_template('index.html', header=header)
 
 
 @app.route('/index2.html')
 def index2():
-    return flask.render_template('index2.html')
+    return flask.render_template('index2.html', header=header)
 
 
 @app.route('/stats')
