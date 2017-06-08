@@ -14,7 +14,7 @@ metadata:
 spec:
   ports:
   - port: {{ .Values.namenode.ui.port }}
-    name: ui
+    name: webui
     {{- if eq .Values.namenode.ui.service.type "NodePort" }}
     {{- if .Values.namenode.ui.service.nodePort }}
     nodePort: {{ .Values.namenode.ui.service.nodePort }}
