@@ -8,7 +8,7 @@ fi
 
 set -eux
 
-REPO_URL="https://${org}.storage.googleapis.com/"
+REPO_URL="https://${org}.storage.googleapis.com"
 repo_dir="$(dirname "$(dirname "$(realpath $0)")")"
 
 # build dependencies
