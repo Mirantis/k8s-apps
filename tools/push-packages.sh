@@ -25,3 +25,4 @@ repo_dir="$(dirname "$(dirname "$(realpath $0)")")"
 pushd "${repo_dir}/dist/charts"
 
 gsutil -m rsync ./ gs://${org}/
+gsutil -m acl set -R -a public-read gs://${org}
