@@ -1,0 +1,4 @@
+antiAffinity: "soft"
+
+config:
+  clusterSize: 1

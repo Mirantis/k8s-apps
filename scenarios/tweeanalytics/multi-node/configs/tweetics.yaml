@@ -1,0 +1,33 @@
+minHashtagCounts: 0
+
+zookeeper:
+  deployChart: false
+  externalAddress: zk-ZKRELEASE-0.zk-ZKRELEASE:2181,zk-ZKRELEASE-1.zk-ZKRELEASE:2181,zk-ZKRELEASE-2.zk-ZKRELEASE:2181
+
+kafka:
+  deployChart: false
+  externalAddress: kafka-kafka-zl4rx4ub-0.kafka-kafka-zl4rx4ub:9092,kafka-kafka-zl4rx4ub-1.kafka-kafka-zl4rx4ub:9092,kafka-kafka-zl4rx4ub-2.kafka-kafka-zl4rx4ub:9092
+  topic: twitter-stream
+  zookeeper:
+    deployChart: false
+    externalAddress: zk-ZKRELEASE-0.zk-ZKRELEASE:2181,zk-ZKRELEASE-1.zk-ZKRELEASE:2181,zk-ZKRELEASE-2.zk-ZKRELEASE:2181
+
+spark:
+  deployChart: false
+  externalAddress: spark-master-SPARKRL-0.spark-master-SPARKRL:7077,spark-master-SPARKRL-1.spark-master-SPARKRL:7077
+  zookeeper:
+    deployChart: false
+    externalAddress: zk-ZKRELEASE-0.zk-ZKRELEASE:2181,zk-ZKRELEASE-1.zk-ZKRELEASE:2181,zk-ZKRELEASE-2.zk-ZKRELEASE:2181
+
+storage: STORAGE
+
+hdfs:
+  deployChart: false
+  externalAddress: hdfs-namenode-HDFSRELEASE-0.hdfs-namenode-HDFSRELEASE
+  path: /twitter
+
+cassandra:
+  deployChart: false
+  externalAddress: cassandra-CASRELEASE:9042
+  keyspace: mirantis
+  table: tweetics

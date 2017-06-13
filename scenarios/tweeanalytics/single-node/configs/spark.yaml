@@ -9,4 +9,4 @@ service:
 
 zookeeper:
   deployChart: false
-  externalAddress: zk-zookeeper-1-0.zk-zookeeper-1:2181
+  externalAddress: zk-ZKRELEASE-0.zk-ZKRELEASE:2181

@@ -1,8 +1,8 @@
 twitter:
-  appKey: EDITME
-  appSecret: EDITME
-  tokenKey: EDITME
-  tokenSecret: EDITME
+  appKey: APPKEY
+  appSecret: APPSECRET
+  tokenKey: TOKENKEY
+  tokenSecret: TOKENSECRET
 
   locations: -71.4415,41.9860,-70.4747,42.9041
 

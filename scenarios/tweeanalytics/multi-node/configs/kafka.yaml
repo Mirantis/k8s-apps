@@ -1,0 +1,6 @@
+replicas: 3
+antiAffinity: "hard"
+
+zookeeper:
+  deployChart: false
+  externalAddress: zk-ZKRELEASE-0.zk-ZKRELEASE:2181,zk-ZKRELEASE-1.zk-ZKRELEASE:2181,zk-ZKRELEASE-2.zk-ZKRELEASE:2181

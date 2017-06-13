@@ -1,0 +1,12 @@
+spark:
+  master:
+    replicas: 2
+  worker:
+    replicas: 3
+
+service:
+  type: NodePort
+
+zookeeper:
+  deployChart: false
+  externalAddress: zk-ZKRELEASE-0.zk-ZKRELEASE:2181,zk-ZKRELEASE-1.zk-ZKRELEASE:2181,zk-ZKRELEASE-2.zk-ZKRELEASE:2181
