@@ -29,6 +29,8 @@ spec:
           value: "{{ .Values.threadsCount }}"
         - name: IOTGEN_RATE
           value: "{{ .Values.rate }}"
+        - name: IOTGEN_TEMPLATE
+          value: /templates/template.tpl
         resources:
 {{ toYaml .Values.resources | indent 12 }}
         volumeMounts:
