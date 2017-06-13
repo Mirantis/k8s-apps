@@ -3,3 +3,7 @@ dependencies:
   version: ^1.x
   repository: "file://../kafka"
   condition: kafka.deployChart
+- name: hdfs
+  version: ^1.x
+  repository: "file://../hdfs"
+  condition: hdfs.deployChart

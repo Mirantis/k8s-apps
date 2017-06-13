@@ -2,10 +2,12 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 image:
-  repository: frostman/
+  repository: mirantisworkloads/
   name: tweepub
-  tag: latest
+  tag: 1.1.0
   pullPolicy: Always
+
+storage: kafka # hdfs or kafka
 
 twitter:
   # TweePub needs to authorize on Twitter Streaming API to listen for tweets
@@ -40,6 +42,13 @@ kafka:
   externalAddress: ""
   # Kafka topic where the tweets will be published
   topic: twitter-stream
+
+hdfs:
+  # if disabled, subchart will not be deployed
+  deployChart: false
+  # this address will be used if subchart deployment is disabled
+  externalAddress: ""
+  path: "/demo/tweepub"
 
 resources:
   requests:

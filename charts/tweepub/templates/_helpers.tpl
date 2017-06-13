@@ -13,3 +13,12 @@
         {{- printf "%s" .Values.kafka.externalAddress -}}
     {{- end -}}
 {{- end -}}
+
+{{- define "tweepub.hdfs-address" -}}
+    {{- if .Values.hdfs.deployChart -}}
+        {{- printf "hdfs-namenode-%s" .Release.Name  | trunc 63 | trimSuffix "-" }}-0.{{ printf "hdfs-namenode-%s" .Release.Name  | trunc 63 | trimSuffix "-" -}}:{{ .Values.hdfs.namenode.ui.port }}
+    {{- else -}}
+        {{- printf "%s" .Values.hdfs.externalAddress -}}
+    {{- end -}}
+{{- end -}}
+

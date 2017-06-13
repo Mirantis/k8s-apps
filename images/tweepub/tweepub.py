@@ -29,12 +29,15 @@ def process_comma_separated_option(option):
 @click.option('--languages', default='en',
               help="Limit filter to the comma-separated list of BCP 47"
                    " language identifiers")
-@click.option('--kafka', default="localhost:9092",
+@click.option('--kafka', default=None,
               help="A comma-separated list of Kafka bootstap servers")
 @click.option('--topic', default="twitter-stream",
               help="Kafka topic where the tweets will be published")
+@click.option('--hdfs', default=None,
+              help="A comma-separated list of HDFS-namenode servers")
+@click.option('--path', help="Path in HDFS to save Tweets")
 def _main(app_key, app_secret, token_key, token_secret, follow, track,
-         locations, languages, kafka, topic):
+         locations, languages, kafka, topic, hdfs, path):
     """TweePub reads tweets from Twitter Streaming API with provided
        characteristics and pushes them to specified Apache Kafka instance.
     """
@@ -59,14 +62,42 @@ def _main(app_key, app_secret, token_key, token_secret, follow, track,
     api = tweepy.API(auth)
     click.echo("Twitter authenticated user: %s" % api.me().screen_name)
 
-    click.echo("Kafka bootstrap servers: %s" % kafka)
-    producer = kafka_client.KafkaProducer(bootstrap_servers=kafka,
-                                          value_serializer=str.encode)
 
-    stream_listener = TwitterStreamListener(producer, topic)
+    if kafka:
+      click.echo("Kafka bootstrap servers: %s" % kafka)
+      producer = kafka_client.KafkaProducer(bootstrap_servers=kafka,
+                                          value_serializer=str.encode)
+      stream_listener = TwitterStreamListener(producer, topic)
+    else:
+      click.echo("HDFS server: %s" % hdfs)
+      from pyhdfs import HdfsClient
+      client = HdfsClient(hosts=hdfs, user_name='root')
+      stream_listener = HDFSStreamListener(client, path)
+
     stream = tweepy.Stream(auth=api.auth, listener=stream_listener)
     stream.filter(follow=follow, track=track, locations=locations, languages=languages)
     producer.flush()
+
+
+
+class HDFSStreamListener(tweepy.StreamListener):
+    def __init__(self, client, path):
+        self.client = client
+        self.path = path
+        super(HDFSStreamListener, self).__init__()
+
+    def on_status(self, status):
+        click.echo(">>> %s ::: %s" % (status.author.screen_name, status.text))
+        if self.client.exists(self.path):
+          self.client.append(self.path, json.dumps(status._json))
+        else:
+          self.client.create(self.path, json.dumps(status._json))
+
+    def on_error(self, status_code):
+        click.echo("Error happened in HDFS Stream listener: %s" % status_code)
+        # Disconnect only if rate limited and keep going otherwise
+        if status_code == 420:
+           return False
 
 
 class TwitterStreamListener(tweepy.StreamListener):
