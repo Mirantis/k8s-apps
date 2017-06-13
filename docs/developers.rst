@@ -83,8 +83,57 @@ NOTES.txt
 Should contain:
 
 * Message about service deployment completion
-* Addresses of deployed services or a command to get them
+* Internal addresses of deployed services in the form:
+    Internal URL:
+       service1: url
+       service2: url
+* External addresses of deployed services or a command to get them
+  (depending on the service type, enabled or disabled ingress and tls)
+  in the form:
+    External URL:
+       service1: url (or how to get url)
 * Authentication information (usernames/passwords/etc.)
+
+Example:
+
+
+  .. code-block:: smarty
+
+    Service has been deployed!
+
+    Internal URL:
+        service: {{ template "service-address" . }}
+
+    External URL:
+    {{- if .Values.ingress.enabled }}
+    From outside the cluster, the cluster URL(s) are:
+    {{ if .Values.ingress.tls.enabled }}
+    {{- range .Values.ingress.hosts }}
+        service: https://{{ . }}
+    {{- end -}}
+    {{- else }}
+    {{- range .Values.ingress.hosts }}
+        service: http://{{ . }}
+    {{- end -}}
+    {{- end }}
+    {{ else }}
+    {{ if contains "NodePort" .Values.service.type -}}
+    Get the Service URL to visit by running these commands in the same shell:
+
+        {{- if .Values.service.nodePort }}
+        export NODE_PORT={{ .Values.service.nodePort }}
+        {{- else }}
+        export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "service-fullname" . }})
+        {{- end -}}
+        export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+        echo http://$NODE_IP:$NODE_PORT
+    {{ else if contains "LoadBalancer" .Values.service.type -}}
+    NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+    You can watch the status of it by running in the same shell 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "service-fullname" . }}'
+
+        service: http://{{ .Values.service.loadBalancerIP }}:{{ .Values.port }}
+    {{- end }}
+    {{- end }}
 
 _helpers.tpl
 ~~~~~~~~~~~~
