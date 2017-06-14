@@ -2,14 +2,15 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 image:
-  repository: frostman/
+  repository: mirantisworkloads/
   name: tweeviz
-  tag: latest
+  tag: 1.1.0
   pullPolicy: Always
 
 port: 8589
 minPopularity: 1
 topListSize: 0
+storage: "hdfs" # cassandra or hdfs
 
 # Set custom header to be displayed in viz page
 header: "Twitter Stats"
@@ -50,3 +51,9 @@ hdfs:
   # these values should be set if subchart deployment is disabled:
   externalAddress: ""
   externalPort: 8020
+
+cassandra:
+  deployChart: false
+  externalAddress: ""
+  keyspace: mirantis
+  table: tweetics
