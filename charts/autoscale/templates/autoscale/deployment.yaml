@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "autoscale.fullname" . }}
+  labels:
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "autoscale.fullname" . }}
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ template "autoscale.fullname" . }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: AUTOSCALE_PROMETHEUS_ADDRESS
+          value: {{ template "autoscale.prometheus-address" . }}
+        - name: AUTOSCALE_KUBERNETES_NAMESPACE
+          value: "{{ .Release.Namespace }}"
+        - name: AUTOSCALE_POLLING_INTERVAL
+          value: "{{ .Values.pollingInterval }}"
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
