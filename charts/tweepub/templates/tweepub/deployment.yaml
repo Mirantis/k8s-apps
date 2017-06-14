@@ -35,9 +35,16 @@ spec:
           value: "{{ .Values.twitter.locations }}"
         - name: TWEEPUB_LANGUAGES
           value: "{{ .Values.twitter.languages }}"
+        {{ if eq .Values.storage "kafka" }}
         - name: TWEEPUB_KAFKA
           value: {{ template "kafka-address" . }}
         - name: TWEEPUB_TOPIC
           value: "{{ .Values.kafka.topic }}"
+        {{ else }}
+        - name: TWEEPUB_HDFS
+          value: {{ template "tweepub.hdfs-address" . }}
+        - name: TWEEPUB_PATH
+          value: "{{ .Values.hdfs.path }}"
+        {{ end }}
         resources:
 {{ toYaml .Values.resources | indent 12 }}
