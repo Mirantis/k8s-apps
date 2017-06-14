@@ -45,3 +45,19 @@
         {{- printf "%s" .Values.hdfs.externalAddress -}}
     {{- end -}}
 {{- end -}}
+
+{{- define "tweetics.cassandra-address" -}}
+    {{- if .Values.cassandra.deployChart -}}
+        {{- printf "cassandra-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
+    {{- else -}}
+        {{- .Values.cassandra.externalAddress -}}
+    {{- end -}}
+{{- end -}}
+
+{{- define "tweetics-storage" -}}
+    {{- if eq .Values.storage "hdfs" -}}
+        {{- printf "hdfs://" -}}{{ template "tweetics.hdfs-address" . }}{{- .Values.hdfs.path -}}
+    {{- else -}}
+        {{ template "tweetics.cassandra-address" . }}:{{- .Values.cassandra.keyspace -}}:{{- .Values.cassandra.table -}}
+    {{- end -}}
+{{- end -}}

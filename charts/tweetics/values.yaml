@@ -4,22 +4,23 @@
 image:
   repository: mirantisworkloads/
   name: tweetics
-  tag: 1.0.0
+  tag: 1.1.0
   pullPolicy: Always
 
 # Filter out hashtags with less then specified count
 minHashtagCounts: 0
+storage: "hdfs" # hdfs or cassandra
 
 zookeeper:
   # if disabled, subchart will not be deployed
   deployChart: false
   # this address will be used if subchart deployment is disabled
   # Required
-  externalAddress: "zk-zk-0.zk-zk:2181,zk-zk-1.zk-zk:2181,zk-zk-2.zk-zk:2181"
+  externalAddress: ""
 
 kafka:
   # if disabled, subchart will not be deployed
-  deployChart: true
+  deployChart: false
   # this address will be used if subchart deployment is disabled
   externalAddress: ""
   # Kafka topic name
@@ -27,7 +28,7 @@ kafka:
   zookeeper:
     deployChart: false
     # Required
-    externalAddress: "zk-zk-0.zk-zk:2181,zk-zk-1.zk-zk:2181,zk-zk-2.zk-zk:2181"
+    externalAddress: ""
 
 spark:
   # if disabled, subchart will not be deployed
@@ -39,7 +40,7 @@ spark:
   zookeeper:
     deployChart: false
     # Required
-    externalAddress: "zk-zk-0.zk-zk:2181,zk-zk-1.zk-zk:2181,zk-zk-2.zk-zk:2181"
+    externalAddress: ""
 
 hdfs:
   # if disabled, subchart will not be deployed
@@ -47,6 +48,12 @@ hdfs:
   # this address will be used if subchart deployment is disabled
   externalAddress: ""
   path: /demo
+
+cassandra:
+  deployChart: false
+  externalAddress: ""
+  keyspace: "mirantis"
+  table: "tweetics"
 
 resources:
   requests:
