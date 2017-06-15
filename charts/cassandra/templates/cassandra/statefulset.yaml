@@ -27,7 +27,7 @@ spec:
                   "matchExpressions": [{
                     "key": "app",
                     "operator": "In",
-                    "values": [{{ template "fullname" . }}]
+                    "values": ["{{ template "fullname" . }}"]
                   }]
                 },
                 "topologyKey": "kubernetes.io/hostname"
@@ -44,7 +44,7 @@ spec:
                     "matchExpressions": [{
                       "key": "app",
                       "operator": "In",
-                      "values": [{{ template "fullname" . }}]
+                      "values": ["{{ template "fullname" . }}"]
                     }]
                   },
                   "topologyKey": "kubernetes.io/hostname"
