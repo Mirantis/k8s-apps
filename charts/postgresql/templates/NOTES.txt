@@ -15,33 +15,20 @@ To connect to your database run the following command (using the env variable fr
    -h {{ template "postgres-fullname" . }} {{ .Values.postgresDatabase }}
 
 External URL:
-{{ if .Values.ingress.enabled -}}
-From outside the cluster, the cluster URL(s) are:
-{{ if .Values.ingress.tls.enabled }}
-{{- range .Values.ingress.hosts }}
-    https://{{ . }}
-{{- end -}}
-{{- else }}
-{{- range .Values.ingress.hosts }}
-    http://{{ . }}
-{{- end -}}
-{{- end }}
-{{- else -}}
-{{- if contains "NodePort" .Values.service.type -}}
+{{- if contains "NodePort" .Values.service.type }}
 To get the PostgreSQL to visit by running these commands in the same shell:
     {{- if .Values.service.nodePort }}
     export NODE_PORT={{ .Values.service.nodePort }}
     {{- else }}
     export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "postgres-fullname" . }})
-    {{- end -}}
+    {{- end }}
     export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
     echo http://$NODE_IP:$NODE_PORT
-{{- else if contains "LoadBalancer" .Values.service.type -}}
+{{- else if contains "LoadBalancer" .Values.service.type }}
 NOTE: It may take a few minutes for the LoadBalancer IP to be available.
 You can watch the status of it by running 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "postgres-fullname" . }}'
 
     echo http://{{ .Values.service.loadBalancerIP }}:{{ .Values.port }}
-{{- end -}}
 {{- end }}
 
 To run simple test:

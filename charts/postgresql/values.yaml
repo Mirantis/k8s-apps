@@ -30,16 +30,6 @@ service:
   loadBalancerSourceRanges: []
   annotations: {}
 
-ingress:
-  enabled: false
-  hosts: []
-    #   - some.domain
-  tls:
-    enabled: false
-    secretName: ""
-  annotations: {}
-    #- kubernetes.io/ingress.class: nginx
-
 resources:
   requests:
     memory: 256Mi

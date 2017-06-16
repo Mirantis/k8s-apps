@@ -31,16 +31,6 @@ service:
   loadBalancerSourceRanges: []
   annotations: {}
 
-ingress:
-  enabled: false
-  hosts: []
-    #   - some.domain
-  tls:
-    enabled: false
-    secretName: ""
-  annotations: {}
-    #   kubernetes.io/ingress.class: nginx
-
 ## Enable persistence using Persistent Volume Claims
 ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
 ##

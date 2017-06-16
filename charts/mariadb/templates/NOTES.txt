@@ -14,32 +14,19 @@ To connect to your database:
     $ mysql -h {{ template "mariadb-fullname" . }} -P {{ .Values.port }} -u root -p{{ .Values.credentials.rootPassword }}
 
 External URL:
-{{ if .Values.ingress.enabled -}}
-From outside the cluster, the cluster URL(s) are:
-{{ if .Values.ingress.tls.enabled }}
-{{- range .Values.ingress.hosts }}
-    mariadb: https://{{ . }}
-{{- end -}}
-{{- else }}
-{{- range .Values.ingress.hosts }}
-    mariadb: http://{{ . }}
-{{- end -}}
-{{- end }}
-{{- else -}}
-{{- if contains "NodePort" .Values.service.type -}}
+{{- if contains "NodePort" .Values.service.type }}
 To get the MariaDB URL to visit by running these commands in the same shell:
 
     {{- if .Values.service.nodePort }}
     export NODE_PORT={{ .Values.service.nodePort }}
     {{- else }}
     export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "mariadb-fullname" . }})
-    {{- end -}}
+    {{- end }}
     export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
     echo http://$NODE_IP:$NODE_PORT
-{{- else if contains "LoadBalancer" .Values.service.type -}}
+{{- else if contains "LoadBalancer" .Values.service.type }}
 NOTE: It may take a few minutes for the LoadBalancer IP to be available.
 You can watch the status of it by running in the same shell 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "mariadb-fullname" . }}'
 
     mariadb: http://{{ .Values.service.loadBalancerIP }}:{{ .Values.port }}
-{{- end -}}
-{{- end -}}
+{{- end }}
