@@ -1,9 +1,8 @@
 HDFS chart has been deployed.
 
 Internal URL:
-    datanode: {{ template "datanode-address" . }}
     namenode: {{ template "namenode-address" . }}
-    ui: {{ template "ui-address" . }}
+    hdfs-ui: {{ template "hdfs-ui-address" . }}
 
 External URL:
 {{- if .Values.namenode.ui.ingress.enabled }}

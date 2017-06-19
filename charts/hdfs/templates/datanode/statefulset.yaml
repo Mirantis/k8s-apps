@@ -99,7 +99,7 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: datadir
-      {{- if .Values.persistence.storageClass }}
+      {{- if .Values.datanode.persistence.storageClass }}
       annotations:
         volume.beta.kubernetes.io/storage-class: "{{ .Values.datanode.persistence.storageClass }}"
       {{- end }}

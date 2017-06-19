@@ -62,7 +62,7 @@ spec:
       name: datadir
       {{- if .Values.namenode.persistence.storageClass }}
       annotations:
-        volume.beta.kubernetes.io/storage-class: "{{ .Values.persistence.storageClass }}"
+        volume.beta.kubernetes.io/storage-class: "{{ .Values.namenode.persistence.storageClass }}"
       {{- end }}
     spec:
       accessModes: [ "ReadWriteOnce" ]

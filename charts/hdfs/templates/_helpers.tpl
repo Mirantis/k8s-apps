@@ -18,14 +18,6 @@
 {{- printf "hdfs-namenode-%s" .Release.Name  | trunc 63 | trimSuffix "-" }}-0.{{ printf "hdfs-namenode-%s" .Release.Name  | trunc 63 | trimSuffix "-" -}}:{{ .Values.namenode.port }}
 {{- end -}}
 
-{{- define "datanode-address" -}}
-{{ $replicas := int (.Values.datanode.replicas)}}
-{{- range $i, $e := until $replicas -}}
-    {{- if $i -}},{{- end -}}
-    hdfs-datanode-{{ $.Release.Name | trunc 63 | trimSuffix "-" }}-{{ $i }}.hdfs-datanode-{{ $.Release.Name | trunc 63 | trimSuffix "-" }}:50075
-{{- end -}}
-{{- end -}}
-
-{{- define "ui-address" -}}
+{{- define "hdfs-ui-address" -}}
 {{ template "hdfs-ui-fullname" . }}:{{ .Values.namenode.ui.port }}
 {{- end -}}
