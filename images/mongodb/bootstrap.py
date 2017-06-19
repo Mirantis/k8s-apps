@@ -80,18 +80,20 @@ def _start_mongo(command):
 
 
 def start_shard(port):
-    command = "mongod --shardsvr --replSet shard --port %d" % port
+    command = ("mongod --logpath /var/log/mongodb/mongo.log --shardsvr"
+               " --replSet shard --port %d") % port
     return _start_mongo(command)
 
 
 def start_configsvr(port):
-    command = "mongod --configsvr --replSet config --port %d" % port
+    command = ("mongod --logpath /var/log/mongodb/mongo.log --configsvr"
+               " --replSet config --port %d") % port
     return _start_mongo(command)
 
 
 def start_router(port, configdb_address):
-    command = "mongos --configdb config/%s --port %d" % (configdb_address,
-                                                         port)
+    command = ("mongos --logpath /var/log/mongodb/mongo.log"
+               " --configdb config/%s --port %d") % (configdb_address, port)
     return _start_mongo(command)
 
 

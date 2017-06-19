@@ -34,3 +34,36 @@ spec:
             - config
           ports:
             - containerPort: {{ .Values.configServer.port }}
+          volumeMounts:
+            {{- if .Values.logCollector.enabled }}
+            - name: logdir
+              mountPath: /var/log/mongodb
+            {{- end }}
+        {{- if .Values.logCollector.enabled }}
+        - name: filebeat
+          image: {{ .Values.logCollector.image.repository }}{{ .Values.logCollector.image.name }}:{{ .Values.logCollector.image.tag }}
+          imagePullPolicy: {{ .Values.logCollector.image.pullPolicy | quote }}
+          volumeMounts:
+            - name: filebeat-config
+              mountPath: /etc/filebeat
+            - name: logdir
+              mountPath: /opt/bitnami/mongodb/logs
+          command:
+            - "filebeat"
+            - "-c"
+            - "/etc/filebeat/filebeat.yml"
+            - "-e"
+            - "-d"
+            - "\"*\""
+        {{- end }}
+      volumes:
+      {{- if .Values.logCollector.enabled }}
+      - name: logdir
+        emptyDir: {}
+      - name: filebeat-config
+        configMap:
+          name: {{ template "mongo-name" . }}
+          items:
+            - key: filebeat-yml
+              path: filebeat.yml
+      {{- end }}

@@ -12,6 +12,10 @@
 {{ printf "mongo-router-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
+{{- define "mongo-name" -}}
+{{ printf "mongo-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- end -}}
+
 {{- define "cfg-address" -}}
 {{- $release := (.Release.Name | trunc 63 | trimSuffix "-") -}}
 {{- range $i, $e := until (int $.Values.configServer.replicas) -}}

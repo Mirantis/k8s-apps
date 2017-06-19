@@ -1,0 +1,27 @@
+{{- if .Values.logCollector.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "mongo-name" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: {{ printf "%s-%s" .Chart.Name .Chart.Version | quote }}
+    app: {{ template "mongo-name" . }}
+data:
+  filebeat-yml: |-
+    filebeat.prospectors:
+      - input_type: log
+        paths:
+        - /opt/bitnami/mongodb/logs/mongo.log*
+        fields:
+          log_host: "mongodb"
+    output.logstash:
+      hosts:
+      {{- range .Values.logCollector.logstashHosts }}
+      - {{ . | quote }}
+      {{- end }}
+    path:
+      data: "/usr/share/filebeat/data"
+      home: "/usr/share/filebeat"
+{{- end -}}
