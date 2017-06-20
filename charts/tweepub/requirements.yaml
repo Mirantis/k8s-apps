@@ -1,9 +1,9 @@
 dependencies:
 - name: kafka
   version: ^1.x
-  repository: "file://../kafka"
+  repository: https://mirantisworkloads.storage.googleapis.com/
   condition: kafka.deployChart
 - name: hdfs
   version: ^1.x
-  repository: "file://../hdfs"
+  repository: https://mirantisworkloads.storage.googleapis.com/
   condition: hdfs.deployChart

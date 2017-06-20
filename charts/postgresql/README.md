@@ -5,7 +5,8 @@
 ## TL;DR;
 
 ```bash
-$ helm install stable/postgresql
+$ helm repo add mirantisworkloads https://mirantisworkloads.storage.googleapis.com
+$ helm install mirantisworkloads/postgresql
 ```
 
 ## Introduction

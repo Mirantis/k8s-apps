@@ -24,7 +24,8 @@ This chart will do the following:
 To install the chart with the release name `my-release`:
 
 ```bash
-$ helm install --name my-release stable/spark
+$ helm repo add mirantisworkloads https://mirantisworkloads.storage.googleapis.com
+$ helm install mirantisworkloads/spark
 ```
 
 ## Configuration

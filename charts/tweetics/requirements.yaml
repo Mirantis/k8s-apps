@@ -1,21 +1,21 @@
 dependencies:
 - name: zookeeper
   version: ^1.x
-  repository: "file://../zookeeper"
+  repository: https://mirantisworkloads.storage.googleapis.com/
   condition: zookeeper.deployChart
 - name: kafka
   version: ^1.x
-  repository: "file://../kafka"
+  repository: https://mirantisworkloads.storage.googleapis.com/
   condition: kafka.deployChart
 - name: spark
   version: ^1.x
-  repository: "file://../spark"
+  repository: https://mirantisworkloads.storage.googleapis.com/
   condition: spark.deployChart
 - name: hdfs
   version: ^1.x
-  repository: "file://../hdfs"
+  repository: https://mirantisworkloads.storage.googleapis.com/
   condition: hdfs.deployChart
 - name: cassandra
   version: ^1.x
-  repository: "file://../cassandra"
+  repository: https://mirantisworkloads.storage.googleapis.com/
   condition: cassandra.deployChart

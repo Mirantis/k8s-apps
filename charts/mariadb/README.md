@@ -7,7 +7,8 @@ MariaDB is developed as open source software and as a relational database it pro
 ## TL;DR;
 
 ```bash
-$ helm install stable/mariadb
+$ helm repo add mirantisworkloads https://mirantisworkloads.storage.googleapis.com
+$ helm install mirantisworkloads/mariadb
 ```
 
 ## Introduction

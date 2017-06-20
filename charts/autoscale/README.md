@@ -2,7 +2,8 @@
 
 ## Deploy chart
 ```console
-$ helm install .
+$ helm repo add mirantisworkloads https://mirantisworkloads.storage.googleapis.com
+$ helm install mirantisworkloads/autoscale
 ```
 
 AutoScale works with K8s StatefulSets and Deployments.

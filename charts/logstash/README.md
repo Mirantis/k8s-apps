@@ -2,7 +2,8 @@ LogStash
 
 ## Deploy chart
 ```console
-$ helm install .
+$ helm repo add mirantisworkloads https://mirantisworkloads.storage.googleapis.com
+$ helm install mirantisworkloads/logstash
 ```
 
 ## Chart configuration

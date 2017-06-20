@@ -15,7 +15,8 @@ minutes — no code, no additional infrastructure required.
 ## Install chart
 
 ```console
-helm install .
+$ helm repo add mirantisworkloads https://mirantisworkloads.storage.googleapis.com
+$ helm install mirantisworkloads/kibana
 ```
 
 ## Chart configuration

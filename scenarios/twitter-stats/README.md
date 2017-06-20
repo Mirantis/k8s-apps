@@ -16,32 +16,38 @@ credentials (in `single-node/tweepub.yaml` or `multi-node/tweepub.yaml`):
 
 After that you can install all necessary charts with the following commands.
 
+At first, add mirantisworkloads repo:
+
+```console
+helm repo add mirantisworkloads https://mirantisworkloads.storage.googleapis.com
+```
+
 For single-node:
 
 ```console
-helm install -n zookeeper-1 ../../charts/zookeeper -f single-node/configs/zookeeper.yaml
-helm install -n hdfs-1 ../../charts/hdfs -f single-node/configs/hdfs.yaml
+helm install -n zookeeper-1 mirantisworkloads/zookeeper -f single-node/configs/zookeeper.yaml
+helm install -n hdfs-1 mirantisworkloads/hdfs -f single-node/configs/hdfs.yaml
 
-helm install -n kafka-1 ../../charts/kafka -f single-node/configs/kafka.yaml
-helm install -n spark-1 ../../charts/spark -f single-node/configs/spark.yaml
+helm install -n kafka-1 mirantisworkloads/kafka -f single-node/configs/kafka.yaml
+helm install -n spark-1 mirantisworkloads/spark -f single-node/configs/spark.yaml
 
-helm install -n tweepub-1 ../../charts/tweepub -f single-node/configs/tweepub.yaml
-helm install -n tweetics-1 ../../charts/tweetics -f single-node/configs/tweetics.yaml
-helm install -n tweeviz-1 ../../charts/tweeviz -f single-node/configs/tweeviz.yaml
+helm install -n tweepub-1 mirantisworkloads/tweepub -f single-node/configs/tweepub.yaml
+helm install -n tweetics-1 mirantisworkloads/tweetics -f single-node/configs/tweetics.yaml
+helm install -n tweeviz-1 mirantisworkloads/tweeviz -f single-node/configs/tweeviz.yaml
 ```
 
 For multi-node:
 
 ```console
-helm install -n zookeeper-1 ../../charts/zookeeper -f multi-node/configs/zookeeper.yaml
-helm install -n hdfs-1 ../../charts/hdfs -f multi-node/configs/hdfs.yaml
+helm install -n zookeeper-1 mirantisworkloads/zookeeper -f multi-node/configs/zookeeper.yaml
+helm install -n hdfs-1 mirantisworkloads/hdfs -f multi-node/configs/hdfs.yaml
 
-helm install -n kafka-1 ../../charts/kafka -f multi-node/configs/kafka.yaml
-helm install -n spark-1 ../../charts/spark -f multi-node/configs/spark.yaml
+helm install -n kafka-1 mirantisworkloads/kafka -f multi-node/configs/kafka.yaml
+helm install -n spark-1 mirantisworkloads/spark -f multi-node/configs/spark.yaml
 
-helm install -n tweepub-1 ../../charts/tweepub -f multi-node/configs/tweepub.yaml
-helm install -n tweetics-1 ../../charts/tweetics -f multi-node/configs/tweetics.yaml
-helm install -n tweeviz-1 ../../charts/tweeviz -f multi-node/configs/tweeviz.yaml
+helm install -n tweepub-1 mirantisworkloads/tweepub -f multi-node/configs/tweepub.yaml
+helm install -n tweetics-1 mirantisworkloads/tweetics -f multi-node/configs/tweetics.yaml
+helm install -n tweeviz-1 mirantisworkloads/tweeviz -f multi-node/configs/tweeviz.yaml
 ```
 
 After that you can access tweeviz endpoint to see a tag cloud.

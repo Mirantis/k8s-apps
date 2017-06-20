@@ -1,5 +1,5 @@
 dependencies:
 - name: zookeeper
   version: ^1.x
-  repository: "file://../zookeeper"
+  repository: https://mirantisworkloads.storage.googleapis.com/
   condition: zookeeper.deployChart

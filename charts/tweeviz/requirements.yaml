@@ -1,9 +1,9 @@
 dependencies:
 - name: hdfs
   version: ^1.x
-  repository: "file://../hdfs"
+  repository: https://mirantisworkloads.storage.googleapis.com/
   condition: hdfs.deployChart
 - name: cassandra
   version: ^1.x
-  repository: "file://../cassandra"
+  repository: https://mirantisworkloads.storage.googleapis.com/
   condition: cassandra.deployChart

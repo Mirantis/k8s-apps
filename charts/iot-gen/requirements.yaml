@@ -1,5 +1,5 @@
 dependencies:
 - name: kafka
   version: ^1.x
-  repository: "file://../kafka"
+  repository: https://mirantisworkloads.storage.googleapis.com/
   condition: kafka.deployChart
