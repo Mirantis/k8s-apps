@@ -20,6 +20,6 @@ Get the Mongo Router URL to visit by running these commands in the same shell:
 
 NOTE: It may take a few minutes for the LoadBalancer IP to be available.
 You can watch the status of it by running in the same shell 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "router-name" . }}'
-
-    mongo-router: http://{{ .Values.router.service.loadBalancerIP }}:{{ .Values.router.port }}
+    export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "router-name" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+    echo http://$SERVICE_IP:{{ .Values.router.port }}
 {{- end }}

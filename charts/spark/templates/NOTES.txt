@@ -29,8 +29,10 @@ To get the Spark and Zeppelin URL to visit by running these commands in the same
 {{- else if contains "LoadBalancer" .Values.service.type -}}
 NOTE: It may take a few minutes for the LoadBalancer IP to be available.
 You can watch the status of it by running in the same shell 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "master-fullname" . }} {{ template "zeppelin-fullname" . }}'
+    export SPARK_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "master-fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+    echo http://$SPARK_IP:{{ .Values.spark.master.webuiPort }}
 
-    spark: http://{{ .Values.service.loadBalancerIP }}:{{ .Values.spark.master.webuiPort }}
-    zeppelin: http://{{ .Values.service.loadBalancerIP }}:{{ .Values.zeppelin.port }}
+    export ZEPPELIN_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "zeppelin-fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+    echo http://$ZEPPELIN_IP:{{ .Values.zeppelin.port }}
 {{- end -}}
 {{- end -}}

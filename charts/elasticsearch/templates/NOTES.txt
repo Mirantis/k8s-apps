@@ -29,8 +29,8 @@ Get the Elasticsearch URL to visit by running these commands in the same shell:
 {{ else if contains "LoadBalancer" .Values.client.service.type -}}
 NOTE: It may take a few minutes for the LoadBalancer IP to be available.
 You can watch the status of it by running in the same shell 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "es-client-fullname" . }}'
-
-    elasticsearch: http://{{ .Values.client.service.loadBalancerIP }}:{{ .Values.port }}
+    export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "es-client-fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+    echo http://$SERVICE_IP:{{ .Values.port }}
 {{- end }}
 {{- end }}
 

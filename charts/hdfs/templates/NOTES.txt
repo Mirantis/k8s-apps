@@ -30,7 +30,7 @@ Get the HDFS UI URL to visit by running these commands in the same shell:
 {{ else if contains "LoadBalancer" .Values.namenode.ui.service.type -}}
 NOTE: It may take a few minutes for the LoadBalancer IP to be available.
 You can watch the status of it by running in the same shell 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "hdfs-ui-fullname" . }}'
-
-    ui: http://{{ .Values.namenode.ui.service.loadBalancerIP }}:{{ .Values.namenode.ui.port }}
+    export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "hdfs-ui-fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+    echo http://$SERVICE_IP:{{ .Values.namenode.ui.port }}
 {{- end }}
 {{- end }}
