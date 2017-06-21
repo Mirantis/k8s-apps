@@ -33,3 +33,25 @@ func Delete(helmClient helm.Client, releaseName string) error {
 	_, err := helmClient.DeleteRelease(releaseName)
 	return err
 }
+
+func IsResourcesReady(helmClient helm.Client, releaseName string) (bool, error) {
+	resources, err := getResources(helmClient, releaseName)
+	if err != nil {
+		return false, err
+	}
+	status, err := helmClient.ReleaseStatus(releaseName)
+	if err != nil {
+		return false, err
+	}
+	namespace := status.Namespace
+	return checkResourcesState(resources, namespace)
+}
+
+func getResources(helmClient helm.Client, releaseName string) (map[string][]string, error) {
+	status, err := helmClient.ReleaseStatus(releaseName)
+	if err != nil {
+		return map[string][]string{}, err
+	}
+	resourcesString := status.Info.Status.Resources
+	return utils.ParseResources(resourcesString)
+}
