@@ -46,6 +46,27 @@ spec:
               mountPath: /etc/grafana
             - name: data
               mountPath: /var/lib/grafana/data
+            {{- if .Values.logCollector.enabled }}
+            - name: logdir
+              mountPath: /var/log/grafana
+            {{- end }}
+        {{- if .Values.logCollector.enabled }}
+        - name: filebeat
+          image: "{{ .Values.logCollector.image.repository }}{{ .Values.logCollector.image.name }}:{{ .Values.logCollector.image.tag }}"
+          imagePullPolicy: {{ .Values.logCollector.image.pullPolicy | quote }}
+          volumeMounts:
+          - name: filebeat-config
+            mountPath: /etc/filebeat
+          - name: logdir
+            mountPath: /var/log/grafana
+          command:
+            - "filebeat"
+            - "-c"
+            - "/etc/filebeat/filebeat.yml"
+            - "-e"
+            - "-d"
+            - "\"*\""
+        {{- end }}
       terminationGracePeriodSeconds: 300
       volumes:
         - name: config-volume
@@ -60,4 +81,14 @@ spec:
       {{- else if eq .Values.persistence.type "hostPath" }}
           hostPath:
             path: "{{ .Values.persistence.hostPath }}"
+      {{- end }}
+      {{- if .Values.logCollector.enabled }}
+        - name: filebeat-config
+          configMap:
+            name: {{ printf "grafana-fb-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+            items:
+              - key: filebeat-yml
+                path: filebeat.yml
+        - name: logdir
+          emptyDir: {}
       {{- end }}

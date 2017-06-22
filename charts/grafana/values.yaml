@@ -77,6 +77,17 @@ setDatasource:
   ##
   restartPolicy: OnFailure
 
+logCollector:
+  enabled: false
+  image:
+    repository: mirantisworkloads/
+    name: filebeat
+    tag: 5.2.2
+    pullPolicy: Always
+  # external logstash hosts
+  logstashHost:
+    - "" # host:port Ex: "logstash-logstash:5043"
+
 ## Grafana config file ConfigMap entry
 ##
 serverConfigFile:
@@ -199,21 +210,21 @@ serverConfigFile:
     ;welcome_email_on_sign_up = false
 
     [log]
-    mode = console
+    mode = console file
     level = info
 
     [log.console]
     ;level =
     ;format = console
 
+    [log.file]
+    ;level =
+    ;format = text
+
     [event_publisher]
     ;enabled = false
     ;rabbitmq_url = amqp://localhost/
     ;exchange = grafana_events
-
-    [dashboards.json]
-    enabled = true
-    path = /var/lib/grafana/dashboards
 
     [metrics]
     ;enabled           = true
