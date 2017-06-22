@@ -15,7 +15,28 @@ data:
         }
     }
     filter {
-        if ([fields][log_host] == "kafka") {
+        if ([fields][log_host] == "prometheus") {
+          grok {
+            match => {
+              "message" => ['time="%{TIMESTAMP_ISO8601:message_time}" level=%{LOGLEVEL:log_level} msg="%{GREEDYDATA:message}"',"%{GREEDYDATA:message}"]
+            }
+            overwrite => [ "message" ]
+            add_field => {
+              "received_at"   => "%{@timestamp}"
+              "received_from" => "%{host}"
+              "app"           => "prometheus"
+            }
+            remove_field => [
+              "beat",
+              "input_type",
+              "offset",
+              "fields",
+              "tags",
+              "host",
+              "type"
+            ]
+          }
+        } else if ([fields][log_host] == "kafka") {
             grok {
                 match => {
                     "message" => [
