@@ -15,7 +15,29 @@ data:
         }
     }
     filter {
-        if ([fields][log_host] == "grafana") {
+        if ([fields][log_host] == "zookeeper") {
+          grok {
+            match => {
+               "message" => ["%{TIMESTAMP_ISO8601:message_time} \[myid:%{INT:myid}\] - %{LOGLEVEL:log_level}  \[%{GREEDYDATA:thread}\] - %{GREEDYDATA:message}", "%{GREEDYDATA:message}"]
+            }
+            overwrite => [ "message" ]
+            add_field => {
+              "received_at"   => "%{@timestamp}"
+              "received_from" => "%{host}"
+              "app"           => "zookeeper"
+            }
+            remove_field => [
+              "beat",
+              "input_type",
+              "offset",
+              "fields",
+              "tags",
+              "host",
+              "type"
+            ]
+          }
+        }
+        else if ([fields][log_host] == "grafana") {
           grok {
             match => {
                "message" => ['t=%{TIMESTAMP_ISO8601:message_time} lvl=%{LOGLEVEL:log_level} msg="%{GREEDYDATA:message}"', "%{GREEDYDATA:message}"]
@@ -25,7 +47,7 @@ data:
               "received_at"   => "%{@timestamp}"
               "received_from" => "%{host}"
               "app"           => "grafana"
-            } 
+            }
             remove_field => [
               "beat",
               "input_type",
