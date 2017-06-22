@@ -9,7 +9,7 @@ fi
 set -eux
 
 REPO_URL="https://${org}.storage.googleapis.com"
-repo_dir="$(dirname "$(dirname "$(realpath $0)")")"
+repo_dir="$(dirname "$(dirname "${PWD}/$0")")"
 
 # build dependencies
 for d in ${repo_dir}/charts/*/; do
