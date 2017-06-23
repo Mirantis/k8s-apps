@@ -17,7 +17,7 @@ data:
     timeout 0
     tcp-keepalive 60
     loglevel notice
-    logfile ""
+    logfile "/var/log/redis/redis.log"
     databases 16
     save 900 1
     save 300 10

@@ -76,6 +76,27 @@ spec:
           mountPath: /var/lib/redis
         - name: redis-cfg
           mountPath: /opt/redis/conf
+        {{- if .Values.logCollector.enabled }}
+        - name: logdir
+          mountPath: /var/log/redis
+        {{- end }}
+      {{- if .Values.logCollector.enabled }}
+      - name: filebeat
+        image: "{{ .Values.logCollector.image.repository }}{{ .Values.logCollector.image.name }}:{{ .Values.logCollector.image.tag }}"
+        imagePullPolicy: {{ .Values.logCollector.image.pullPolicy | quote }}
+        volumeMounts:
+        - name: filebeat-config
+          mountPath: /etc/filebeat
+        - name: logdir
+          mountPath: /var/log/redis
+        command:
+          - "filebeat"
+          - "-c"
+          - "/etc/filebeat/filebeat.yml"
+          - "-e"
+          - "-d"
+          - "\"*\""
+      {{- end }}
       - name: sentinel
         image: {{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -113,6 +134,16 @@ spec:
       - name: data
         hostPath:
           path: "{{ .Values.persistence.hostPath }}"
+      {{- end }}
+      {{- if .Values.logCollector.enabled }}
+      - name: filebeat-config
+        configMap:
+          name: {{ printf "redis-fb-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+          items:
+            - key: filebeat-yml
+              path: filebeat.yml
+      - name: logdir
+        emptyDir: {}
       {{- end }}
 {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
   volumeClaimTemplates:

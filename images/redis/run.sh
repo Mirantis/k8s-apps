@@ -54,6 +54,7 @@ cluster_port=$(echo $CLUSTER_SERVICE_NAME | sed 's/-/_/g' | awk '{print toupper(
 if [[ "${SENTINEL}" == "true" ]]; then
   launchsentinel
 else
+  mkdir -p /var/log/redis
   master=$(redis-cli -h ${!cluster_host} -p ${!cluster_port} --csv SENTINEL get-master-addr-by-name mymaster | tr ',' ' ' | cut -d' ' -f1)
   if [[ -n ${master} ]]; then
     launchslave

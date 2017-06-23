@@ -6,8 +6,8 @@ probeTimeoutSeconds: 5
 image:
   repository: mirantisworkloads/
   name: redis
-  tag: 3.2
-  pullPolicy: IfNotPresent
+  tag: 3.2-r1
+  pullPolicy: Always
 
 resources:
   #requests:
@@ -26,3 +26,14 @@ config:
   redisPort: 6379
   sentinelPort: 26379
   slaveReadOnly: "no"
+
+logCollector:
+  enabled: false
+  image:
+    repository: mirantisworkloads/
+    name: filebeat
+    tag: 5.2.2
+    pullPolicy: Always
+  # external logstash hosts
+  logstashHost:
+    - "" # host:port Ex: "logstash-logstash:5043"
