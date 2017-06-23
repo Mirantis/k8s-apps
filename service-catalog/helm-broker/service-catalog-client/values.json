@@ -1,0 +1,9 @@
+{
+  "replicas": 1,
+  "resources": {
+    "requests": {
+      "cpu": 0,
+      "memory": "0Gi"
+    }
+  }
+}
