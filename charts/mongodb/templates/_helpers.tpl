@@ -4,12 +4,24 @@
 {{ printf "mongo-cfg-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
+{{- define "cfg-exporter-name" -}}
+{{ printf "mongo-cfg-exporter-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- end -}}
+
 {{- define "shard-name" -}}
 {{ printf "mongo-shard-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
+{{- define "shard-exporter-name" -}}
+{{ printf "mongo-shard-exporter-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- end -}}
+
 {{- define "router-name" -}}
 {{ printf "mongo-router-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- end -}}
+
+{{- define "router-exporter-name" -}}
+{{ printf "mongo-router-exporter-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "mongo-name" -}}
