@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/rand"
+	"net/http"
 	"os"
 	"os/exec"
 	"path"
@@ -37,9 +38,22 @@ var (
 	imageRepoPtr       = flag.String("image-repo", "127.0.0.1:5000", "Image repo address for test")
 	pushRepoPtr        = flag.String("push-repo", "mirantisworkloads", "Image repo address for push")
 	buildImagesOptsPtr = flag.String("build-images-opts", "", "Docker opts for building images")
+	verifyVersion = flag.Bool("verify-version", false, "Run tests to verify new helm/k8s version")
+	remoteCluster = flag.String("remote-cluster", "127.0.0.1", "Cluster IP if remote kubernetes cluster is used")
+	verifyIngress = flag.Bool("verify-ingress", false, "Ensure ingress is working correctly")
+	ingressSvc    = flag.String("ingress-svc", "", "Ingress service host:port to connect the ingress resource")
 	helmCmd            = LookupEnvDefault("HELM_CMD", "helm")
 	kubectlCmd         = LookupEnvDefault("KUBECTL_CMD", "kubectl")
 )
+
+func TestVerify(t *testing.T) {
+	if *verifyVersion {
+		t.Run("verify_version", VerifyVersion)
+	}
+	if *verifyIngress {
+		t.Run("verify_ingress", VerifyIngress)
+	}
+}
 
 func TestRoot(t *testing.T) {
 	if *imagesPtr {
@@ -51,6 +65,85 @@ func TestRoot(t *testing.T) {
 	if *pushPtr {
 		t.Run("push", RunPushImages)
 	}
+}
+
+func VerifyVersion(t *testing.T) {
+	// 10.3 verify
+	repoAddResult := RunCmdTest(t, "repo_add", helmCmd, "repo", "add", "mirantisworkloads", "https://mirantisworkloads.storage.googleapis.com")
+	if !repoAddResult {
+		t.Fatalf("Adding repo failed, not proceeding")
+	}
+
+	kafkaChart := path.Join(*repoPathPtr, "/kafka")
+
+	// 4, 10.6 verify
+	depUpArgs := []string{helmCmd, "dep", "up", kafkaChart}
+	depUpResult := RunCmdTest(t, "dep_up", depUpArgs...)
+	if !depUpResult {
+		t.Fatalf("Dependencies update failed for kafka, not proceeding")
+	}
+
+	// 10.2 verify
+	lintResult := RunCmdTest(t, "lint", helmCmd, "lint", kafkaChart)
+	if !lintResult {
+		t.Fatalf("lint failed, not proceeding")
+	}
+
+	// 1, 2, 4, 10.1 verify
+	installKafkaArgs := "persistence.type=PersistentVolumeClaim"
+	kafkaNs := *prefixPtr + randStringRunes(10)
+	kafkaRel := *prefixPtr + randStringRunes(8)
+	t.Run("create_chart", func(t *testing.T) {
+		CreateChartVersionVerify(t, kafkaChart, installKafkaArgs, "", kafkaNs, kafkaRel)
+	})
+
+	// 10.4 verify
+	listResult := RunCmdTest(t, "list", helmCmd, "list")
+	if !listResult {
+		t.Fatalf("list releases failed, not proceeding")
+	}
+
+	// 7 verify
+	t.Run("delete_chart", func(t *testing.T) {
+		DeleteChartVersionVerify(t, kafkaNs, kafkaRel)
+	})
+
+	escChart := path.Join(*repoPathPtr, "/elasticsearch")
+
+	// 3 verify
+	installEscArgs := "client.service.type=NodePort,client.service.nodePort=31111"
+	escNs := *prefixPtr + randStringRunes(10)
+	escRel := *prefixPtr + randStringRunes(3)
+	t.Run("create_chart", func(t *testing.T) {
+		CreateChartVersionVerify(t, escChart, installEscArgs, "", escNs, escRel)
+	})
+
+	_, nodePortErr := http.Get("http://" + *remoteCluster + ":31111/")
+	if nodePortErr != nil {
+		t.Fatalf("NodePort works incorrectly, not proceeding")
+	}
+}
+
+func VerifyIngress(t *testing.T) {
+	// 5 verify
+	hdfsChart := path.Join(*repoPathPtr, "/hdfs")
+	hdfsNs := *prefixPtr + randStringRunes(10)
+	hdfsRel := *prefixPtr + randStringRunes(8)
+
+	t.Run("create_chart", func(t *testing.T) {
+		CreateChartVersionVerify(t, hdfsChart, "", "tests/hdfs/ingress.yaml", hdfsNs, hdfsRel)
+	})
+
+	t.Run("check_ingress", func(t *testing.T) {
+		client := &http.Client{}
+		req, _ := http.NewRequest("GET", *ingressSvc, nil)
+		req.Header.Add("Host", "hdfs.ingress")
+		client.Do(req)
+	})
+
+	t.Run("delete_chart", func(t *testing.T) {
+		DeleteChartVersionVerify(t, hdfsNs, hdfsRel)
+	})
 }
 
 func DiscoverArtifacts(t *testing.T, path string) []string {
@@ -332,6 +425,30 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 	}
 
 	RunCmdTest(t, "test", helmCmd, "--tiller-namespace", ns, "--home", helmHome, "test", rel)
+}
+
+func CreateChartVersionVerify(t *testing.T, chartPath string, configStr string, configFile string, ns string, rel string) {
+	installArgs := []string{helmCmd, "install", chartPath, "--namespace", ns, "--name", rel, "--wait", "--timeout", "600"}
+	if configStr != "" {
+		installArgs = append(installArgs, "--set")
+		installArgs = append(installArgs, configStr)
+	}
+	if configFile != "" {
+		installArgs = append(installArgs, "-f")
+		installArgs = append(installArgs, configFile)
+	}
+	installResult := RunCmdTest(t, "install", installArgs...)
+
+	if installResult {
+		RunCmdTest(t, "test", helmCmd, "test", rel)
+	} else {
+		FailTest(t, "test", "helm install failed")
+	}
+}
+
+func DeleteChartVersionVerify(t *testing.T, ns string, rel string) {
+	RunCmdTest(t, "delete", helmCmd, "delete", rel, "--purge")
+	RunCmdTest(t, "delete_ns", kubectlCmd, "delete", "ns", ns)
 }
 
 func RunCmdTest(t *testing.T, name string, args ...string) bool {

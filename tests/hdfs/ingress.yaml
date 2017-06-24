@@ -1,0 +1,6 @@
+ui:
+  ingress:
+    enabled: true
+    hosts: ["hdfs.ingress"]
+    annotations:
+     kubernetes.io/ingress.class: nginx
