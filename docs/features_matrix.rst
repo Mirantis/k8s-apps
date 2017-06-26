@@ -4,7 +4,7 @@ Component     HA  Scaling Logging Monitoring Ingress PV  LoadBalancer Grafana
 ============= === ======= ======= ========== ======= === ============ =========
 cassandra     yes yes     yes     yes        no      yes no           yes
 elasticsearch yes yes     N/A     no         yes     yes yes          no
-grafana       no  no      no      N/A        yes     yes yes          N/A
+grafana       no  no      yes      N/A        yes     yes yes          N/A
 hdfs          no  no      no      no         yes     yes yes          no
 kafka         yes yes     yes     yes        N/A     yes no           yes
 kibana        yes yes     N/A     no         yes     N/A yes          no
@@ -12,10 +12,10 @@ logstash      yes yes     N/A     no         N/A     N/A no           no
 mariadb       no  no      yes     yes        N/A     yes yes          no
 mongodb       yes yes     no      no         N/A     no  yes          no
 postgresql    no  no      no      yes        N/A     yes yes          no
-prometheus    yes yes     no      N/A        yes     yes yes          N/A
-rabbitmq      yes yes     no      yes        yes     yes yes          no
-redis         yes yes     no      no         N/A     yes no           no
+prometheus    yes yes     yes      N/A        yes     yes yes          N/A
+rabbitmq      yes yes     yes      yes        yes     yes yes          no
+redis         yes yes     yes      no         N/A     yes no           no
 spark         yes yes     yes     yes        yes     N/A yes          yes
 zeppelin      no  no      no      no         yes     N/A yes          no
-zookeeper     yes yes     no      yes        N/A     yes no           yes
+zookeeper     yes yes     yes      yes        N/A     yes no           yes
 ============= === ======= ======= ========== ======= === ============ =========
