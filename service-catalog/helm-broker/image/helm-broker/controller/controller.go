@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"errors"
-	"github.com/kubernetes-incubator/service-catalog/contrib/pkg/broker/controller"
 	"github.com/kubernetes-incubator/service-catalog/pkg/brokerapi"
 	"github.com/satori/go.uuid"
 	"gopkg.in/yaml.v2"
@@ -18,8 +16,19 @@ type helmController struct {
 	tillerHost string
 }
 
+type Controller interface {
+	Catalog() (*brokerapi.Catalog, error)
+
+	GetServiceInstance(id string) (*brokerapi.LastOperationResponse, error)
+	CreateServiceInstance(id string, req *brokerapi.CreateServiceInstanceRequest) (*brokerapi.CreateServiceInstanceResponse, error)
+	RemoveServiceInstance(id string) (*brokerapi.DeleteServiceInstanceResponse, error)
+
+	Bind(instanceID string, bindingID string, req *brokerapi.BindingRequest) (*brokerapi.CreateServiceBindingResponse, error)
+	UnBind(instanceID string, bindingID string) error
+}
+
 // CreateController returns a Helm Broker Controller
-func CreateController(c Config) (controller.Controller, error) {
+func CreateController(c Config) (Controller, error) {
 
 	helmClient := helm.NewClient(helm.Host(c.TillerHost))
 
@@ -90,12 +99,30 @@ func (c *helmController) CreateServiceInstance(id string, req *brokerapi.CreateS
 		log.Println(err)
 		return nil, err
 	}
-	return &brokerapi.CreateServiceInstanceResponse{}, nil
+	return &brokerapi.CreateServiceInstanceResponse{
+		DashboardURL: "",
+		Operation:    "chart installation",
+	}, nil
 }
 
 // GetServiceInstance
-func (c *helmController) GetServiceInstance(id string) (string, error) {
-	return "", errors.New("Unimplemented")
+func (c *helmController) GetServiceInstance(id string) (*brokerapi.LastOperationResponse, error) {
+	isReady, err := client.IsResourcesReady(c.helmClient, id)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	if isReady {
+		log.Printf("Release %s was successfully deployed", id)
+		return &brokerapi.LastOperationResponse{
+			State:       brokerapi.StateSucceeded,
+			Description: "Chart was successfully deployed",
+		}, nil
+	}
+	return &brokerapi.LastOperationResponse{
+		State:       brokerapi.StateInProgress,
+		Description: "Chart deployment is in progress",
+	}, nil
 }
 
 // RemoveServiceInstance

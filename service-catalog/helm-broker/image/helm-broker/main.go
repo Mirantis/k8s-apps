@@ -2,8 +2,8 @@ package main
 
 import (
 	"flag"
-	"github.com/kubernetes-incubator/service-catalog/contrib/pkg/broker/server"
 	"helm-broker/controller"
+	"helm-broker/server"
 	"log"
 )
 

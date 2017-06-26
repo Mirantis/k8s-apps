@@ -35,3 +35,23 @@ func GetConnectionStringsFromNotes(note string) (brokerapi.Credential, error) {
 	}
 	return result, nil
 }
+
+func ParseResources(resources string) (map[string][]string, error) {
+	strs := strings.Split(resources, "\n")
+	res := map[string][]string{}
+	key := ""
+	for _, str := range strs {
+		if strings.HasPrefix(str, "==>") {
+			key = strings.Split(str, "/")[1]
+		} else if strings.HasPrefix(str, "NAME") || str == "" {
+			continue
+		} else if key != "" {
+			st := strings.Split(str, " ")
+			res[key] = append(res[key], st[0])
+		}
+	}
+	if len(res) == 0 {
+		return res, errors.New("There is no resources")
+	}
+	return res, nil
+}
