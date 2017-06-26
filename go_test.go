@@ -24,7 +24,6 @@ func LookupEnvDefault(key string, def string) string {
 
 var (
 	repoPathPtr   = flag.String("repo", "charts/", "Path to charts repository")
-	junitPathPtr  = flag.String("junit", "report.xml", "Path to output junit-xml report")
 	configPathPtr = flag.String("config", "tests/", "Path to charts config files")
 	paramsPtr     = flag.String("params", "", "Set config values on the command line (can specify multiple or separate values with commas: key1=val1,key2=val2)")
 	excludePtr    = flag.String("exclude", "", "List of charts to exclude from run")
@@ -76,7 +75,10 @@ func RunCharts(t *testing.T) {
 		if excludes[chart] {
 			continue
 		}
-		t.Run(chart, func(t *testing.T) { RunChart(t, chart) })
+		t.Run(chart, func(t *testing.T) {
+			t.Parallel()
+			RunChart(t, chart)
+		})
 	}
 }
 
