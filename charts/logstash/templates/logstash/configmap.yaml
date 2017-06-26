@@ -15,7 +15,29 @@ data:
         }
     }
     filter {
-        if ([fields][log_host] == "redis") {
+        if ([fields][log_host] == "rabbitmq") {
+          grok {
+            match => {
+               "message" => ["=%{LOGLEVEL:log_level} REPORT=+ %{MONTHDAY}-%{MONTH}-%{YEAR}::%{HOUR}:%{MINUTE}:%{SECOND} ===%{GREEDYDATA:message}", "%{GREEDYDATA:message}"]
+            }
+            overwrite => [ "message" ]
+            add_field => {
+              "received_at"   => "%{@timestamp}"
+              "received_from" => "%{host}"
+              "app"           => "rabbitmq"
+            }
+            remove_field => [
+              "beat",
+              "input_type",
+              "offset",
+              "fields",
+              "tags",
+              "host",
+              "type"
+            ]
+          }
+        }
+        else if ([fields][log_host] == "redis") {
           grok {
             match => {
                "message" => ["%{REDISTIMESTAMP} \* %{GREEDYDATA:message}", "%{GREEDYDATA:message}"]
