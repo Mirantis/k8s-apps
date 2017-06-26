@@ -1,0 +1,35 @@
+{{- if .Values.prometheusExporter.enabled -}}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "router-exporter-name" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "router-name" . }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        heritage: {{ .Release.Service | quote }}
+        release: {{ .Release.Name | quote }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "router-name" . }}
+      annotations:
+        prometheus.io/scrape: "true"
+    spec:
+      containers:
+      - name: mongo-router-exporter
+        image: {{ .Values.prometheusExporter.image.repository }}{{ .Values.prometheusExporter.image.name }}:{{ .Values.prometheusExporter.image.tag }}
+        imagePullPolicy: {{ .Values.prometheusExporter.image.pullPolicy | quote }}
+        command:
+          - ./mongodb_exporter
+          - -logtostderr
+          - -mongodb.uri
+          - mongodb://{{ template "router-address" . }}
+        ports:
+          - name: metrics
+            containerPort: 9001
+{{- end -}}

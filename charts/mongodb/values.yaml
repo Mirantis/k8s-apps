@@ -38,3 +38,11 @@ logCollector:
     tag: 5.2.2
     pullPolicy: Always
   logstashHosts: [] # external logstash hosts with ports; override with actual data
+
+prometheusExporter:
+  enabled: false
+  image:
+    repository: mirantisworkloads/
+    name: mongodb-prometheus-exporter
+    tag: 1.0.0
+    pullPolicy: Always
