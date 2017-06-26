@@ -17,6 +17,13 @@ image:
 
 master:
   replicas: 1
+  prometheusExporter:
+    enabled: false
+    image:
+      repository: justwatch/
+      name: elasticsearch_exporter
+      tag: 0.3.3
+      pullPolicy: IfNotPresent
   heapSize: 1G
   resources:
     requests:

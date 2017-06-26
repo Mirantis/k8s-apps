@@ -18,6 +18,11 @@ spec:
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         app: {{ template "es-fullname" . }}
         type: master
+      {{- if .Values.master.prometheusExporter.enabled }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9108"
+      {{- end }}
     spec:
       containers:
       - name: elasticsearch
@@ -47,3 +52,13 @@ spec:
             port: {{ .Values.port }}
           timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
           initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+      {{- if .Values.master.prometheusExporter.enabled }}
+      - name: metrics
+        image: "{{ .Values.master.prometheusExporter.image.repository }}{{ .Values.master.prometheusExporter.image.name }}:{{ .Values.master.prometheusExporter.image.tag }}"
+        imagePullPolicy: {{ .Values.master.prometheusExporter.image.pullPolicy | quote }}
+        command:
+        - /bin/elasticsearch_exporter
+        - -es.all
+        ports:
+        - containerPort: 9108
+      {{- end }}
