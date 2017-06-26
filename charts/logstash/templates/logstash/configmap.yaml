@@ -128,6 +128,27 @@ data:
                     "type"
                 ]
             }
+        } else if ([fields][log_host] == "mongodb") {
+            grok {
+                match => {
+                    "message" => ["%{TIMESTAMP_ISO8601:timestamp} %{MONGO3_SEVERITY:severity} %{MONGO3_COMPONENT:component}%{SPACE}(?:\[%{DATA:context}\])? %{GREEDYDATA:message}"]
+                }
+                overwrite => [ "message" ]
+                add_field => {
+                    "received_at" => "%{@timestamp}"
+                    "reveived_from" => "%{host}"
+                    "app" => "mongodb"
+                }
+                remove_field => [
+                    "beat",
+                    "input_type",
+                    "offset",
+                    "fields",
+                    "tags",
+                    "host",
+                    "type"
+                ]
+            }
         } else {
             grok {
                 match => {

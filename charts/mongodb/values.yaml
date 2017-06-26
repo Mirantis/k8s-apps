@@ -4,7 +4,7 @@
 image:
   repository: mirantisworkloads/
   name: mongodb
-  tag: "3.4-r4"
+  tag: "3.4-r5"
   pullPolicy: Always
 
 configServer:
@@ -29,3 +29,12 @@ resources:
   requests:
     cpu: 100m
     memory: 128Mi
+
+logCollector:
+  enabled: false
+  image:
+    repository: mirantisworkloads/
+    name: filebeat
+    tag: 5.2.2
+    pullPolicy: Always
+  logstashHosts: [] # external logstash hosts with ports; override with actual data
