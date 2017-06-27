@@ -1,8 +1,3 @@
 datanode:
   replicas: 3
   antiAffinity: "soft"
-
-namenode:
-  ui:
-    service:
-      type: NodePort

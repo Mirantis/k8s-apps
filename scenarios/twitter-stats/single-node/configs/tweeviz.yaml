@@ -1,9 +1,6 @@
 minPopularity: 1
 topListSize: 25
 
-service:
-  type: NodePort
-
 storage: ${TS_STORAGE}
 
 hdfs:
