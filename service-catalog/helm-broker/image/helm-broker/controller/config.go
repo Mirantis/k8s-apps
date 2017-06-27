@@ -9,8 +9,8 @@ import (
 )
 
 type Config struct {
-	ChartUrl   string `json:"chartUrl"`
-	TillerHost string `json:"tillerHost"`
+	ChartUrls  []string `json:"chartUrls"`
+	TillerHost string   `json:"tillerHost"`
 }
 
 func LoadConfig(configFile string) (config Config, err error) {
@@ -40,8 +40,8 @@ func LoadConfig(configFile string) (config Config, err error) {
 }
 
 func (c Config) Validate() error {
-	if c.ChartUrl == "" {
-		return errors.New("Must provide a non-empty Chart URL")
+	if len(c.ChartUrls) == 0 {
+		return errors.New("Must provide a non-empty Chart URL list")
 	}
 	if c.TillerHost == "" {
 		return errors.New("Must provide a non-empty Tiller Host")

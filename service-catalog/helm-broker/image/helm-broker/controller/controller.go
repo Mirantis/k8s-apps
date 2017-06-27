@@ -12,7 +12,7 @@ import (
 
 type helmController struct {
 	helmClient helm.Client
-	chartUrl   string
+	chartUrls  []string
 	tillerHost string
 }
 
@@ -34,41 +34,44 @@ func CreateController(c Config) (Controller, error) {
 
 	return &helmController{
 		helmClient: *helmClient,
-		chartUrl:   c.ChartUrl,
+		chartUrls:  c.ChartUrls,
 		tillerHost: c.TillerHost,
 	}, nil
 }
 
 // Catalog returns the Helm Broker catalog entries
 func (c *helmController) Catalog() (*brokerapi.Catalog, error) {
-	err := utils.DownloadIndex(c.chartUrl)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-	index, err := utils.ParseIndex()
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
 	var services []*brokerapi.Service
-	for _, val := range index.Entries {
-		for _, v := range val {
-			service := &brokerapi.Service{
-				Name:        v.Name + v.Version,
-				ID:          uuid.NewV4().String(),
-				Description: v.Description,
-				Plans: []brokerapi.ServicePlan{
-					{
-						Name:        "default",
-						ID:          uuid.NewV4().String(),
-						Description: v.Description,
-						Free:        true,
+	for _, chartUrl := range c.chartUrls {
+		repoName := utils.GetName(chartUrl)
+		err := utils.DownloadIndex(chartUrl)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+		index, err := utils.ParseIndex()
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+		for _, val := range index.Entries {
+			for _, v := range val {
+				service := &brokerapi.Service{
+					Name:        v.Name + "." + v.Version + "." + repoName,
+					ID:          uuid.NewV4().String(),
+					Description: v.Description,
+					Plans: []brokerapi.ServicePlan{
+						{
+							Name:        "default",
+							ID:          uuid.NewV4().String(),
+							Description: v.Description,
+							Free:        true,
+						},
 					},
-				},
-				Bindable: true,
+					Bindable: true,
+				}
+				services = append(services, service)
 			}
-			services = append(services, service)
 		}
 	}
 	return &brokerapi.Catalog{

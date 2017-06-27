@@ -6,5 +6,6 @@ image:
 app:
   port: 8080
 config:
-  chartUrl: "https://mirantisworkloads.storage.googleapis.com"
+  chartUrls:
+    - https://mirantisworkloads.storage.googleapis.com
   tillerHost: ""
