@@ -1,6 +1,6 @@
 replicas: 3
-antiAffinity: "hard"
+antiAffinity: "soft"
 
 zookeeper:
   deployChart: false
-  externalAddress: zk-ZKRELEASE-0.zk-ZKRELEASE:2181,zk-ZKRELEASE-1.zk-ZKRELEASE:2181,zk-ZKRELEASE-2.zk-ZKRELEASE:2181
+  externalAddress: zk-${TS_ZOOKEEPER_RELEASE}-0.zk-${TS_ZOOKEEPER_RELEASE}:2181,zk-${TS_ZOOKEEPER_RELEASE}-1.zk-${TS_ZOOKEEPER_RELEASE}:2181,zk-${TS_ZOOKEEPER_RELEASE}-2.zk-${TS_ZOOKEEPER_RELEASE}:2181

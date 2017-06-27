@@ -1,19 +1,19 @@
 minPopularity: 1
-topListSize: 0
+topListSize: 25
 
 service:
   type: NodePort
 
-storage: STORAGE
+storage: ${TS_STORAGE}
 
 hdfs:
   deployChart: false
   path: /
-  externalAddress: hdfs-namenode-HDFSRELEASE-0.hdfs-namenode-HDFSRELEASE
+  externalAddress: hdfs-namenode-${TS_HDFS_RELEASE}-0.hdfs-namenode-${TS_HDFS_RELEASE}
   externalPort: 8020
 
 cassandra:
   deployChart: false
-  externalAddress: cassandra-CASRELEASE:9042
+  externalAddress: cassandra-${TS_CASSANDRA_RELEASE}:9042
   keyspace: mirantis
   table: tweetics

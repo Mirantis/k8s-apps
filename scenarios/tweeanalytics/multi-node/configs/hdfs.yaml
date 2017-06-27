@@ -1,6 +1,6 @@
 datanode:
   replicas: 3
-  antiAffinity: "hard"
+  antiAffinity: "soft"
 
 namenode:
   ui:
