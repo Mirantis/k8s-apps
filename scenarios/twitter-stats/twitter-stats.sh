@@ -167,12 +167,6 @@ function main() {
 
     header "Following commands will be executed: ${ARGS}"
 
-    log "Setting up Helm"
-    _helm repo list | grep -q mirantisworkloads && _helm repo remove mirantisworkloads 1>/dev/null
-    # TODO make URL configurable
-    _helm repo add mirantisworkloads https://mirantisworkloads.storage.googleapis.com 1>/dev/null
-    _helm repo update 1>/dev/null
-
     for command in ${ARGS}; do
         COMMAND="$(printf %4s ${command})"
         command_${command}
@@ -210,13 +204,21 @@ function command_up() {
         find configs/ -type f -name "*.yaml" -exec sed -i "" "s/\${${param_name}}/${param_value}/g" {} \;
     done
 
+    log "Setting up Helm"
+    _helm repo list | grep -q ts-${TS_NAME} && _helm repo remove ts-${TS_NAME} 1>/dev/null
+    # TODO make URL configurable
+    _helm repo add ts-${TS_NAME} https://mirantisworkloads.storage.googleapis.com 1>/dev/null
+    _helm repo update 1>/dev/null
+
     for chart in ${TS_CHARTS}; do
         local release=$(release_name ${chart})
 
         log "Deploying or upgrading chart ${chart} with release ${release}"
 
-        _helm upgrade --install --namespace ${TS_NAMESPACE} ${release} mirantisworkloads/${chart} -f configs/${chart}.yaml | tee ${chart}.log
+        _helm upgrade --install --namespace ${TS_NAMESPACE} ${release} ts-${TS_NAME}/${chart} -f configs/${chart}.yaml | tee ${chart}.log
     done
+
+    _helm repo list | grep -q ts-${TS_NAME} && _helm repo remove ts-${TS_NAME} 1>/dev/null
 
     log "All Twitter Stats services deployed or upgraded (async)"
 
