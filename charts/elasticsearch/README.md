@@ -14,7 +14,7 @@ $ helm install .
 | probeTimeoutSeconds | Timeout for running probes | 5 |
 | image.repository | Container image repository | mirantisworkloads/elasticsearch |
 | image.tag | Container image tag | 5.2.2 |
-| image.pullPolicy | Container pull policy | Always |
+| image.pullPolicy | Container pull policy | IfNotPresent |
 | master.replicas | Deployment replicas | 2 |
 | master.heapSize | JVM option - exact heap size | 1G |
 | master.resources.requests.cpu | Container requested cpu | 256m |

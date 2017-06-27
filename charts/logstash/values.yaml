@@ -13,7 +13,7 @@ image:
  repository: "mirantisworkloads/"
  name: "logstash"
  tag: "5.2.2"
- pullPolicy: "Always"
+ pullPolicy: "IfNotPresent"
 
 testImage:
   repository: "mirantisworkloads/"
@@ -29,9 +29,9 @@ service:
 
 # container required resources
 resources:
- requests:
-   memory: "2Gi"
-   cpu: "250m"
+ #requests:
+ #  memory: "2Gi"
+ #  cpu: "250m"
  #limits:
  #  memory: "4Gi"
  #  cpu: "1024m"

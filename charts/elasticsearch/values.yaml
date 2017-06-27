@@ -13,7 +13,7 @@ image:
   repository: mirantisworkloads/
   name: elasticsearch
   tag: 5.2.2
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 master:
   replicas: 1
@@ -26,9 +26,9 @@ master:
       pullPolicy: IfNotPresent
   heapSize: 1G
   resources:
-    requests:
-      cpu: 256m
-      memory: 512Mi
+    #requests:
+    #  cpu: 256m
+    #  memory: 512Mi
     #limits:
     #  cpu: 512m
     #  memory: 1Gi
@@ -37,9 +37,9 @@ client:
   replicas: 1
   heapSize: 1G
   resources:
-    requests:
-      cpu: 256m
-      memory: 512Mi
+    #requests:
+    #  cpu: 256m
+    #  memory: 512Mi
     #limits:
     #  cpu: 512m
     #  memory: 1Gi
@@ -63,9 +63,9 @@ data:
   replicas: 3
   heapSize: 1536m
   resources:
-    requests:
-      cpu: 256m
-      memory: 2Gi
+    #requests:
+    #  cpu: 256m
+    #  memory: 2Gi
     #limits:
     #  cpu: 1
     #  memory: 4Gi

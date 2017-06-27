@@ -24,16 +24,16 @@ persistence:
   hostPath: ""
 
 service:
-  type: ClusterIP # or NodePort or LoadBalancer
+  type: NodePort # or ClusterIP or LoadBalancer
   nodePort: ""
   loadBalancerIP: ""
   loadBalancerSourceRanges: []
   annotations: {}
 
 resources:
-  requests:
-    memory: 256Mi
-    cpu: 100m
+  #requests:
+  #  memory: 256Mi
+  #  cpu: 100m
 
 prometheusExporter:
   enabled: false
@@ -43,6 +43,6 @@ prometheusExporter:
     tag: v0.1.1
     pullPolicy: IfNotPresent
   resources:
-    requests:
-      memory: 256Mi
-      cpu: 100m
+    #requests:
+    #  memory: 256Mi
+    #  cpu: 100m

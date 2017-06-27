@@ -9,7 +9,7 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   clusterIP: None
-  type: ClusterIP
+  type: NodePort # or ClusterIP or LoadBalancer
   ports:
   - name: intra
     port: 7000

@@ -5,7 +5,7 @@ image:
   repository: mirantisworkloads/
   name: autoscale
   tag: 0.1.0
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 # Interval in seconds
 pollingInterval: 30
@@ -17,9 +17,9 @@ prometheus:
   externalAddress: ""
 
 resources:
-  requests:
-    cpu: 100m
-    memory: 512Mi
+  #requests:
+  #  cpu: 100m
+  #  memory: 512Mi
   #limits:
   #  cpu: 100m
   #  memory: 512Mi

@@ -4,7 +4,7 @@
 # name: value
 
 replicas: 3
-antiAffinity: "hard" # or "soft"
+antiAffinity: "soft" # or "hard"
 probeInitialDelaySeconds: 15
 probeTimeoutSeconds: 5
 
@@ -20,7 +20,7 @@ image:
   repository: kuberstack/
   name: kubernetes-rabbitmq-autocluster
   tag: latest
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 persistence:
   type: emptyDir # or hostPath or PersistentVolumeClaim
@@ -31,13 +31,13 @@ persistence:
   hostPath: ""
 
 resources:
-  requests:
-    memory: 256Mi
-    cpu: 100m
+  #requests:
+  #  memory: 256Mi
+  #  cpu: 100m
 
 management:
   service:
-    type: ClusterIP # or NodePort or LoadBalancer
+    type: NodePort # or ClusterIP or LoadBalancer
 
     nodePort: ""
 

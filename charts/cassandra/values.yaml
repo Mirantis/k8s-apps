@@ -2,9 +2,9 @@ image:
   repository: mirantisworkloads/
   name: cassandra
   tag: 3.0.13
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
-antiAffinity: "null" # or soft or hard
+antiAffinity: "soft" # or hard or null
 
 probeInitialDelaySeconds: 30
 probePeriodSeconds: 10
@@ -24,9 +24,9 @@ persistence:
 ## Minimum memory for production is 8GB and 4 CPU cores
 ## ref: http://docs.datastax.com/en/archived/cassandra/2.0/cassandra/architecture/architecturePlanningHardware_c.html
 resources:
-  requests:
-    memory: 4Gi
-    cpu: 2
+  #requests:
+  #  memory: 4Gi
+  #  cpu: 2
   #limits:
   #  memory: 4Gi
   #  cpu: 2
@@ -59,7 +59,7 @@ logCollector:
     repository: mirantisworkloads/
     name: filebeat
     tag: 5.2.2
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   # external logstash hosts
   logstashHost:
     - "" # host:port Ex: "logstash-logstash:5043"

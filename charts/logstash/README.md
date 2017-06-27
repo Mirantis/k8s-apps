@@ -17,7 +17,7 @@ $ helm install .
 | elasticsearch.port | Elasticsearch service port to connect | 9200 |
 | image.repository | Container image repository | 127.0.0.1:31500/logstash |
 | image.tag | Container image tag | latest |
-| image.pullPolicy | Container pull policy | Always |
+| image.pullPolicy | Container pull policy | IfNotPresent |
 | heapSize | JVM option - exact heap size | 1536m |
 | resources.requests.memory | Container requested memory | 2Gi |
 | resources.requests.cpu | Container requested cpu | 250m |

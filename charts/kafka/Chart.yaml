@@ -1,4 +1,4 @@
 name: kafka
-version: 1.1.0
+version: 1.2.0
 description: Apache Kafka is publish-subscribe messaging rethought as a distributed commit log.
 

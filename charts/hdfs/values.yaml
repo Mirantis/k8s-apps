@@ -6,7 +6,7 @@ datanode:
     tag: 2.7.2
     pullPolicy: Always
 
-  antiAffinity: "hard" # or "soft"
+  antiAffinity: "soft" # or "hard"
 
   persistence:
     type: emptyDir # or hostPath or PersistentVolumeClaim
@@ -17,9 +17,9 @@ datanode:
     hostPath: ""
 
   resources:
-    requests:
-      cpu: 1
-      memory: 1Gi
+    #requests:
+    #  cpu: 1
+    #  memory: 1Gi
     #limits:
       #cpu: 4
       #memory: 4Gi
@@ -41,17 +41,17 @@ namenode:
     hostPath: ""
 
   resources:
-    requests:
-      cpu: 1
-      memory: 1Gi
+    #requests:
+    #  cpu: 1
+    #  memory: 1Gi
     #limits:
-      #cpu: 4
-      #memory: 4Gi
+    #  cpu: 4
+    #  memory: 4Gi
 
   ui:
     port: 50070
     service:
-      type: ClusterIP # or NodePort or LoadBalancer
+      type: NodePort # or ClusterIP or LoadBalancer
 
       nodePort: ""
 

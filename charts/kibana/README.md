@@ -35,7 +35,7 @@ helm install .
 | elasticsearchConfig.startupTimeout | Time in milliseconds to wait for Elasticsearch at Kibana startup before retrying | 5000 |
 | image.repository | Container image repository | mirantisworkloads/kibana |
 | image.tag | Container image tag | 5.2.2 |
-| image.pullPolicy | Container pull policy | Always |
+| image.pullPolicy | Container pull policy | IfNotPresent |
 | resources.requests.memory | Container requested memory | 256Mi |
 | resources.requests.cpu | Container requested cpu | 250m |
 | service.type | Type of service. Allowed values: ClusterIP, NodePort, LoadBalancer | ClusterIP |

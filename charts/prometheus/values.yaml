@@ -43,15 +43,15 @@ alertmanager:
   ## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ##
   resources:
-    requests:
-      cpu: 10m
-      memory: 32Mi
+    #requests:
+    #  cpu: 10m
+    #  memory: 32Mi
     # limits:
     #   cpu: 10m
     #   memory: 32Mi
 
   service:
-    type: ClusterIP # or NodePort or LoadBalancer
+    type: NodePort # or ClusterIP or LoadBalancer
 
     nodePort: ""
 
@@ -223,15 +223,15 @@ server:
   ## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ##
   resources:
-    requests:
-      cpu: 500m
-      memory: 512Mi
+    #requests:
+    #  cpu: 500m
+    #  memory: 512Mi
     # limits:
     #   cpu: 500m
     #   memory: 512Mi
 
   service:
-    type: ClusterIP # or NodePort or LoadBalancer
+    type: NodePort # or ClusterIP or LoadBalancer
 
     nodePort: ""
 

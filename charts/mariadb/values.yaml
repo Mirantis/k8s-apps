@@ -25,7 +25,7 @@ probeTimeoutSeconds: 5
 
 ## Kubernetes service type
 service:
-  type: ClusterIP # or NodePort or LoadBalancer
+  type: NodePort # or ClusterIP or LoadBalancer
   nodePort: ""
   loadBalancerIP: ""
   loadBalancerSourceRanges: []
@@ -44,9 +44,9 @@ persistence:
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
 resources:
-  requests:
-    memory: 256Mi
-    cpu: 250m
+  #requests:
+  #  memory: 256Mi
+  #  cpu: 250m
 
 prometheusExporter:
   enabled: false
@@ -65,5 +65,5 @@ logCollector:
     repository: mirantisworkloads/
     name: filebeat
     tag: 5.2.2
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   logstashHosts: [] # external logstash hosts with ports; override with actual data

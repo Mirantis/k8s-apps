@@ -5,18 +5,18 @@ image:
   repository: mirantisworkloads/
   name: tweeviz
   tag: 1.1.0
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 port: 8589
 minPopularity: 1
-topListSize: 0
+topListSize: 25
 storage: "hdfs" # cassandra or hdfs
 
 # Set custom header to be displayed in viz page
 header: "Twitter Stats"
 
 service:
-  type: ClusterIP # or NodePort or LoadBalancer
+  type: NodePort # or ClusterIP or LoadBalancer
 
   nodePort: ""
 
@@ -36,9 +36,9 @@ ingress:
     #kubernetes.io/ingress.class: nginx
 
 resources:
-  requests:
-    cpu: 100m
-    memory: 512Mi
+  #requests:
+  #  cpu: 100m
+  #  memory: 512Mi
   #limits:
   #  cpu: 100m
   #  memory: 512Mi

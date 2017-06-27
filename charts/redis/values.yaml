@@ -1,5 +1,5 @@
 replicas: 3
-antiAffinity: "hard" # or "soft" or "null"
+antiAffinity: "soft" # or "hard" or "null"
 probeInitialDelaySeconds: 15
 probeTimeoutSeconds: 5
 
@@ -7,12 +7,12 @@ image:
   repository: mirantisworkloads/
   name: redis
   tag: 3.2
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 resources:
-  requests:
-    memory: 256Mi
-    cpu: 100m
+  #requests:
+  #  memory: 256Mi
+  #  cpu: 100m
 
 ## Persist data to a persitent volume
 persistence:

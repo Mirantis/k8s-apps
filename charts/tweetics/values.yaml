@@ -5,7 +5,7 @@ image:
   repository: mirantisworkloads/
   name: tweetics
   tag: 1.1.0
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 # Filter out hashtags with less then specified count
 minHashtagCounts: 0
@@ -56,9 +56,9 @@ cassandra:
   table: "tweetics"
 
 resources:
-  requests:
-    cpu: 100m
-    memory: 512Mi
+  #requests:
+  #  cpu: 100m
+  #  memory: 512Mi
   #limits:
   #  cpu: 100m
   #  memory: 512Mi

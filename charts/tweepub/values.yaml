@@ -5,7 +5,7 @@ image:
   repository: mirantisworkloads/
   name: tweepub
   tag: 1.1.0
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 storage: kafka # hdfs or kafka
 
@@ -51,9 +51,9 @@ hdfs:
   path: "/demo/tweepub"
 
 resources:
-  requests:
-    cpu: 100m
-    memory: 512Mi
+  #requests:
+  #  cpu: 100m
+  #  memory: 512Mi
   #limits:
   #  cpu: 100m
   #  memory: 512Mi

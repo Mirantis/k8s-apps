@@ -4,7 +4,7 @@
 # name: value
 
 replicas: 3
-antiAffinity: "hard" # or "soft"
+antiAffinity: "soft" # or "hard"
 probeInitialDelaySeconds: 15
 probeTimeoutSeconds: 5
 port: 9092
@@ -13,7 +13,7 @@ image:
   repository: mirantisworkloads/
   name: kafka
   tag: 0.10.2.0
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 persistence:
   type: emptyDir # or hostPath or PersistentVolumeClaim
@@ -28,9 +28,9 @@ prometheusExporter:
 
 heapSize: 1G
 resources:
-  requests:
-    cpu: 1
-    memory: 1Gi
+  #requests:
+  #  cpu: 1
+  #  memory: 1Gi
   #limits:
     #cpu: 4
     #memory: 4Gi
@@ -47,7 +47,7 @@ logCollector:
     repository: mirantisworkloads/
     name: filebeat
     tag: 5.2.2
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   # external logstash hosts
   logstashHost:
     - "" # host:port

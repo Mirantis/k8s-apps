@@ -21,4 +21,4 @@ filebeatImage:
   repository: mirantisworkloads/
   name: filebeat
   tag: 5.2.2
-  pullPolicy: Always
+  pullPolicy: IfNotPresent

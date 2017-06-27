@@ -16,16 +16,16 @@ persistence:
   hostPath: ""
 
 resources:
-  requests:
-    cpu: 1
-    memory: 1Gi
+  #requests:
+  #  cpu: 1
+  #  memory: 1Gi
   #limits:
     #cpu: 4
     #memory: 4Gi
 
 port: 3000
 service:
-  type: ClusterIP # or NodePort or LoadBalancer
+  type: NodePort # or ClusterIP or LoadBalancer
 
   nodePort: ""
 

@@ -22,7 +22,7 @@ image:
   repository: "mirantisworkloads/"
   name: "kibana"
   tag: "5.2.2"
-  pullPolicy: "Always"
+  pullPolicy: "IfNotPresent"
 
 testImage:
   repository: "mirantisworkloads/"
@@ -32,9 +32,9 @@ testImage:
 
 # Configure resource requests and limits.
 resources:
-  requests:
-    memory: "256Mi"
-    cpu: "250m"
+  #requests:
+  #  memory: "256Mi"
+  #  cpu: "250m"
   #limits:
     #cpu: "256Mi"
     #memory: "250m"
