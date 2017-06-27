@@ -124,6 +124,16 @@ function main() {
     log "\tTS_DELETE_NS - Delete or not K8s namespace when 'down' called"
     log "\t\tcurrent: ${TS_DELETE_NS} (default: yes)"
 
+    log "\tTS_APP_KEY, TS_APP_SECRET, TS_TOKEN_KEY, TS_TOKEN_SECRET - Twitter API credentials (must be read+write)"
+    export TS_APP_KEY=${TS_APP_KEY:-}
+    export TS_APP_SECRET=${TS_APP_SECRET:-}
+    export TS_TOKEN_KEY=${TS_TOKEN_KEY:-}
+    export TS_TOKEN_SECRET=${TS_TOKEN_SECRET:-}
+
+    if [ -z "${TS_APP_KEY}" ] || [ -z "${TS_APP_SECRET}" ] || [ -z "${TS_TOKEN_KEY}" ] || [ -z "${TS_TOKEN_SECRET}" ] ; then
+        log_error "TS_APP_KEY, TS_APP_SECRET, TS_TOKEN_KEY, TS_TOKEN_SECRET must be specified"
+    fi
+
     export TS_MODE=${TS_MODE:-multi}
     log "\tTS_MODE - single or multi-node deployment"
     log "\t\tcurrent: ${TS_MODE} (default: multi)"
