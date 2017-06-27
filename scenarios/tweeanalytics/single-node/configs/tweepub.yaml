@@ -1,12 +1,12 @@
 twitter:
-  appKey: APPKEY
-  appSecret: APPSECRET
-  tokenKey: TOKENKEY
-  tokenSecret: TOKENSECRET
+  appKey: ${TS_APP_KEY}
+  appSecret: ${TS_APP_SECRET}
+  tokenKey: ${TS_TOKEN_KEY}
+  tokenSecret: ${TS_TOKEN_SECRET}
 
   locations: -71.4415,41.9860,-70.4747,42.9041
 
 kafka:
   deployChart: false
-  externalAddress: kafka-kafka-1-0.kafka-kafka-1:9092
+  externalAddress: kafka-${TS_KAFKA_RELEASE}-0.kafka-${TS_KAFKA_RELEASE}:9092
   topic: twitter-stream
