@@ -87,7 +87,9 @@ spec:
           name: jmx
         {{- end }}
         env:
-        - name : ZK_REPLICAS
+        - name: ZOO_LOG4J_PROP
+          value: "INFO,CONSOLE,ROLLINGFILE"
+        - name: ZK_REPLICAS
           value: "{{ .Values.replicas }}"
         - name: ZK_LOG_LEVEL
           value: "{{ .Values.logLevel }}"
@@ -123,6 +125,27 @@ spec:
           mountPath: /var/lib/zookeeper
         - name: zoo-cfg
           mountPath: /opt/zookeeper/configmap
+        {{- if .Values.logCollector.enabled }}
+        - name: logdir
+          mountPath: /var/log/zookeeper
+        {{- end }}
+      {{- if .Values.logCollector.enabled }}
+      - name: filebeat
+        image: "{{ .Values.logCollector.image.repository }}{{ .Values.logCollector.image.name }}:{{ .Values.logCollector.image.tag }}"
+        imagePullPolicy: {{ .Values.logCollector.image.pullPolicy | quote }}
+        volumeMounts:
+        - name: filebeat-config
+          mountPath: /etc/filebeat
+        - name: logdir
+          mountPath: /var/log/zookeeper
+        command:
+          - "filebeat"
+          - "-c"
+          - "/etc/filebeat/filebeat.yml"
+          - "-e"
+          - "-d"
+          - "\"*\""
+      {{- end }}
       volumes:
       - name: zoo-cfg
         configMap:
@@ -134,6 +157,16 @@ spec:
       - name: datadir
         hostPath:
           path: "{{ .Values.persistence.hostPath }}"
+      {{- end }}
+      {{- if .Values.logCollector.enabled }}
+      - name: filebeat-config
+        configMap:
+          name: {{ printf "zk-fb-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+          items:
+            - key: filebeat-yml
+              path: filebeat.yml
+      - name: logdir
+        emptyDir: {}
       {{- end }}
   {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
   volumeClaimTemplates:
