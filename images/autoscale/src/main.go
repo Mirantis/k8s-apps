@@ -16,8 +16,8 @@ import (
 	"golang.org/x/time/rate"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	appsv1beta1 "k8s.io/client-go/pkg/apis/apps/v1beta1"
-	extv1beta1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
+	appsv1beta1 "k8s.io/api/apps/v1beta1"
+	extv1beta1 "k8s.io/api/extensions/v1beta1"
 	"k8s.io/client-go/rest"
 )
 
