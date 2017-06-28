@@ -15,6 +15,10 @@ spec:
       labels:
         app: {{ template "redis-fullname" . }}
       annotations:
+        {{- if .Values.prometheusExporter.enabled }}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9121"
+        {{- end }}
         {{- if eq .Values.antiAffinity "hard"}}
         scheduler.alpha.kubernetes.io/affinity: >
             {
@@ -120,6 +124,13 @@ spec:
         volumeMounts:
         - name: sentinel-cfg
           mountPath: /opt/redis/conf
+      {{- if .Values.prometheusExporter.enabled }}
+      - name: metrics
+        image: {{ .Values.prometheusExporter.image.repository }}{{ .Values.prometheusExporter.image.name }}:{{ .Values.prometheusExporter.image.tag }}
+        imagePullPolicy: {{ .Values.prometheusExporter.image.pullPolicy }}
+        ports:
+        - containerPort: 9121
+      {{- end }}
       volumes:
       - name: redis-cfg
         configMap:
@@ -159,4 +170,3 @@ spec:
         requests:
           storage: ReadWriteOnce
 {{- end }}
-

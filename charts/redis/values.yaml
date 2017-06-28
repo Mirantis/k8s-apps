@@ -37,3 +37,11 @@ logCollector:
   # external logstash hosts
   logstashHost:
     - "" # host:port Ex: "logstash-logstash:5043"
+
+prometheusExporter:
+  enabled: false
+  image:
+    repository: oliver006/
+    name: redis_exporter
+    tag: v0.11.2
+    pullPolicy: IfNotPresent
