@@ -38,17 +38,10 @@ spec:
         - name: server
           image: "{{ .Values.server.image.repository }}{{ .Values.server.image.name }}:{{ .Values.server.image.tag }}"
           imagePullPolicy: "{{ .Values.server.image.pullPolicy }}"
-          args:
-          {{- if or .Values.alertmanager.enabled .Values.server.alertmanagerURL }}
-            - --alertmanager.url={{- if .Values.alertmanager.enabled }}http://{{ template "alertmanager.fullname" . }}:{{ .Values.alertmanager.port }}{{- else }}{{ .Values.server.alertmanagerURL }}{{- end }}
-          {{- end }}
-            - --config.file=/etc/config/prometheus.yml
-            - --storage.local.path=/data
-            - --web.console.libraries=/etc/prometheus/console_libraries
-            - --web.console.templates=/etc/prometheus/consoles
-          {{- range $key, $value := .Values.server.extraArgs }}
-            - --{{ $key }}={{ $value }}
-          {{- end }}
+          command:
+            - "sh"
+            - "-c"
+            - "prometheus --config.file=/etc/config/prometheus.yml {{ if .Values.alertmanager.enabled }} --alertmanager.url={{ template "alertmanager.address" . }}{{ end }} --storage.local.path=/data --web.console.libraries=/etc/prometheus/console_libraries --web.console.templates=/etc/prometheus/consoles {{ range $key, $value := .Values.server.extraArgs }} --{{ $key }}={{ $value }} {{ end }} | tee /prometheus/prom.log"
           ports:
             - containerPort: 9090
           readinessProbe:
@@ -64,6 +57,27 @@ spec:
               mountPath: /etc/config
             - name: storage-volume
               mountPath: /data
+            {{- if .Values.logCollector.enabled }}
+            - name: logdir
+              mountPath: /prometheus
+            {{- end }}
+        {{- if .Values.logCollector.enabled }}
+        - name: filebeat
+          image: "{{ .Values.logCollector.image.repository }}{{ .Values.logCollector.image.name }}:{{ .Values.logCollector.image.tag }}"
+          imagePullPolicy: {{ .Values.logCollector.image.pullPolicy | quote }}
+          volumeMounts:
+          - name: filebeat-config
+            mountPath: /etc/filebeat
+          - name: logdir
+            mountPath: /prometheus
+          command:
+            - "filebeat"
+            - "-c"
+            - "/etc/filebeat/filebeat.yml"
+            - "-e"
+            - "-d"
+            - "\"*\""
+        {{- end }}
       terminationGracePeriodSeconds: {{ .Values.server.terminationGracePeriodSeconds }}
       volumes:
         - name: config-volume
@@ -78,4 +92,14 @@ spec:
         {{- else if eq .Values.server.persistence.type "hostPath" }}
           hostPath:
             path: "{{ .Values.server.persistence.hostPath }}"
+        {{- end }}
+        {{- if .Values.logCollector.enabled }}
+        - name: filebeat-config
+          configMap:
+            name: {{ printf "prom-fb-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+            items:
+              - key: filebeat-yml
+                path: filebeat.yml
+        - name: logdir
+          emptyDir: {}
         {{- end }}

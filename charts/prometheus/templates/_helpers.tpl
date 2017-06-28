@@ -52,7 +52,11 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{- define "alertmanager.address" -}}
-{{ template "alertmanager.fullname" . }}:{{ .Values.alertmanager.port }}
+{{- if .Values.alertmanager.deploy }}
+http://{{ template "alertmanager.fullname" . }}:{{ .Values.alertmanager.port }}
+{{- else }}
+{{ .Values.alertmanager.externalAddress }}
+{{- end }}
 {{- end -}}
 
 {{- define "kubeStateMetrics.address" -}}

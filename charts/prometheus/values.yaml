@@ -1,7 +1,9 @@
 alertmanager:
+  enabled: false
   ## If false, alertmanager will not be installed
   ##
-  enabled: false
+  deploy: false
+  externalAddress: ""
   port: 80
   ## alertmanager container image
   ##
@@ -177,18 +179,15 @@ server:
   image:
     repository: prom/
     name: prometheus
-    tag: v1.5.2
+    tag: master
     pullPolicy: IfNotPresent
     testImage: mirantisworkloads/test-base
     testImageTag: 1.0.0
 
-  ## (optional) alertmanager URL
-  ## only used if alertmanager.enabled = false
-  alertmanagerURL: ""
-
   ## Additional Prometheus server container arguments
   ##
-  extraArgs: {}
+  extraArgs:
+    log.level: info
 
   ingress:
     enabled: false
@@ -243,6 +242,17 @@ server:
   ## Prometheus server pod termination grace period
   ##
   terminationGracePeriodSeconds: 300
+
+logCollector:
+  enabled: false
+  image:
+    repository: mirantisworkloads/
+    name: filebeat
+    tag: 5.2.2
+    pullPolicy: Always
+  # external logstash hosts
+  logstashHost:
+    - "" # host:port Ex: "logstash-logstash:5043"
 
 ## alertmanager ConfigMap entries
 ##
