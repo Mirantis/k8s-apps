@@ -10,6 +10,6 @@ metadata:
 data:
   broker-config.json: >
     {
-      "chartUrl": {{ .Values.config.chartUrl | quote }},
+      "chartUrls": {{ .Values.config.chartUrls | toJson }},
       "tillerHost": {{ .Values.config.tillerHost | quote }}
     }

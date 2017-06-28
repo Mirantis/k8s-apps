@@ -4,7 +4,7 @@ metadata:
   name: "zookeeper"
   namespace: "test-ns" # secret's namespace
 spec:
-  serviceClassName: "zookeeper1.1.0"
+  serviceClassName: "zookeeper.1.1.0.mirantisworkloads.storage.googleapis.com"
   planName: "default"
   parameters:
     name: "zookeeper"

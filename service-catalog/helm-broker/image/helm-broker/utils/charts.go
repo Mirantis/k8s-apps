@@ -68,9 +68,13 @@ func DownloadChart(name, version string) (string, error) {
 	if chartUrl == "" {
 		return "", errors.New("There is no URL for chart " + name + version + " in the index.yaml")
 	}
-	ls := strings.Split(chartUrl, "/")
-	tarName := ls[len(ls)-1]
+	tarName := GetName(chartUrl)
 	chartPath := path.Join(ChartsPath, tarName)
 	err = downloadFile(ChartsPath, tarName, chartUrl)
 	return chartPath, err
+}
+
+func GetName(url string) string {
+	ls := strings.Split(url, "/")
+	return ls[len(ls)-1]
 }
