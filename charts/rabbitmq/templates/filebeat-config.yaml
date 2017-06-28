@@ -1,0 +1,31 @@
+{{ if .Values.logCollector.enabled }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ printf "rabbitmq-fb-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    app: {{ template "rabbitmq.fullname" . }}
+data:
+  filebeat-yml: |-
+    filebeat.prospectors:
+      - input_type: log
+        paths:
+          - "/var/log/rabbitmq/*.log"
+        fields:
+          log_host: "rabbitmq"
+        multiline:
+          pattern: "^="
+          negate: true
+          match: after
+    output.logstash:
+      hosts:
+      {{- range .Values.logCollector.logstashHost }}
+      - {{ . | quote }}
+      {{- end }}
+    path:
+      data: "/usr/share/filebeat/data"
+      home: "/usr/share/filebeat"
+{{ end }}

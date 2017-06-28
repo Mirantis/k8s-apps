@@ -63,3 +63,14 @@ prometheusExporter:
       name: rabbitmq-exporter
       tag: latest
       pullPolicy: Always
+
+logCollector:
+  enabled: false
+  image:
+    repository: mirantisworkloads/
+    name: filebeat
+    tag: 5.2.2
+    pullPolicy: Always
+  # external logstash hosts
+  logstashHost:
+    - "" # host:port Ex: "logstash-logstash:5043"
