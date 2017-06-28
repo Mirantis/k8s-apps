@@ -7,7 +7,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/pkg/api/v1"
 	v1beta1 "k8s.io/client-go/pkg/apis/apps/v1beta1"
-	extensions "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/rest"
 )
 
@@ -67,7 +66,7 @@ func checkResourcesState(resources map[string][]string, namespace string) (bool,
 					return false, err
 				}
 				list, err := getPods(client, namespace, r)
-				if len(list) < int(stSet.Spec.Replicas) {
+				if int32(len(list)) < *stSet.Spec.Replicas {
 					return false, nil
 				}
 				if err != nil {
@@ -101,7 +100,7 @@ func checkResourcesState(resources map[string][]string, namespace string) (bool,
 
 func deploymentsReady(deployments []*v1beta1.Deployment) bool {
 	for _, dep := range deployments {
-		if dep.Status.ReadyReplicas != int32(dep.Spec.Replicas) {
+		if dep.Status.ReadyReplicas != int32(*dep.Spec.Replicas) {
 			return false
 		}
 	}
