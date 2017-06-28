@@ -146,7 +146,14 @@ func (c *helmController) Bind(instanceID string, bindingID string, req *brokerap
 		log.Println(err)
 		return nil, err
 	}
-	// TODO Add secrets
+	secrets, err := client.GetSecrets(c.helmClient, instanceID)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	for key, data := range secrets {
+		credentials[key] = data
+	}
 	bindingResponse := &brokerapi.CreateServiceBindingResponse{
 		Credentials: credentials,
 	}
