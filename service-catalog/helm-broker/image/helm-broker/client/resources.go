@@ -1,6 +1,7 @@
 package client
 
 import (
+	"github.com/kubernetes-incubator/service-catalog/pkg/brokerapi"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
@@ -142,4 +143,23 @@ func volumesReady(vols []v1.PersistentVolumeClaim) bool {
 		}
 	}
 	return true
+}
+
+func getSecretsByNames(names []string, namespace string) (brokerapi.Credential, error) {
+	secrets := brokerapi.Credential{}
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		return secrets, err
+	}
+	client, err := kubernetes.NewForConfig(config)
+	for _, name := range names {
+		secret, err := client.Secrets(namespace).Get(name, metaV1.GetOptions{})
+		if err != nil {
+			return secrets, err
+		}
+		for k, v := range secret.Data {
+			secrets[k] = string(v)
+		}
+	}
+	return secrets, nil
 }

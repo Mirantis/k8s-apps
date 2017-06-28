@@ -24,8 +24,7 @@ func GetConnectionStrings(helmClient helm.Client, releaseName string) (brokerapi
 	if err != nil {
 		return brokerapi.Credential{}, err
 	}
-	conn_strings, err := utils.GetConnectionStringsFromNotes(status.Info.Status.Notes)
-	return conn_strings, err
+	return utils.GetConnectionStringsFromNotes(status.Info.Status.Notes)
 }
 
 // Delete deletes a release
@@ -39,12 +38,32 @@ func IsResourcesReady(helmClient helm.Client, releaseName string) (bool, error) 
 	if err != nil {
 		return false, err
 	}
-	status, err := helmClient.ReleaseStatus(releaseName)
+	namespace, err := getNamespace(helmClient, releaseName)
 	if err != nil {
 		return false, err
 	}
-	namespace := status.Namespace
 	return checkResourcesState(resources, namespace)
+}
+
+func GetSecrets(helmClient helm.Client, releaseName string) (brokerapi.Credential, error) {
+	resources, err := getResources(helmClient, releaseName)
+	if err != nil {
+		return brokerapi.Credential{}, err
+	}
+	var secrets []string
+	for typeRes, res := range resources {
+		if typeRes == "Secret" {
+			secrets = res
+		}
+	}
+	namespace, err := getNamespace(helmClient, releaseName)
+	if err != nil {
+		return brokerapi.Credential{}, err
+	}
+	if len(secrets) != 0 {
+		return getSecretsByNames(secrets, namespace)
+	}
+	return brokerapi.Credential{}, nil
 }
 
 func getResources(helmClient helm.Client, releaseName string) (map[string][]string, error) {
@@ -54,4 +73,12 @@ func getResources(helmClient helm.Client, releaseName string) (map[string][]stri
 	}
 	resourcesString := status.Info.Status.Resources
 	return utils.ParseResources(resourcesString)
+}
+
+func getNamespace(helmClient helm.Client, releaseName string) (string, error) {
+	status, err := helmClient.ReleaseStatus(releaseName)
+	if err != nil {
+		return "", err
+	}
+	return status.Namespace, nil
 }
