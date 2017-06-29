@@ -2,6 +2,7 @@ package go_test
 
 import (
 	"flag"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -110,8 +111,49 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 	ns := *prefixPtr + randStringRunes(10)
 	rel := *prefixPtr + randStringRunes(3)
 	chartDir := path.Join(*repoPathPtr, chart)
+	helmHome, ok := os.LookupEnv("HELM_HOME")
+	if ok {
+		helmHome = helmHome + "-" + ns
+	} else {
+		var err error
+		helmHome, err = ioutil.TempDir("", "helm-" + ns + "-")
+		if err != nil {
+			t.Fatalf("Failed to create temporary directory for helm home")
+		}
+	}
+	
+	createNsResult := RunCmdTest(t, "create_ns", kubectlCmd, "create", "ns", ns)
+	if createNsResult {
+		defer RunCmdTest(t, "delete_ns", kubectlCmd, "delete", "ns", ns)
+	} else {
+		for _, name := range []string{"install_tiller", "install", "test", "delete", "delete_ns"} {
+			FailTest(t, name, "failed to create namespace")
+		}
+		return
+	}
 
-	installArgs := []string{helmCmd, "install", chartDir, "--namespace", ns, "--name", rel, "--wait", "--timeout", "600"}
+	installTillerResult := t.Run("install_tiller", func(t *testing.T) {
+		RunCmd(t, helmCmd, "--tiller-namespace", ns, "--home", helmHome, "init")
+		for i := 0; i < 10; i++ {
+			cmd := exec.Command(helmCmd, "--tiller-namespace", ns, "--home", helmHome, "list")
+			output, err := cmd.CombinedOutput()
+			if err != nil {
+				t.Logf("helm list failed: %s\nOutput: %s", err, output)
+			} else {
+				return
+			}
+			time.Sleep(3 * time.Second)
+		}
+		t.Fatalf("Tiller takes too long to start")
+	})
+	if !installTillerResult {
+		for _, name := range []string{"install", "test", "delete"} {
+			FailTest(t, name, "failed to init tiller")
+		}
+		return
+	}
+
+	installArgs := []string{helmCmd, "--tiller-namespace", ns, "--home", helmHome, "install", chartDir, "--namespace", ns, "--name", rel, "--wait", "--timeout", "600"}
 	if config != "" {
 		installArgs = append(installArgs, "--values", config)
 	}
@@ -121,13 +163,12 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 	installResult := RunCmdTest(t, "install", installArgs...)
 
 	if installResult {
-		RunCmdTest(t, "test", helmCmd, "test", rel)
+		RunCmdTest(t, "test", helmCmd, "--tiller-namespace", ns, "--home", helmHome, "test", rel)
 	} else {
 		FailTest(t, "test", "helm install failed")
 	}
 
-	RunCmdTest(t, "delete", helmCmd, "delete", rel, "--purge")
-	RunCmdTest(t, "delete_ns", kubectlCmd, "delete", "ns", ns)
+	RunCmdTest(t, "delete", helmCmd, "--tiller-namespace", ns, "--home", helmHome, "delete", rel, "--purge")
 }
 
 func RunCmdTest(t *testing.T, name string, args ...string) bool {
@@ -142,6 +183,8 @@ func RunCmd(t *testing.T, args ...string) {
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("Command failed: %s\nCommand output: %s", err, output)
+	} else {
+		t.Logf("Command output: %s", output)
 	}
 }
 
