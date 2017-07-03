@@ -72,6 +72,7 @@ func RunCharts(t *testing.T) {
 	}
 
 	for _, chart := range charts {
+		chart := chart // capture range variable
 		if excludes[chart] {
 			continue
 		}
@@ -118,12 +119,12 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 		helmHome = helmHome + "-" + ns
 	} else {
 		var err error
-		helmHome, err = ioutil.TempDir("", "helm-" + ns + "-")
+		helmHome, err = ioutil.TempDir("", "helm-"+ns+"-")
 		if err != nil {
 			t.Fatalf("Failed to create temporary directory for helm home")
 		}
 	}
-	
+
 	createNsResult := RunCmdTest(t, "create_ns", kubectlCmd, "create", "ns", ns)
 	if createNsResult {
 		defer RunCmdTest(t, "delete_ns", kubectlCmd, "delete", "ns", ns)
