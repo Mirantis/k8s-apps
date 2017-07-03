@@ -68,6 +68,7 @@ type Parameters struct {
 	Name      string `json:"name"`
 	Namespace string `json:"namespace"`
 	Version   string `json:"version"`
+	Repo      string `json:"repo"`
 	Values    Values `json:"values"`
 }
 
@@ -83,6 +84,7 @@ func (cli *CatalogClient) CreateInstance(name, chart, version, repo, namespace s
 		Name:      chart,
 		Namespace: namespace,
 		Version:   version,
+		Repo:      repo,
 		Values:    valuesMap,
 	}
 	data, err := json.Marshal(param)
