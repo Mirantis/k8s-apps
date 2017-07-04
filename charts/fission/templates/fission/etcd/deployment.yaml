@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fission-etcd" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "fission-fullname" . }}
+spec:
+  replicas: {{ .Values.etcd.replicas }}
+  template:
+    metadata:
+      name: {{ template "fission-etcd" . }}
+      labels:
+        heritage: {{ .Release.Service | quote }}
+        release: {{ .Release.Name | quote }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "fission-fullname" . }}
+        type: etcd
+    spec:
+      containers:
+      - name: etcd
+        image: {{ .Values.etcd.image.repository }}{{ .Values.etcd.image.name }}:{{ .Values.etcd.image.tag }}
+        imagePullPolicy: {{ .Values.etcd.image.pullPolicy }}
+        env:
+        - name: ETCD_LISTEN_CLIENT_URLS
+          value: http://0.0.0.0:{{ .Values.etcd.port }}
+        - name: ETCD_ADVERTISE_CLIENT_URLS
+          value: http://{{ template "fission-etcd" . }}:{{ .Values.etcd.port }}

@@ -1,0 +1,42 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fission-kubewatcher" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "fission-fullname" . }}
+spec:
+  replicas: {{ .Values.kubewatcher.replicas }}
+  template:
+    metadata:
+      name: {{ template "fission-kubewatcher" . }}
+      labels:
+        heritage: {{ .Release.Service | quote }}
+        release: {{ .Release.Name | quote }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "fission-fullname" . }}
+        type: kubewatcher
+    spec:
+      containers:
+      - name: kubewatcher
+        image: {{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["/fission-bundle"]
+        args:
+        - "--kubewatcher"
+        - "--controllerUrl"
+        - "http://{{ template "fission-controller" . }}:{{ .Values.controller.port }}"
+        - "--routerUrl"
+        - "http://{{ template "fission-router" . }}:{{ .Values.router.port }}"
+      - name: timer
+        image: {{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["/fission-bundle"]
+        args:
+        - "--timer"
+        - "--controllerUrl"
+        - "http://{{ template "fission-controller" . }}:{{ .Values.controller.port }}"
+        - "--routerUrl"
+        - "http://{{ template "fission-router" . }}:{{ .Values.router.port }}"

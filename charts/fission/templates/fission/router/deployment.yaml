@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fission-router" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "fission-fullname" . }}
+spec:
+  replicas: {{ .Values.router.replicas }}
+  template:
+    metadata:
+      name: {{ template "fission-router" . }}
+      labels:
+        heritage: {{ .Release.Service | quote }}
+        release: {{ .Release.Name | quote }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "fission-fullname" . }}
+        type: router
+    spec:
+      containers:
+      - name: router
+        image: {{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["/fission-bundle"]
+        args:
+        - "--routerPort"
+        - {{ .Values.router.port | quote }}
+        - "--poolmgrUrl"
+        - "http://{{ template "fission-poolmgr" . }}:{{ .Values.poolmgr.port }}"
+        - "--controllerUrl"
+        - "http://{{ template "fission-controller" . }}:{{ .Values.controller.port }}"

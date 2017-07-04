@@ -1,0 +1,60 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: {{ template "fission-controller" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    app: {{ template "fission-fullname" . }}
+spec:
+  serviceName: {{ template "fission-controller" . }}
+  replicas: {{ .Values.controller.replicas }}
+  template:
+    metadata:
+      name: {{ template "fission-controller" . }}
+      labels:
+        heritage: {{ .Release.Service | quote }}
+        release: {{ .Release.Name | quote }}
+        chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+        app: {{ template "fission-fullname" . }}
+        type: controller
+    spec:
+      containers:
+      - name: controller
+        image: {{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["/fission-bundle"]
+        args:
+        - "--controllerPort"
+        - {{ .Values.controller.port | quote }}
+        - "--filepath"
+        - "/storage"
+        - "--etcdUrl"
+        - "http://{{ template "fission-etcd" . }}:{{ .Values.etcd.port }}"
+        volumeMounts:
+        - name: file-storage
+          mountPath: /storage
+      volumes:
+      {{- if eq .Values.controller.persistence.type "emptyDir" }}
+      - name: file-storage
+        emptyDir: {}
+      {{- else if eq .Values.controller.persistence.type "hostPath" }}
+      - name: file-storage
+        hostPath:
+          path: {{ .Values.controller.persistence.hostPath }}
+      {{- end }}
+  {{- if eq .Values.controller.persistence.type "PersistentVolumeClaim" }}
+  volumeClaimTemplates:
+  - metadata:
+      name: file-storage
+      {{- if .Values.controller.persistence.storageClass }}
+      annotations:
+        volume.beta.kubernetes.io/storage-class: {{ .Values.controller.persistence.storageClass | quote }}
+      {{- end }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.controller.persistence.volumeSize }}
+  {{- end }}

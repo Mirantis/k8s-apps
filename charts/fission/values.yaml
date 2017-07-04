@@ -1,0 +1,46 @@
+image:
+  repository: fission/
+  name: fission-bundle
+  tag: nightly20170620
+  pullPolicy: IfNotPresent
+
+controller:
+  replicas: 1
+  port: 80
+  persistence:
+    type: emptyDir # or hostPath or PersistentVolumeClaim
+    #storageClass: ""
+    volumeSize: 10Gi
+    hostPath: ""
+  service:
+    type: NodePort # or ClusterIP or LoadBalancer
+    nodePort: ""
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    annotations: {}
+
+router:
+  replicas: 1
+  port: 80
+  service:
+    type: NodePort # or ClusterIP or LoadBalancer
+    nodePort: ""
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    annotations: {}
+
+poolmgr:
+  replicas: 1
+  port: 80
+
+kubewatcher:
+  replicas: 1
+
+etcd:
+  replicas: 1
+  port: 2379
+  image:
+    repository: quay.io/coreos/
+    name: etcd
+    tag: latest
+    pullPolicy: IfNotPresent
