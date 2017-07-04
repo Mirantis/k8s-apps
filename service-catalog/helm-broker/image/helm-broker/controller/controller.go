@@ -49,7 +49,7 @@ func (c *helmController) Catalog() (*brokerapi.Catalog, error) {
 			log.Println(err)
 			return nil, err
 		}
-		index, err := utils.ParseIndex()
+		index, err := utils.ParseIndex(chartUrl)
 		if err != nil {
 			log.Println(err)
 			return nil, err
@@ -90,9 +90,10 @@ func (c *helmController) CreateServiceInstance(id string, req *brokerapi.CreateS
 	name := req.Parameters["name"].(string)
 	version := req.Parameters["version"].(string)
 	namespace := req.Parameters["namespace"].(string)
+	repo := req.Parameters["repo"].(string)
 	values, _ := yaml.Marshal(req.Parameters["values"])
 
-	chartPath, err := utils.DownloadChart(name, version)
+	chartPath, err := utils.DownloadChart(name, version, repo)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -122,7 +123,7 @@ func (c *helmController) GetServiceInstance(id string) (*brokerapi.LastOperation
 			Description: "Chart was successfully deployed",
 		}, nil
 	}
-	return &brokerapi.LastOperationResponse{
+		return &brokerapi.LastOperationResponse{
 		State:       brokerapi.StateInProgress,
 		Description: "Chart deployment is in progress",
 	}, nil

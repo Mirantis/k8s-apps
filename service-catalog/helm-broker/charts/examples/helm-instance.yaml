@@ -10,6 +10,7 @@ spec:
     name: "zookeeper"
     namespace: "test-ns" # instance's namespace
     version: "1.1.0"
+    repo: "mirantisworkloads.storage.googleapis.com"
     values:
       replicas: 1
       resources:

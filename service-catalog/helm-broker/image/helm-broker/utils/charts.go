@@ -32,13 +32,15 @@ func DownloadIndex(urlCharts string) error {
 	if err != nil {
 		return err
 	}
+	name := GetName(urlCharts) + ".yaml"
 	u.Path = path.Join(u.Path, IndexName)
 	indexUrl := u.String()
-	return downloadFile(ChartsPath, IndexName, indexUrl)
+	return downloadFile(ChartsPath, name, indexUrl)
 }
 
-func ParseIndex() (Index, error) {
-	indexPath := path.Join(ChartsPath, IndexName)
+func ParseIndex(urlCharts string) (Index, error) {
+	name := GetName(urlCharts) + ".yaml"
+	indexPath := path.Join(ChartsPath, name)
 	yamlFile, err := ioutil.ReadFile(indexPath)
 	if err != nil {
 		return Index{}, err
@@ -49,8 +51,8 @@ func ParseIndex() (Index, error) {
 	return index, err
 }
 
-func DownloadChart(name, version string) (string, error) {
-	index, err := ParseIndex()
+func DownloadChart(name, version, repo string) (string, error) {
+	index, err := ParseIndex(repo)
 	if err != nil {
 		return "", err
 	}

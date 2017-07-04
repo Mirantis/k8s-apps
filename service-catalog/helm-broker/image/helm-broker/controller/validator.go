@@ -34,6 +34,15 @@ func validateInstanceRequest(req *brokerapi.CreateServiceInstanceRequest) error 
 		return errors.New("Can't convert to string the namespace from the instance creation request")
 	}
 
+	repo, isExist := req.Parameters["repo"]
+	if !isExist {
+		return errors.New("There is no repo in the instance creation request")
+	}
+	_, isSuccess = repo.(string)
+	if !isSuccess {
+		return errors.New("Can't convert to string the repo name from the instance creation request")
+	}
+
 	values, isExist := req.Parameters["namespace"]
 	if !isExist {
 		return errors.New("There is no namespace in the instance creation request")
