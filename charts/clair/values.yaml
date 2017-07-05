@@ -1,0 +1,106 @@
+# Default values for clair.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+image:
+  repository: quay.io/coreos/
+  name: clair
+  tag: v2.0.1
+  pullPolicy: IfNotPresent
+
+probeInitialDelaySeconds: 15
+probeTimeoutSeconds: 5
+
+service:
+  type: ClusterIP # or ClusterIP or LoadBalancer
+
+  nodePort: ""
+
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+
+  annotations: {}
+
+ingress:
+  enabled: false
+  hosts: []
+    #- some.domain
+  tls:
+    enabled: false
+    secretName: ""
+  annotations: {}
+    #kubernetes.io/ingress.class: nginx
+
+resources:
+  #requests:
+  #  cpu: 100m
+  #  memory: 512Mi
+  #limits:
+  #  cpu: 100m
+  #  memory: 512Mi
+
+postgresql:
+  # if disabled, subchart will not be deployed
+  deployChart: true
+
+  # these values should be set if subchart deployment is disabled:
+  # PostgreSQL Connection string
+  # https://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING
+  externalAddress: ""
+
+database:
+  # Number of elements kept in the cache
+  # Values unlikely to change (e.g. namespaces) are cached in order to save prevent needless roundtrips to the database.
+  cachesize: 16384
+
+api:
+  # API server port
+  port: 6060
+
+  # Health server port
+  # This is an unencrypted endpoint useful for load balancers to check to healthiness of the clair server.
+  healthport: 6061
+
+  # Deadline before an API request will respond with a 503
+  timeout: 900s
+
+  # 32-bit URL-safe base64 key used to encrypt pagination tokens
+  # If one is not provided, it will be generated.
+  # Multiple clair instances in the same cluster need the same value.
+  paginationkey:
+
+  # Optional PKI configuration
+  # If you want to easily generate client certificates and CAs, try the following projects:
+  # https://github.com/coreos/etcd-ca
+  # https://github.com/cloudflare/cfssl
+  servername:
+  cafile:
+  keyfile:
+  certfile:
+
+updater:
+  # Frequency the database will be updated with vulnerabilities from the default data sources
+  # The value 0 disables the updater entirely.
+  interval: 2h
+
+notifier:
+  # Number of attempts before the notification is marked as failed to be sent
+  attempts: 3
+
+  # Duration before a failed notification is retried
+  renotifyinterval: 2h
+
+  http:
+    # Optional endpoint that will receive notifications via POST requests
+    endpoint:
+
+    # Optional PKI configuration
+    # If you want to easily generate client certificates and CAs, try the following projects:
+    # https://github.com/cloudflare/cfssl
+    # https://github.com/coreos/etcd-ca
+    servername:
+    cafile:
+    keyfile:
+    certfile:
+
+    # Optional HTTP Proxy: must be a valid URL (including the scheme).
+    proxy:

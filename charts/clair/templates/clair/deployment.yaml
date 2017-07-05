@@ -1,0 +1,43 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "clair.fullname" . }}
+  labels:
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "clair.fullname" . }}
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ template "clair.fullname" . }}
+    spec:
+      volumes:
+      - name: config
+        secret:
+          secretName: {{ template "clair.fullname" . }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        args:
+        - "-config"
+        - "/config/config.yaml"
+        volumeMounts:
+        - mountPath: /config
+          name: config
+        readinessProbe:
+          httpGet:
+            port: {{ .Values.api.healthport | int }}
+            path: /health
+          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+          timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
+        livenessProbe:
+          httpGet:
+            port: {{ .Values.api.healthport | int }}
+            path: /health
+          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+          timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
