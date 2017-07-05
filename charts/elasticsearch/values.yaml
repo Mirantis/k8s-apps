@@ -44,7 +44,7 @@ client:
     #  cpu: 512m
     #  memory: 1Gi
   service:
-    type: ClusterIP # or NodePort or LoadBalancer
+    type: NodePort # or ClusterIP or LoadBalancer
     nodePort: ""
     loadBalancerIP: ""
     loadBalancerSourceRanges: []
