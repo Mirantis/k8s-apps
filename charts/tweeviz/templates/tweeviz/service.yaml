@@ -13,8 +13,8 @@ metadata:
 {{- end }}
 spec:
   ports:
-    - name: webui
-      port: {{ .Values.port }}
+    - port: {{ .Values.port }}
+      name: http
       {{- if eq .Values.service.type "NodePort" }}
       {{- if .Values.service.nodePort }}
       nodePort: {{ .Values.service.nodePort }}

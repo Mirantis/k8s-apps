@@ -57,3 +57,6 @@ cassandra:
   externalAddress: ""
   keyspace: mirantis
   table: tweetics
+
+istio:
+  enabled: false
