@@ -2,6 +2,7 @@ package go_test
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"math/rand"
 	"os"
@@ -24,58 +25,108 @@ func LookupEnvDefault(key string, def string) string {
 
 var (
 	repoPathPtr   = flag.String("repo", "charts/", "Path to charts repository")
+	imagesPathPtr = flag.String("images", "images/", "Path to Dockerfiles")
 	configPathPtr = flag.String("config", "tests/", "Path to charts config files")
 	paramsPtr     = flag.String("params", "", "Set config values on the command line (can specify multiple or separate values with commas: key1=val1,key2=val2)")
 	excludePtr    = flag.String("exclude", "", "List of charts to exclude from run")
 	prefixPtr     = flag.String("prefix", "", "Prefix to prepend to object names (releases, namespaces)")
+	onlyChartsPtr = flag.Bool("only-charts", true, "Only chart testing")
+	onlyImagesPtr = flag.Bool("only-images", false, "Only image building")
+	imageRepoPtr  = flag.String("image-repo", "mirantisworkloads", "Image repo address")
+	pushImagesPtr = flag.Bool("push-images", false, "Push images into repository")
 	helmCmd       = LookupEnvDefault("HELM_CMD", "helm")
 	kubectlCmd    = LookupEnvDefault("KUBECTL_CMD", "kubectl")
 	excludes      []string
 )
 
 func TestRoot(t *testing.T) {
-	t.Run("charts", RunCharts)
+	if *onlyImagesPtr {
+		t.Run("images", RunImages)
+	} else if *onlyChartsPtr {
+		t.Run("charts", RunCharts)
+	} else {
+		t.Run("images", RunImages)
+		t.Run("charts", RunCharts)
+	}
 }
 
-func RunCharts(t *testing.T) {
-	matches, err := filepath.Glob(*repoPathPtr + "/*")
+func DiscoverArtifacts(t *testing.T, path string) []string {
+	matches, err := filepath.Glob(path + "/*")
 	if err != nil {
-		t.Fatalf("Failed to list directory %s: %s", *repoPathPtr, err)
+		t.Fatalf("Failed to list directory %s: %s", path, err)
 	}
-	t.Logf("Found charts: %+v", matches)
-	var charts []string
+	var allArtifacts []string
+	for _, match := range matches {
+		allArtifacts = append(allArtifacts, filepath.Base(match))
+	}
+	t.Logf("Found artifacts: %+v", allArtifacts)
+	var artifacts []string
 	if flag.NArg() == 0 {
-		for _, match := range matches {
-			charts = append(charts, filepath.Base(match))
-		}
+		artifacts = allArtifacts
 	} else {
 		matchSet := make(map[string]bool)
 		for _, match := range matches {
 			matchSet[filepath.Base(match)] = true
 		}
-		var not_found []string
-		args := flag.Args()
-		for _, arg := range args {
-			if !matchSet[arg] {
-				not_found = append(not_found, arg)
+		var notFound []string
+		for _, arg := range flag.Args() {
+			artifact := filepath.Base(arg)
+			if !matchSet[artifact] {
+				notFound = append(notFound, arg)
+			} else {
+				artifacts = append(artifacts, artifact)
 			}
 		}
-		if len(not_found) > 0 {
-			t.Fatalf("Couldn't find these charts: %+v", not_found)
+		if len(notFound) > 0 {
+			t.Fatalf("Couldn't find these artifacts: %+v", notFound)
 		}
-		charts = args
 	}
-
 	excludes := make(map[string]bool)
 	for _, e := range strings.Split(*excludePtr, ",") {
-		excludes[e] = true
+		excludes[filepath.Base(e)] = true
 	}
-
-	for _, chart := range charts {
-		chart := chart // capture range variable
-		if excludes[chart] {
-			continue
+	var res []string
+	for _, a := range artifacts {
+		if !excludes[a] {
+			res = append(res, a)
 		}
+	}
+	return res
+}
+
+func RunImages(t *testing.T) {
+	for _, image := range DiscoverArtifacts(t, "images") {
+		image := image
+		t.Run(image, func(t *testing.T) {
+			t.Parallel()
+			RunImage(t, image)
+		})
+	}
+}
+
+func RunImage(t *testing.T, image string) {
+	imageDir := path.Join(*imagesPathPtr, image)
+	imageVersionFilePath := path.Join(imageDir, ".version")
+	version, err := ioutil.ReadFile(imageVersionFilePath)
+	if err != nil {
+		t.Fatalf("Couldn't get image version from file: %s\n%s", imageVersionFilePath, err)
+	}
+	imageTag := fmt.Sprintf("%s/%s:%s", *imageRepoPtr, image, strings.TrimSpace(string(version)))
+	res := RunCmdTest(t, "build", "docker", "build", "-t", imageTag, imageDir)
+	if !res {
+		t.Fatalf("Failed to build %s image", image)
+	}
+	if *pushImagesPtr {
+		res := RunCmdTest(t, "push", "docker", "push", imageTag)
+		if !res {
+			t.Fatalf("Failed to push %s image", image)
+		}
+	}
+}
+
+func RunCharts(t *testing.T) {
+	for _, chart := range DiscoverArtifacts(t, "charts") {
+		chart := chart
 		t.Run(chart, func(t *testing.T) {
 			t.Parallel()
 			RunChart(t, chart)
