@@ -116,7 +116,7 @@ kubeStateMetrics:
     #   memory: 16Mi
 
   service:
-    type: ClusterIP # or NodePort or LoadBalancer
+    type: NodePort # or ClusterIP or LoadBalancer
 
     nodePort: ""
 
@@ -160,7 +160,7 @@ nodeExporter:
     #   memory: 30Mi
 
   service:
-    type: ClusterIP # or NodePort or LoadBalancer
+    type: NodePort # or ClusterIP or LoadBalancer
 
     nodePort: ""
 

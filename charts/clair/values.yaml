@@ -11,7 +11,7 @@ probeInitialDelaySeconds: 15
 probeTimeoutSeconds: 5
 
 service:
-  type: ClusterIP # or ClusterIP or LoadBalancer
+  type: NodePort # or ClusterIP or LoadBalancer
 
   nodePort: ""
 
