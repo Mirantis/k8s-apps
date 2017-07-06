@@ -51,3 +51,9 @@ helm install -n tweeviz-1 mirantisworkloads/tweeviz -f multi-node/configs/tweevi
 ```
 
 After that you can access tweeviz endpoint to see a tag cloud.
+
+Deploy Istio:
+```console
+helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
+helm install incubator/istio -f istio/values.yaml
+```
