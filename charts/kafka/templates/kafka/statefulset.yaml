@@ -97,7 +97,14 @@ spec:
         - name: KAFKA_PORT
           value: "{{ .Values.port }}"
         - name: ZK_CONNECT
+        {{- if .Values.zookeeper.serviceCatalog.enabled }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.zookeeper.serviceCatalog.secretName }}
+              key: zookeeper
+        {{- else }}
           value: "{{ template "zk-address" . }}"
+        {{- end }}
         - name: KAFKA_HEAP_OPTS
           value: "-Xmx{{ .Values.heapSize }} -Xms{{ .Values.heapSize }}"
         {{- if .Values.prometheusExporter.enabled }}
