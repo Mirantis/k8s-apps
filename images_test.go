@@ -1,4 +1,4 @@
-package images_test
+package go_test
 
 import (
 	"io/ioutil"
