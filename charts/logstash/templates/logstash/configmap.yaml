@@ -257,6 +257,26 @@ data:
                     "type"
                 ]
             }
+        } else if ([fields][log_host] == "fission") {
+            grok {
+                match => {
+                    "message" => ["\{\"log\"\: \"%{GREEDYDATA: message}\", \"stream\": \"%{WORD: stream}\", \"time\": \"%{TIMESTAMP_ISO8601:timestamp}\"\}"]
+                }
+                overwrite => [ "message", "timestamp" ]
+                add_field => {
+                    "received_at" => "%{@timestamp}"
+                    "reveived_from" => "%{host}"
+                }
+                remove_field => [
+                    "beat",
+                    "input_type",
+                    "offset",
+                    "fields",
+                    "tags",
+                    "host",
+                    "type"
+                ]
+            }
         } else {
             grok {
                 match => {

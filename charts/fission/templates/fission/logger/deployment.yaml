@@ -1,0 +1,57 @@
+{{- if .Values.logCollector.enabled -}}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fission-logger" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "fission-fullname" . }}
+spec:
+  replicas: {{ .Values.logCollector.replicas }}
+  template:
+    metadata:
+      name: {{ template "fission-logger" . }}
+      labels:
+        heritage: {{ .Release.Service | quote }}
+        release: {{ .Release.Name | quote }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "fission-fullname" . }}
+        type: logger
+    spec:
+      containers:
+      - name: logger
+        image: {{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["/fission-bundle"]
+        args:
+        - "--logger"
+        volumeMounts:
+        - name: logdir
+          mountPath: /var/log/fission
+      - name: filebeat
+        image: {{ .Values.logCollector.image.repository }}{{ .Values.logCollector.image.name }}:{{ .Values.logCollector.image.tag }}
+        imagePullPolicy: {{ .Values.logCollector.image.pullPolicy }}
+        volumeMounts:
+        - name: filebeat-config
+          mountPath: /etc/filebeat
+        - name: logdir
+          mountPath: /var/log/fission
+        command:
+          - "filebeat"
+          - "-c"
+          - "/etc/filebeat/filebeat.yml"
+          - "-e"
+          - "-d"
+          - "\"*\""
+      volumes:
+      - name: filebeat-config
+        configMap:
+          name: {{ printf "fission-fb-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+          items:
+            - key: filebeat-yml
+              path: filebeat.yml
+      - name: logdir
+        emptyDir: {}
+{{- end -}}

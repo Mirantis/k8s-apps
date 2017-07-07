@@ -36,6 +36,18 @@ poolmgr:
 kubewatcher:
   replicas: 1
 
+logCollector:
+  enabled: false
+  replicas: 1
+  image:
+    repository: mirantisworkloads/
+    name: filebeat
+    tag: 5.2.2
+    pullPolicy: IfNotPresent
+  # external logstash hosts
+  logstashHost:
+    - "" # host:port
+
 etcd:
   replicas: 1
   port: 2379
