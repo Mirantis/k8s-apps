@@ -13,8 +13,6 @@ RUN apt update \
     && apt install -y python-matplotlib
 
 # install R integration
-# FIXME: install r-cran-knitr from deb once it is fixed in jessie-backports
-RUN apt install -y -t jessie-backports r-base && \
-    R -e 'install.packages("knitr",repos = "http://cran.r-project.org")'
+RUN apt install -y r-base r-cran-knitr
 
 ENV PATH /zeppelin/bin:$PATH
