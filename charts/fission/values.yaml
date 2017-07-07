@@ -29,6 +29,28 @@ router:
     loadBalancerSourceRanges: []
     annotations: {}
 
+ui:
+  enabled: false
+  image:
+    repository: fission/
+    name: fission-ui
+    tag: 0.1.0
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort # or ClusterIP or LoadBalancer
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    annotations: {}
+  ingress:
+    enabled: false
+    hosts: []
+      #   - some.domain
+    tls:
+      enabled: false
+      secretName: ""
+    annotations: {}
+      #   kubernetes.io/ingress.class: nginx
+
 poolmgr:
   replicas: 1
   port: 80
