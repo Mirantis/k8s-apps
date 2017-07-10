@@ -24,29 +24,32 @@ func LookupEnvDefault(key string, def string) string {
 }
 
 var (
-	repoPathPtr   = flag.String("repo", "charts/", "Path to charts repository")
-	imagesPathPtr = flag.String("images", "images/", "Path to Dockerfiles")
-	configPathPtr = flag.String("config", "tests/", "Path to charts config files")
-	paramsPtr     = flag.String("params", "", "Set config values on the command line (can specify multiple or separate values with commas: key1=val1,key2=val2)")
-	excludePtr    = flag.String("exclude", "", "List of charts to exclude from run")
-	prefixPtr     = flag.String("prefix", "", "Prefix to prepend to object names (releases, namespaces)")
-	onlyChartsPtr = flag.Bool("only-charts", true, "Only chart testing")
-	onlyImagesPtr = flag.Bool("only-images", false, "Only image building")
-	imageRepoPtr  = flag.String("image-repo", "mirantisworkloads", "Image repo address")
-	pushImagesPtr = flag.Bool("push-images", false, "Push images into repository")
-	helmCmd       = LookupEnvDefault("HELM_CMD", "helm")
-	kubectlCmd    = LookupEnvDefault("KUBECTL_CMD", "kubectl")
-	excludes      []string
+	repoPathPtr        = flag.String("repo", "charts/", "Path to charts repository")
+	imagesPathPtr      = flag.String("images-dir", "images/", "Path to Dockerfiles")
+	configPathPtr      = flag.String("config", "tests/", "Path to charts config files")
+	paramsPtr          = flag.String("params", "", "Set config values on the command line (can specify multiple or separate values with commas: key1=val1,key2=val2)")
+	excludePtr         = flag.String("exclude", "", "List of charts to exclude from run")
+	prefixPtr          = flag.String("prefix", "", "Prefix to prepend to object names (releases, namespaces)")
+	chartsPtr          = flag.Bool("charts", true, "Test charts")
+	imagesPtr          = flag.Bool("images", false, "Build images")
+	pushPtr            = flag.Bool("push", false, "Push images after tests")
+	imageRepoPtr       = flag.String("image-repo", "127.0.0.1:5000", "Image repo address for test")
+	pushRepoPtr        = flag.String("push-repo", "mirantisworkloads", "Image repo address for push")
+	buildImagesOptsPtr = flag.String("build-images-opts", "", "Docker opts for building images")
+	helmCmd            = LookupEnvDefault("HELM_CMD", "helm")
+	kubectlCmd         = LookupEnvDefault("KUBECTL_CMD", "kubectl")
+	excludes           []string
 )
 
 func TestRoot(t *testing.T) {
-	if *onlyImagesPtr {
+	if *imagesPtr {
 		t.Run("images", RunImages)
-	} else if *onlyChartsPtr {
+	}
+	if *chartsPtr {
 		t.Run("charts", RunCharts)
-	} else {
-		t.Run("images", RunImages)
-		t.Run("charts", RunCharts)
+	}
+	if *pushPtr {
+		t.Run("push", RunPushImages)
 	}
 }
 
@@ -112,15 +115,13 @@ func RunImage(t *testing.T, image string) {
 		t.Fatalf("Couldn't get image version from file: %s\n%s", imageVersionFilePath, err)
 	}
 	imageTag := fmt.Sprintf("%s/%s:%s", *imageRepoPtr, image, strings.TrimSpace(string(version)))
-	res := RunCmdTest(t, "build", "docker", "build", "-t", imageTag, imageDir)
+	res := RunCmdTest(t, "build", "docker", "build", *buildImagesOptsPtr, "-t", imageTag, imageDir)
 	if !res {
 		t.Fatalf("Failed to build %s image", image)
 	}
-	if *pushImagesPtr {
-		res := RunCmdTest(t, "push", "docker", "push", imageTag)
-		if !res {
-			t.Fatalf("Failed to push %s image", image)
-		}
+	res = RunCmdTest(t, "push", "docker", "push", imageTag)
+	if !res {
+		t.Fatalf("Failed to push %s image", image)
 	}
 }
 
@@ -159,6 +160,36 @@ func RunChart(t *testing.T, chart string) {
 			})
 		}
 	})
+}
+
+func RunPushImages(t *testing.T) {
+	for _, image := range DiscoverArtifacts(t, "images") {
+		image := image
+		t.Run(image, func(t *testing.T) {
+			t.Parallel()
+			RunImage(t, image)
+		})
+	}
+}
+
+func RunPushImage(t *testing.T, image string) {
+	imageDir := path.Join(*imagesPathPtr, image)
+	imageVersionFilePath := path.Join(imageDir, ".version")
+	versionData, err := ioutil.ReadFile(imageVersionFilePath)
+	if err != nil {
+		t.Fatalf("Couldn't get image version from file: %s\n%s", imageVersionFilePath, err)
+	}
+	version := strings.TrimSpace(string(versionData))
+	imageTag := fmt.Sprintf("%s/%s:%s", *imageRepoPtr, image, version)
+	newTag := fmt.Sprintf("%s/%s:%s", *pushRepoPtr, image, version)
+	res := RunCmdTest(t, "tag", "docker", "tag", imageTag, newTag)
+	if !res {
+		t.Fatalf("Failed to tag %s image", image)
+	}
+	res = RunCmdTest(t, "push", "docker", "push", newTag)
+	if !res {
+		t.Fatalf("Failed to push %s image", image)
+	}
 }
 
 func RunOneConfig(t *testing.T, chart string, config string) {
