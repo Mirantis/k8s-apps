@@ -17,6 +17,9 @@ and shows following workloads flow:
 
 # How to
 
+You can see it in use in https://asciinema.org/a/FiTPSZyV2guFv7VPAbDriExtg
+
+
 1. Make sure to have kubectl configured to the k8s cluster that you'd like to use.
 
 1. Switch to `scenarios/twitter-stats` directory. There is a bash script `./twitter-stats.sh`
