@@ -115,7 +115,12 @@ func RunImage(t *testing.T, image string) {
 		t.Fatalf("Couldn't get image version from file: %s\n%s", imageVersionFilePath, err)
 	}
 	imageTag := fmt.Sprintf("%s/%s:%s", *imageRepoPtr, image, strings.TrimSpace(string(version)))
-	res := RunCmdTest(t, "build", "docker", "build", *buildImagesOptsPtr, "-t", imageTag, imageDir)
+	var res bool
+	if *buildImagesOptsPtr == "" {
+		res = RunCmdTest(t, "build", "docker", "build", "-t", imageTag, imageDir)
+	} else {
+		res = RunCmdTest(t, "build", "docker", "build", *buildImagesOptsPtr, "-t", imageTag, imageDir)
+	}
 	if !res {
 		t.Fatalf("Failed to build %s image", image)
 	}
@@ -140,6 +145,10 @@ func RunChart(t *testing.T, chart string) {
 	res := RunCmdTest(t, "lint", helmCmd, "lint", chartDir)
 	if !res {
 		t.Fatalf("lint failed, not proceeding")
+	}
+	res = RunCmdTest(t, "dependencies", helmCmd, "dependency", "update", chartDir)
+	if !res {
+		t.Fatalf("Failed to update dependencies")
 	}
 	t.Run("tests", func(t *testing.T) {
 		configs, err := filepath.Glob(path.Join(*configPathPtr, chart, "*"))
