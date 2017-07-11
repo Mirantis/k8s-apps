@@ -1,6 +1,6 @@
 {{ $host := include "mariadb-fullname" . }}
 {{ $port := .Values.port }}
-{{ $rand := printf "%s-%s" .Release.Name (randAlpha 6) }}
+{{ $rand := printf "%s" (randAlpha 10) }}
 apiVersion: v1
 kind: Pod
 metadata:
