@@ -131,7 +131,8 @@ Example:
     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
     You can watch the status of it by running in the same shell 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "service-fullname" . }}'
 
-        service: http://{{ .Values.service.loadBalancerIP }}:{{ .Values.port }}
+        export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        echo http://$SERVICE_IP:{{ .Values.port }}
     {{- end }}
     {{- end }}
 
@@ -142,7 +143,7 @@ _helpers.tpl
 
   .. code-block:: smarty
 
-      {{- define "namenode-fullname" -}}
+      {{- define "namenode.fullname" -}}
       {{- printf "hdfs-namenode-%s" .Release.Name  | trunc 63 | trimSuffix "-" -}}
       {{- end -}}
 
@@ -150,7 +151,7 @@ _helpers.tpl
 
   .. code-block:: smarty
 
-      {{- define "namenode-address" -}}
+      {{- define "namenode.address" -}}
       {{- printf "some address"  | trunc 63 | trimSuffix "-" -}}
       {{- end -}}
 
@@ -192,7 +193,7 @@ values.yaml
         repository: mirantisworkloads/
         name: zookeeper
         tag: 3.5.3-rc1
-        pullPolicy: Always
+        pullPolicy: IfNotPresent
 
   Upstream images or images published to `mirantisworkloads` Docker Hub
   repository should be used as defaults.
@@ -203,15 +204,14 @@ values.yaml
 
       replicas: 1
 
-  Resources requests and limits. Requests should be set by default, limits are
-  optional:
+  Resources requests and limits. Both should not be set by default:
 
   .. code-block:: yaml
 
-      resources:
-        requests:
-          cpu: 100m
-          memory: 128Mi
+      #resources:
+        #requests:
+          #cpu: 100m
+          #memory: 128Mi
         #limits:
           #cpu: 100m
           #memory: 128Mi
@@ -252,7 +252,7 @@ values.yaml
 
   .. code-block:: yaml
 
-      antiAffinity: hard # or soft or null
+      antiAffinity: soft # or hard or no
 
   Three options should be supported:
 
@@ -314,7 +314,7 @@ values.yaml
   .. code-block:: yaml
 
       service:
-        type: ClusterIP # or NodePort or LoadBalancer
+        type: NodePort # or ClusterIP or LoadBalancer
 
         nodePort: ""
 
