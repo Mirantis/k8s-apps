@@ -7,7 +7,7 @@ image:
   repository: mirantisworkloads/
   name: redis
   tag: 3.2-r1
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 resources:
   #requests:
@@ -33,7 +33,7 @@ logCollector:
     repository: mirantisworkloads/
     name: filebeat
     tag: 5.2.2
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   # external logstash hosts
   logstashHost:
     - "" # host:port Ex: "logstash-logstash:5043"

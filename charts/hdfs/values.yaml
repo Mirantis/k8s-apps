@@ -4,7 +4,7 @@ datanode:
     repository: mirantisworkloads/
     name: hadoop-datanode
     tag: 2.7.2
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
 
   antiAffinity: "soft" # or "hard"
 
@@ -30,7 +30,7 @@ namenode:
     repository: mirantisworkloads/
     name: hadoop-namenode
     tag: 2.7.2
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
 
   persistence:
     type: emptyDir # or hostPath or PersistentVolumeClaim

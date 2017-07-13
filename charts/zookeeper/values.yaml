@@ -56,7 +56,7 @@ logCollector:
     repository: mirantisworkloads/
     name: filebeat
     tag: 5.2.2
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   # external logstash hosts
   logstashHost:
     - "" # host:port Ex: "logstash-logstash:5043"
