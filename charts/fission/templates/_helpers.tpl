@@ -22,6 +22,10 @@
 {{- printf "fission-logger-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{- define "fission-ui" -}}
+{{- printf "fission-ui-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
 {{- define "fission-etcd" -}}
 {{- printf "fission-etcd-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}

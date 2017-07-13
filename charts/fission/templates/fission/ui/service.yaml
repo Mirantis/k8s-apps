@@ -1,0 +1,40 @@
+{{- if .Values.ui.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "fission-ui" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "fission-fullname" . }}
+    type: ui
+  {{- if .Values.ui.service.annotations }}
+  annotations:
+{{ toYaml .Values.ui.service.annotations | indent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.ui.service.type | quote }}
+  ports:
+  - port: 80
+    targetPort: 80
+    {{- if eq .Values.ui.service.type "NodePort" }}
+    {{- if .Values.ui.service.nodePort }}
+    nodePort: {{ .Values.ui.service.nodePort }}
+    {{- end -}}
+    {{- end }}
+  selector:
+    app: {{ template "fission-fullname" . }}
+    type: ui
+  {{- if eq .Values.ui.service.type "LoadBalancer" }}
+  {{- if .Values.ui.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.ui.service.loadBalancerIP }}
+  {{- end }}
+  {{- if .Values.ui.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+  {{- range .Values.ui.service.loadBalancerSourceRanges }}
+  - {{ . }}
+  {{- end }}
+  {{- end -}}
+  {{- end -}}
+{{- end -}}
