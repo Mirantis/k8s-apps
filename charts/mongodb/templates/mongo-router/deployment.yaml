@@ -31,6 +31,10 @@ spec:
           - /bootstrap.py
           - {{ .Values.router.port | quote }}
           - "router"
+        readinessProbe:
+          tcpSocket:
+            port: {{ .Values.router.port }}
+          periodSeconds: {{ .Values.router.probeTimeoutSeconds }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         volumeMounts:

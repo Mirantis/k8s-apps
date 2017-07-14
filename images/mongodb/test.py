@@ -11,7 +11,7 @@ def msg(service_name):
         def fct_wrapper(*args, **kwargs):
             print(">>> Check %s service..." % service_name)
             res = fct(*args, **kwargs)
-            print(">>> Done" % service_name)
+            print(">>> Done %s" % service_name)
             return res
         return fct_wrapper
     return msg_decorator
