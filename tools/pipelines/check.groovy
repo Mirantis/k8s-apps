@@ -26,22 +26,8 @@ def run(helm_home) {
     parallel stages
   }
   def image_tag = env.BUILD_NUMBER + '-' + env.GERRIT_CHANGE_NUMBER + '-' + env.GERRIT_PATCHSET_NUMBER
-  dir("images") {
-    def stages = [:]
-    def image_names = []
-    for (image_dir in findFiles()) {
-      image_names << image_dir.name
-    }
-    for (_image_name in image_names) {
-      def image_name = _image_name
-      stages[image_name] = {
-        stage(image_name + " image build") {
-          sh('docker build --tag nexus-scc.ng.mirantis.net:5000/' + image_name + ':' + image_tag + ' ' + image_name)
-          sh('docker push nexus-scc.ng.mirantis.net:5000/' + image_name + ':' + image_tag)
-        }
-      }
-    }
-    parallel stages
+  stage("Build images") {
+    sh("go test -v --timeout 90m -args --images --charts=false --image-repo nexus-scc.ng.mirantis.net:5000/${image_tag}")
   }
   stage("Run tests") {
     try {
