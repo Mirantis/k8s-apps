@@ -25,7 +25,7 @@ spec:
           key: postgres-password
     command:
       - sh
-      - -cx
+      - -cxe
       - |
         cat > {{ $rand }}.sql << EOF
         create table {{ $rand }}-journal(name varchar(30), mark int);

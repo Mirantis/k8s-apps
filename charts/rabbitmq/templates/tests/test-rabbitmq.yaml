@@ -17,7 +17,7 @@ spec:
           key: password
     command:
       - "sh"
-      - "-cx"
+      - "-cxe"
       - |
         {{- $release := (.Release.Name | trunc 63 | trimSuffix "-") -}}
         {{ range $i, $e := until (int $.Values.replicas) }}

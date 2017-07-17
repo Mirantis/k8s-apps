@@ -94,7 +94,7 @@ spec:
         imagePullPolicy: {{ .Values.prometheusExporter.image.pullPolicy | quote }}
         command:
         - sh
-        - -cx
+        - -cxe
         - |
           sleep {{ mul .Values.probeInitialDelaySeconds 2 }}
           cat > ~/.my.cnf << EOF

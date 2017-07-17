@@ -11,7 +11,7 @@ spec:
       imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
       command:
         - sh
-        - "-cx"
+        - "-cxe"
         - |
           redis-cli -h {{ template "cluster-svc-fullname" . }} ping
           redis-cli -h {{ template "cluster-svc-fullname" . }} set test:1:string "test string"

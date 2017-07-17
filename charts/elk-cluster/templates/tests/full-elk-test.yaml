@@ -13,7 +13,7 @@ spec:
     imagePullPolicy: {{ .Values.filebeatImage.pullPolicy }}
     command:
     - "sh"
-    - "-cx"
+    - "-cxe"
     - |
       cat > /etc/filebeat/filebeat.yml << EOF
       filebeat.prospectors:
@@ -43,7 +43,7 @@ spec:
     imagePullPolicy: {{ .Values.testImage.pullPolicy }}
     command:
     - "sh"
-    - "-cx"
+    - "-cxe"
     - |
       mkdir /opt/stublogs
       echo "Current line only for check" > /opt/stublogs/logfile.log

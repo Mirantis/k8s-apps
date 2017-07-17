@@ -25,7 +25,7 @@ spec:
           key: mariadb-root-password
     command:
       - "sh"
-      - "-cx"
+      - "-cxe"
       - |
         cat > query.sql << EOF
         create database {{ $rand }}_test;
