@@ -44,13 +44,6 @@ def run(helm_home) {
     parallel stages
   }
   stage("Run tests") {
-    def params = []
-
-    for (prefix in ['', 'logCollector.', 'testImage.', 'filebeatImage.', 'spark.', 'zeppelin.']) {
-      params << prefix + 'image.repository=nexus-scc.ng.mirantis.net:5000/'
-      params << prefix + 'image.tag=' + image_tag
-    }
-
     try {
       withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
         withEnv([

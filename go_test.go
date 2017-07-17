@@ -12,6 +12,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"gopkg.in/yaml.v2"
 )
 
 func LookupEnvDefault(key string, def string) string {
@@ -27,7 +29,6 @@ var (
 	repoPathPtr        = flag.String("repo", "charts/", "Path to charts repository")
 	imagesPathPtr      = flag.String("images-dir", "images/", "Path to Dockerfiles")
 	configPathPtr      = flag.String("config", "tests/", "Path to charts config files")
-	paramsPtr          = flag.String("params", "", "Set config values on the command line (can specify multiple or separate values with commas: key1=val1,key2=val2)")
 	excludePtr         = flag.String("exclude", "", "List of charts to exclude from run")
 	prefixPtr          = flag.String("prefix", "", "Prefix to prepend to object names (releases, namespaces)")
 	chartsPtr          = flag.Bool("charts", true, "Test charts")
@@ -216,6 +217,42 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 		}
 	}
 
+	imageParams := []string{}
+	valuesData, err := ioutil.ReadFile(path.Join(chartDir, "values.yaml"))
+	if err != nil {
+		t.Fatalf("Failed to read values.yaml for %s chart", chart)
+	}
+	values := make(map[interface{}]interface{})
+	err = yaml.Unmarshal(valuesData, &values)
+	if err != nil {
+		t.Fatalf("Error parsing values.yaml file")
+	}
+	image := values["image"]
+	if image != nil {
+		img, ok := image.(map[interface{}]interface{})
+		if !ok {
+			t.Fatalf("Incorrect image section\n%+v", image)
+		}
+		if img["repository"].(string) == "mirantisworkloads/" {
+			imageParams = append(imageParams, fmt.Sprintf("image.repository=%s", *imageRepoPtr))
+		}
+	}
+	for key, item := range values {
+		value, ok := item.(map[interface{}]interface{})
+		if ok {
+			image = value["image"]
+			if image != nil {
+				img, ok := image.(map[interface{}]interface{})
+				if !ok {
+					t.Fatalf("Incorrect image section\n%+v", image)
+				}
+				if img["repository"].(string) == "mirantisworkloads/" {
+					imageParams = append(imageParams, fmt.Sprintf("%s.image.repository=%s", key, *imageRepoPtr))
+				}
+			}
+		}
+	}
+
 	createNsResult := RunCmdTest(t, "create_ns", kubectlCmd, "create", "ns", ns)
 	if createNsResult {
 		defer RunCmdTest(t, "delete_ns", kubectlCmd, "delete", "ns", ns)
@@ -251,8 +288,8 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 	if config != "" {
 		installArgs = append(installArgs, "--values", config)
 	}
-	if *paramsPtr != "" {
-		installArgs = append(installArgs, "--set", *paramsPtr)
+	if len(imageParams) > 0 {
+		installArgs = append(installArgs, "--set", strings.Join(imageParams, ","))
 	}
 	installResult := RunCmdTest(t, "install", installArgs...)
 
