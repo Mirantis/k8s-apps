@@ -220,7 +220,7 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 	if createNsResult {
 		defer RunCmdTest(t, "delete_ns", kubectlCmd, "delete", "ns", ns)
 	} else {
-		for _, name := range []string{"install_tiller", "install", "test", "delete", "delete_ns"} {
+		for _, name := range []string{"install_tiller", "install", "wait_deployments", "test", "delete", "delete_ns"} {
 			FailTest(t, name, "failed to create namespace")
 		}
 		return
@@ -241,7 +241,7 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 		t.Fatalf("Tiller takes too long to start")
 	})
 	if !installTillerResult {
-		for _, name := range []string{"install", "test", "delete"} {
+		for _, name := range []string{"install", "wait_deployments", "test", "delete"} {
 			FailTest(t, name, "failed to init tiller")
 		}
 		return
@@ -256,13 +256,39 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 	}
 	installResult := RunCmdTest(t, "install", installArgs...)
 
-	if installResult {
-		RunCmdTest(t, "test", helmCmd, "--tiller-namespace", ns, "--home", helmHome, "test", rel)
-	} else {
-		FailTest(t, "test", "helm install failed")
+	if !installResult {
+		for _, name := range []string{"wait_deployments", "test", "delete"} {
+			FailTest(t, name, "helm install failed")
+		}
+		return
 	}
 
-	RunCmdTest(t, "delete", helmCmd, "--tiller-namespace", ns, "--home", helmHome, "delete", rel, "--purge")
+	defer RunCmdTest(t, "delete", helmCmd, "--tiller-namespace", ns, "--home", helmHome, "delete", rel, "--purge")
+
+	// wait deployments
+	waitDeploymentsResult := t.Run("wait_deployments", func(t *testing.T) {
+		cmd := exec.Command(kubectlCmd, "get", "deployment", "-n", ns, "-l", fmt.Sprintf("release=%s", rel), "-o", "jsonpath={ .items[*].metadata.name }")
+		output, err := cmd.Output()
+		if err != nil {
+			t.Fatalf("Get deployments command failed")
+		}
+		deployments := strings.Split(strings.TrimSpace(string(output)), " ")
+		for _, dp := range deployments {
+			if dp != "" {
+				cmd := exec.Command(kubectlCmd, "rollout", "status", "-w", "-n", ns, fmt.Sprintf("deployment/%s", dp))
+				out, err := cmd.CombinedOutput()
+				if err != nil {
+					t.Fatalf("%s deployment is not ready.\nDetails:\n%s", dp, string(out))
+				}
+			}
+		}
+	})
+	if !waitDeploymentsResult {
+		FailTest(t, "test", "Chart is not ready")
+		return
+	}
+
+	RunCmdTest(t, "test", helmCmd, "--tiller-namespace", ns, "--home", helmHome, "test", rel)
 }
 
 func RunCmdTest(t *testing.T, name string, args ...string) bool {
