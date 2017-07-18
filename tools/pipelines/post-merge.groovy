@@ -58,7 +58,7 @@ def run(helm_home) {
           'HELM_CMD=' + pwd() + '/helm',
           'KUBECTL_CMD=' + pwd() + '/kubectl',
         ]) {
-          sh('set -o pipefail; exec 3>&1; go test -v -timeout 90m -args --exclude tweepub,tweetics --params ' + params.join(',') + ' --prefix j' + image_tag + '- 2>&1 3>&- | tee /dev/fd/3 | ./go-junit-report > report.xml 3>&-')
+          sh('set -o pipefail; exec 3>&1; go test -v -timeout 90m -args --exclude tweepub,tweetics,kibana,logstash --params ' + params.join(',') + ' --prefix j' + image_tag + '- 2>&1 3>&- | tee /dev/fd/3 | ./go-junit-report > report.xml 3>&-')
         }
       }
     } finally {

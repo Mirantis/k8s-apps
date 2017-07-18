@@ -59,9 +59,9 @@ def run(helm_home) {
           'KUBECTL_CMD=' + pwd() + '/kubectl',
         ]) {
           if (env.GERRIT_CHANGE_NUMBER == '6417') {
-              sh('set -o pipefail; exec 3>&1; go test -v -timeout 90m -args --verify-version --exclude tweepub,tweetics --params ' + params.join(',') + ' --prefix j' + image_tag + '- 2>&1 3>&- | tee /dev/fd/3 | ./go-junit-report > report.xml 3>&-')
+              sh("set -o pipefail; exec 3>&1; go test -v -timeout 90m -args --charts --image-repo nexus-scc.ng.mirantis.net:5000/${image_tag}/ --verify-version --exclude tweepub,tweetics,kibana,logstash --prefix j${image_tag}- 2>&1 3>&- | tee /dev/fd/3 | ./go-junit-report > report.xml 3>&-")
           } else {
-              sh('set -o pipefail; exec 3>&1; go test -v -timeout 90m -args --exclude tweepub,tweetics --params ' + params.join(',') + ' --prefix j' + image_tag + '- 2>&1 3>&- | tee /dev/fd/3 | ./go-junit-report > report.xml 3>&-')
+              sh("set -o pipefail; exec 3>&1; go test -v -timeout 90m -args --charts --image-repo nexus-scc.ng.mirantis.net:5000/${image_tag}/ --exclude tweepub,tweetics,kibana,logstash --prefix j${image_tag}- 2>&1 3>&- | tee /dev/fd/3 | ./go-junit-report > report.xml 3>&-")
           }
         }
       }
