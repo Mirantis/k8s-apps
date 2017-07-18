@@ -39,7 +39,6 @@ var (
 	buildImagesOptsPtr = flag.String("build-images-opts", "", "Docker opts for building images")
 	helmCmd            = LookupEnvDefault("HELM_CMD", "helm")
 	kubectlCmd         = LookupEnvDefault("KUBECTL_CMD", "kubectl")
-	excludes           []string
 )
 
 func TestRoot(t *testing.T) {
@@ -85,17 +84,15 @@ func DiscoverArtifacts(t *testing.T, path string) []string {
 			t.Fatalf("Couldn't find these artifacts: %+v", notFound)
 		}
 	}
+	return artifacts
+}
+
+func ListExcludesCharts() map[string]bool {
 	excludes := make(map[string]bool)
 	for _, e := range strings.Split(*excludePtr, ",") {
 		excludes[filepath.Base(e)] = true
 	}
-	var res []string
-	for _, a := range artifacts {
-		if !excludes[a] {
-			res = append(res, a)
-		}
-	}
-	return res
+	return excludes
 }
 
 func RunImages(t *testing.T) {
@@ -132,12 +129,15 @@ func RunImage(t *testing.T, image string) {
 }
 
 func RunCharts(t *testing.T) {
+	excludes := ListExcludesCharts()
 	for _, chart := range DiscoverArtifacts(t, "charts") {
-		chart := chart
-		t.Run(chart, func(t *testing.T) {
-			t.Parallel()
-			RunChart(t, chart)
-		})
+		if !excludes[chart] {
+			chart := chart
+			t.Run(chart, func(t *testing.T) {
+				t.Parallel()
+				RunChart(t, chart)
+			})
+		}
 	}
 }
 
