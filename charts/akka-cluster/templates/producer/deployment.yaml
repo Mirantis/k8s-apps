@@ -1,0 +1,83 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "akka.producer.fullname" . }}
+  labels:
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "akka.producer.fullname" . }}
+spec:
+  replicas: {{ .Values.producer.replicas }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "akka.producer.fullname" . }}
+      annotations:
+        {{- if eq .Values.seed.antiAffinity "hard" }}
+        scheduler.alpha.kubernetes.io/affinity: >
+            {
+              "podAntiAffinity": {
+                "requiredDuringSchedulingIgnoredDuringExecution": [{
+                  "labelSelector": {
+                    "matchExpressions": [{
+                      "key": "app",
+                      "operator": "In",
+                      "values": ["{{ template "akka.seed.fullname" . }}"]
+                    }]
+                  },
+                  "topologyKey": "kubernetes.io/hostname"
+                }]
+              }
+            }
+        {{- else if eq .Values.seed.antiAffinity "soft" }}
+        scheduler.alpha.kubernetes.io/affinity: >
+            {
+              "podAntiAffinity": {
+                "preferredDuringSchedulingIgnoredDuringExecution": [{
+                  "weight": 100,
+                  "preference": {
+                    "matchExpressions": [{
+                      "key": "app",
+                      "operator": "In",
+                      "values": ["{{ template "akka.seed.fullname" . }}"]
+                    }]
+                  },
+                  "topologyKey": "kubernetes.io/hostname"
+                }]
+              }
+            }
+        {{- end }}
+    spec:
+      containers:
+      - name: producer
+        image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: AKKA_PORT
+          value: "{{ .Values.port }}"
+        - name: AKKA_MANAGEMENT_PORT
+          value: "{{ .Values.managementPort }}"
+        - name: AKKA_HOST_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: JAVA_TOOL_OPTIONS
+          valueFrom:
+            configMapKeyRef:
+              name: "{{ template "akka.fullname" . }}"
+              key: java-opts
+        args: ["producer"]
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - "sh"
+              - "-ce"
+              - |
+                url="127.0.0.1:${AKKA_MANAGEMENT_PORT}/members/akka.tcp://AkkaCluster@${AKKA_HOST_NAME}:${AKKA_PORT}"
+                curl -X DELETE $url
+                until [ $(curl -s -o /dev/null -w "%{http_code}" $url) == "404" ]; do sleep 2; done
+        resources:
+{{ toYaml .Values.producer.resources | indent 12 }}

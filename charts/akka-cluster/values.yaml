@@ -1,0 +1,44 @@
+port: 2551
+managementPort: 19999
+
+image:
+  repository: kshatrix/
+  name: akka-cluster
+  tag: latest
+  pullPolicy: Always
+
+seed:
+  replicas: 1
+  antiAffinity: "soft" # or "hard"
+
+  resources:
+    #requests:
+    #  cpu: 100m
+    #  memory: 512Mi
+    #limits:
+    #  cpu: 100m
+    #  memory: 512Mi
+
+producer:
+  replicas: 1
+  antiAffinity: "soft" # or "hard"
+
+  resources:
+    #requests:
+    #  cpu: 100m
+    #  memory: 512Mi
+    #limits:
+    #  cpu: 100m
+    #  memory: 512Mi
+
+consumer:
+  replicas: 1
+  antiAffinity: "soft" # or "hard"
+
+  resources:
+    #requests:
+    #  cpu: 100m
+    #  memory: 512Mi
+    #limits:
+    #  cpu: 100m
+    #  memory: 512Mi
