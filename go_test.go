@@ -142,13 +142,13 @@ func RunCharts(t *testing.T) {
 
 func RunChart(t *testing.T, chart string) {
 	chartDir := path.Join(*repoPathPtr, chart)
-	res := RunCmdTest(t, "lint", helmCmd, "lint", chartDir)
-	if !res {
-		t.Fatalf("lint failed, not proceeding")
-	}
-	res = RunCmdTest(t, "dependencies", helmCmd, "dependency", "update", chartDir)
+	res := RunCmdTest(t, "dependencies", helmCmd, "dependency", "update", chartDir)
 	if !res {
 		t.Fatalf("Failed to update dependencies")
+	}
+	res = RunCmdTest(t, "lint", helmCmd, "lint", chartDir)
+	if !res {
+		t.Fatalf("lint failed, not proceeding")
 	}
 	t.Run("tests", func(t *testing.T) {
 		configs, err := filepath.Glob(path.Join(*configPathPtr, chart, "*"))
