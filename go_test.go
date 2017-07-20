@@ -234,7 +234,7 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 			t.Fatalf("Incorrect image section\n%+v", image)
 		}
 		if img["repository"].(string) == "mirantisworkloads/" {
-			imageParams = append(imageParams, fmt.Sprintf("image.repository=%s", *imageRepoPtr))
+			imageParams = append(imageParams, fmt.Sprintf("image.repository/=%s", *imageRepoPtr))
 		}
 	}
 	for key, item := range values {
@@ -247,7 +247,7 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 					t.Fatalf("Incorrect image section\n%+v", image)
 				}
 				if img["repository"].(string) == "mirantisworkloads/" {
-					imageParams = append(imageParams, fmt.Sprintf("%s.image.repository=%s", key, *imageRepoPtr))
+					imageParams = append(imageParams, fmt.Sprintf("%s.image.repository/=%s", key, *imageRepoPtr))
 				}
 			}
 		}
