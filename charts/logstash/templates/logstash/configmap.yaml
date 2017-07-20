@@ -277,6 +277,27 @@ data:
                     "type"
                 ]
             }
+        } else if ([fields][log_host] == "vernemq") {
+            grok {
+                match => {
+                    "message" => ["%{TIMESTAMP_ISO8601:message_time} \[%{LOGLEVEL:log_level}\] %{GREEDYDATA:message}", "%{GREEDYDATA:message}"]
+                }
+                overwrite => [ "message" ]
+                add_field => {
+                    "received_at"   => "%{@timestamp}"
+                    "reveived_from" => "%{host}"
+                    "app"           => "vernemq"
+                }
+                remove_field => [
+                    "beat",
+                    "input_type",
+                    "offset",
+                    "fields",
+                    "tags",
+                    "host",
+                    "type"
+                ]
+            }
         } else {
             grok {
                 match => {

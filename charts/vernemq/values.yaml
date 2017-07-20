@@ -1,0 +1,47 @@
+image:
+  repository: mirantisworkloads/
+  name: vernemq
+  tag: 0.1.0
+  pullPolicy: IfNotPresent
+
+
+antiAffinity: "soft" # or hard or null
+
+probeInitialDelaySeconds: 10
+probePeriodSeconds: 10
+
+persistence:
+  type: emptyDir # or hostPath or PersistentVolumeClaim
+
+  #storageClass:
+  volumeSize: 10Gi
+
+  hostPath: ""
+
+
+resources:
+  #requests:
+  #  memory: 4Gi
+  #  cpu: 2
+  #limits:
+  #  memory: 4Gi
+  #  cpu: 2
+
+
+config:
+  replicas: 3
+
+prometheusExporter:
+  enabled: false
+
+logCollector:
+  enabled: false
+  image:
+    repository: mirantisworkloads/
+    name: filebeat
+    tag: 5.2.2
+    pullPolicy: IfNotPresent
+  # external logstash hosts
+  logstashHost:
+    - "" # host:port Ex: "logstash-logstash:5043"
+
