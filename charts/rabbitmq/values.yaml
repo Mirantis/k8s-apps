@@ -17,9 +17,9 @@ user: rabbit
 password: ""
 
 image:
-  repository: kuberstack/
-  name: kubernetes-rabbitmq-autocluster
-  tag: latest
+  repository: mirantisworkloads/
+  name: rabbitmq-autocluster
+  tag: 3.6.10
   pullPolicy: IfNotPresent
 
 persistence:
