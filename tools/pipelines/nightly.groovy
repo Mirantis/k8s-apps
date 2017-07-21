@@ -1,6 +1,8 @@
 def run(helm_home) {
   stage("Add repo") {
-    sh('./helm repo add mirantisworkloads https://mirantisworkloads.storage.googleapis.com/')
+    withEnv(["HELM_HOME=${helm_home}"]) {
+      sh('./helm repo add mirantisworkloads https://mirantisworkloads.storage.googleapis.com/')
+    }
   }
 
   stage("Run tests") {
@@ -19,4 +21,5 @@ def run(helm_home) {
     }
   }
 }
+
 return this;
