@@ -45,7 +45,7 @@ spec:
     - "sh"
     - "-cxe"
     - |
-      mkdir /opt/stublogs
+      mkdir -p /opt/stublogs
       echo "Current line only for check" > /opt/stublogs/logfile.log
       cat /opt/stublogs/logfile.log
       # check for new elasticsearch indices of this service
