@@ -19,6 +19,7 @@ spec:
       - "sh"
       - "-cxe"
       - |
+        sleep 20
         {{- $release := (.Release.Name | trunc 63 | trimSuffix "-") -}}
         {{ range $i, $e := until (int $.Values.replicas) }}
         curl -u {{ $.Values.user }}:$PASSWORD -f {{ printf "rabbitmq-%s-%d.rabbitmq-%s:15672" $release $i $release }}/api/aliveness-test/%2F | [ `jq -r .status` == ok ]
