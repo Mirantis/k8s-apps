@@ -177,7 +177,7 @@ func RunPushImages(t *testing.T) {
 		image := image
 		t.Run(image, func(t *testing.T) {
 			t.Parallel()
-			RunImage(t, image)
+			RunPushImage(t, image)
 		})
 	}
 }
