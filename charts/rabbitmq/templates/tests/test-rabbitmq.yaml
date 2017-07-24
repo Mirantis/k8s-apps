@@ -19,10 +19,21 @@ spec:
       - "sh"
       - "-cxe"
       - |
-        sleep 20
+        set -o pipefail
         {{- $release := (.Release.Name | trunc 63 | trimSuffix "-") -}}
         {{ range $i, $e := until (int $.Values.replicas) }}
-        curl -u {{ $.Values.user }}:$PASSWORD -f {{ printf "rabbitmq-%s-%d.rabbitmq-%s:15672" $release $i $release }}/api/aliveness-test/%2F | [ `jq -r .status` == ok ]
+        success=0
+        for i in $(seq 1 20); do
+          if curl -u {{ $.Values.user }}:$PASSWORD -f {{ printf "rabbitmq-%s-%d.rabbitmq-%s:15672" $release $i $release }}/api/aliveness-test/%2F | [ `jq -r .status` == ok ]; then
+            success=1
+            break
+          else
+            sleep 5
+          fi
+        done
+        if [ ${success} -eq 0 ]; then
+          exit 1
+        fi
         {{ range $j, $er := until (int $.Values.replicas) }}
         curl -u {{ $.Values.user }}:$PASSWORD -f {{ printf "rabbitmq-%s-%d.rabbitmq-%s:15672" $release $i $release }}/api/nodes | [ `jq -r .[{{ $j }}].running` == true ]
         {{- end }}
