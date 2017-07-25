@@ -129,8 +129,18 @@ func RunImage(t *testing.T, image string) {
 }
 
 func RunCharts(t *testing.T) {
+	artifacts := DiscoverArtifacts(t, "charts")
+	for range [2]struct{}{} {
+		for _, chart := range artifacts {
+			chartDir := path.Join(*repoPathPtr, chart)
+			res := RunCmdTest(t, "dependencies", helmCmd, "dependency", "update", chartDir)
+			if !res {
+				t.Fatalf("Failed to update dependencies")
+			}
+		}
+	}
 	excludes := ListExcludesCharts()
-	for _, chart := range DiscoverArtifacts(t, "charts") {
+	for _, chart := range artifacts {
 		if !excludes[chart] {
 			chart := chart
 			t.Run(chart, func(t *testing.T) {
@@ -143,11 +153,7 @@ func RunCharts(t *testing.T) {
 
 func RunChart(t *testing.T, chart string) {
 	chartDir := path.Join(*repoPathPtr, chart)
-	res := RunCmdTest(t, "dependencies", helmCmd, "dependency", "update", chartDir)
-	if !res {
-		t.Fatalf("Failed to update dependencies")
-	}
-	res = RunCmdTest(t, "lint", helmCmd, "lint", chartDir)
+	res := RunCmdTest(t, "lint", helmCmd, "lint", chartDir)
 	if !res {
 		t.Fatalf("lint failed, not proceeding")
 	}
