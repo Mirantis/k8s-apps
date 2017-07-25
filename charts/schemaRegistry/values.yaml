@@ -1,0 +1,36 @@
+image:
+  repository: confluent/
+  name: schema-registry
+  tag: 3.0.0
+  pullPolicy: IfNotPresent
+
+port: 8081
+
+ui:
+  enabled: true
+  port: 8000
+  image:
+    repository: landoop/
+    name: schema-registry-ui
+    tag: 0.9.1
+    pullPolicy: IfNotPresent
+
+resources:
+  #requests:
+  #  cpu: 1
+  #  memory: 1Gi
+  #limits:
+  #  cpu: 4
+  #  memory: 4Gi
+
+
+kafka:
+  # if disabled, subchart will not be deployed
+  deployChart: false
+  # this address will be used if subchart deployment is disabled
+  externalAddress: ""
+zookeeper:
+  # if disabled, subchart will not be deployed
+  deployChart: false
+  # this address will be used if subchart deployment is disabled
+  externalAddress: ""
