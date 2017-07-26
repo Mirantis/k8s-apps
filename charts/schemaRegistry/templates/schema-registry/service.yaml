@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "schema-registry.fullname" . }}
+  labels:
+    app: {{ template "schema-registry.fullname" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  clusterIP: None
+  ports:
+  - name: api
+    port: {{ .Values.port }}
+  {{ if .Values.ui.enabled }}
+  - name: ui
+    port: {{ .Values.ui.port }}
+  {{ end }}
+  selector:
+    app: {{ template "schema-registry.fullname" . }}
