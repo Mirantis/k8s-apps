@@ -24,7 +24,7 @@ def run(helm_home) {
   }
 
   stage("Push images") {
-    sh("go test -v -timeout 30m -args --charts=false --push --image-repo nexus-scc.ng.mirantis.net:5000/${buildId}")
+    sh("go test -v -timeout 60m -args --charts=false --push --image-repo nexus-scc.ng.mirantis.net:5000/${buildId}")
   }
 }
 return this;
