@@ -281,10 +281,10 @@ function command_test() {
             if [ "$(curl -m 10 -f ${url}/stats 2>/dev/null | jq -r '.popularity[0].weight')" -gt "0" 2>/dev/null ] ; then
                 header "Deployed services endpoints"
 
-                spark_url="http://${node_ip}:$(_kubectl -n ${TS_NAMESPACE} get svc spark-master-ext-ts-demo-spark -o jsonpath='{ $.spec.ports[?(@.port==8080)].nodePort }')"
+                spark_url="http://${node_ip}:$(_kubectl -n ${TS_NAMESPACE} get svc spark-master-ext-ts-${TS_NAMESPACE}-spark -o jsonpath='{ $.spec.ports[?(@.port==8080)].nodePort }')"
                 log "Spark Web UI: ${spark_url}"
 
-                hdfs_url="http://${node_ip}:$(_kubectl -n ${TS_NAMESPACE} get svc hdfs-ui-ts-demo-hdfs -o jsonpath='{ $.spec.ports[?(@.port==50070)].nodePort }')"
+                hdfs_url="http://${node_ip}:$(_kubectl -n ${TS_NAMESPACE} get svc hdfs-ui-ts-${TS_NAMESPACE}-hdfs -o jsonpath='{ $.spec.ports[?(@.port==50070)].nodePort }')"
                 log "HDFS Web UI: ${hdfs_url}"
 
                 header "Twitter Stats ready and serve stats successfully"
