@@ -4,6 +4,9 @@ spark:
   worker:
     replicas: 3
 
+prometheusExporter:
+  enabled: true
+
 zookeeper:
   deployChart: false
   externalAddress: zk-${TS_ZOOKEEPER_RELEASE}-0.zk-${TS_ZOOKEEPER_RELEASE}:2181,zk-${TS_ZOOKEEPER_RELEASE}-1.zk-${TS_ZOOKEEPER_RELEASE}:2181,zk-${TS_ZOOKEEPER_RELEASE}-2.zk-${TS_ZOOKEEPER_RELEASE}:2181
