@@ -54,8 +54,8 @@ function ensure_command_exists() {
 }
 
 function check_dependencies() {
-    ensure_command_exists kubectl
-    ensure_command_exists helm
+    ensure_command_exists ${TS_KUBECTL_CMD}
+    ensure_command_exists ${TS_HELM_CMD}
     ensure_command_exists jq
 
     # TODO(slukjanov): check versions of kubectl, k8s and helm
@@ -73,6 +73,8 @@ function _kubectl() {
 function _helm() {
     ${TS_HELM_CMD} "$@"
 }
+
+WORKDIR="$(dirname ${PWD}/${0})"
 
 function main() {
     header "Welcome to the Twitter Stats!"
@@ -194,8 +196,7 @@ function command_up() {
     local tmp=$(mktemp -d)
     log "Calculated configs and Helm logs: ${tmp}"
 
-    # TODO(slukjanov) add $workdir to make sure we're always exec it correctly
-    cp -r ${TS_MODE}-node/ ${tmp}/
+    cp -r ${WORKDIR}/${TS_MODE}-node/* ${tmp}/
 
     pushd ${tmp} 1>/dev/null
 
@@ -210,8 +211,8 @@ function command_up() {
 
         # Replace $param_name and ${param_name} with param value
         # Not using envsubst to decrease number of dependencies
-        find configs/ -type f -name "*.yaml" -exec sed -i "" "s/\$${param_name}/${param_value}/g" {} \;
-        find configs/ -type f -name "*.yaml" -exec sed -i "" "s/\${${param_name}}/${param_value}/g" {} \;
+        find configs/ -type f -name "*.yaml" -exec sed -i="" "s/\$${param_name}/${param_value}/g" {} \;
+        find configs/ -type f -name "*.yaml" -exec sed -i="" "s/\${${param_name}}/${param_value}/g" {} \;
     done
 
     log "Setting up Helm"
@@ -267,17 +268,17 @@ function command_test() {
         fi
 
         for node_ip in ${node_ips} ; do
-            node_port=$(_kubectl -n demo get svc ${service} -o jsonpath='{ $.spec.ports[?(@.port==8589)].nodePort }')
+            node_port=$(_kubectl -n ${TS_NAMESPACE} get svc ${service} -o jsonpath='{ $.spec.ports[?(@.port==8589)].nodePort }')
 
             url="http://${node_ip}:${node_port}"
 
             if [ "$(curl -m 10 -f ${url}/stats 2>/dev/null | jq -r '.popularity[0].weight')" -gt "0" 2>/dev/null ] ; then
                 header "Deployed services endpoints"
 
-                spark_url="http://${node_ip}:$(kubectl -n demo get svc spark-master-ext-ts-demo-spark -o jsonpath='{ $.spec.ports[?(@.port==8080)].nodePort }')"
+                spark_url="http://${node_ip}:$(_kubectl -n ${TS_NAMESPACE} get svc spark-master-ext-ts-demo-spark -o jsonpath='{ $.spec.ports[?(@.port==8080)].nodePort }')"
                 log "Spark Web UI: ${spark_url}"
 
-                hdfs_url="http://${node_ip}:$(kubectl -n demo get svc hdfs-ui-ts-demo-hdfs -o jsonpath='{ $.spec.ports[?(@.port==50070)].nodePort }')"
+                hdfs_url="http://${node_ip}:$(_kubectl -n ${TS_NAMESPACE} get svc hdfs-ui-ts-demo-hdfs -o jsonpath='{ $.spec.ports[?(@.port==50070)].nodePort }')"
                 log "HDFS Web UI: ${hdfs_url}"
 
                 header "Twitter Stats ready and serve stats successfully"
