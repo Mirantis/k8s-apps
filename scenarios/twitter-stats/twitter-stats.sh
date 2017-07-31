@@ -264,6 +264,9 @@ function command_test() {
 
         node_ips=$(_kubectl get nodes -o jsonpath='{ $.items[*].status.addresses[?(@.type=="ExternalIP")].address }')
         if [ -z "${node_ips}" ] ; then
+            node_ips=$(_kubectl get nodes -o jsonpath='{ $.items[*].status.addresses[?(@.type=="LegacyHostIP")].address }')
+        fi
+        if [ -z "${node_ips}" ] ; then
             log_error "There are no External IPs for K8s nodes available, need at least one to access NodePort"
         fi
 
