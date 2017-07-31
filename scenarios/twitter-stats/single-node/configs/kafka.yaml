@@ -1,6 +1,9 @@
 replicas: 1
 antiAffinity: "soft"
 
+prometheusExporter:
+  enabled: true
+
 zookeeper:
   deployChart: false
   externalAddress: zk-${TS_ZOOKEEPER_RELEASE}-0.zk-${TS_ZOOKEEPER_RELEASE}:2181

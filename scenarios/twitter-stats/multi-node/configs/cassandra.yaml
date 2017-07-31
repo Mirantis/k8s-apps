@@ -2,3 +2,6 @@ antiAffinity: "soft"
 
 config:
   clusterSize: 3
+
+prometheusExporter:
+  enabled: true

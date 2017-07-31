@@ -1,4 +1,7 @@
 antiAffinity: "soft"
 
+prometheusExporter:
+  enabled: true
+
 config:
   clusterSize: 1
