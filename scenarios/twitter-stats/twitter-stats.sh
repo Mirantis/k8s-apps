@@ -166,11 +166,14 @@ function main() {
     log "\tTS_HELM_CMD - path to helm binary to run"
     log "\t\tcurrent: ${TS_HELM_CMD} (default: helm)"
 
+    export TS_CHARTS=${TS_CHARTS:-"zookeeper ${TS_STORAGE} kafka spark tweepub tweetics tweeviz"}
+    log "\tTS_CHARTS - list of Helm charts to be deployed"
+    log "\t\tcurrent: ${TS_CHARTS} (default: zookeeper \${TS_STORAGE} kafka spark tweepub tweetics tweeviz)"
+
     # Check that all dependencies installed
     check_dependencies
 
     # Calculated params
-    export TS_CHARTS="zookeeper ${TS_STORAGE} kafka spark tweepub tweetics tweeviz"
     export TS_ZOOKEEPER_RELEASE=$(release_name zookeeper)
     export TS_KAFKA_RELEASE=$(release_name kafka)
     export TS_SPARK_RELEASE=$(release_name spark)
