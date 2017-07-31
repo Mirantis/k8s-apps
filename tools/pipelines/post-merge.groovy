@@ -26,5 +26,28 @@ def run(helm_home) {
   stage("Push images") {
     sh("go test -v -timeout 60m -args --charts=false --push --image-repo nexus-scc.ng.mirantis.net:5000/${buildId}")
   }
+
+  stage("Add chart repo") {
+    withEnv(["HELM_HOME=${helm_home}"]) {
+      sh('./helm repo add mirantisworkloads https://mirantisworkloads.storage.googleapis.com/')
+    }
+  }
+
+  stage("Build packages") {
+    withEnv([
+      'HELM_HOME=' + helm_home,
+      'HELM_CMD=' + pwd() + '/helm',
+    ]) {
+      sh("./tools/build-packages.sh")
+    }
+  }
+
+  stage("Push packages") {
+    withCredentials([file(credentialsId: "gcloud-mirantisworkloads", variable: "GCLOUD_KEYPATH"),
+                     string(credentialsId: "gcloud-mirantisworkloads-project", variable: "GCLOUD_PROJECT")]) {
+      sh("./tools/push-packages.sh")
+    }
+  }
 }
+
 return this;
