@@ -1,0 +1,72 @@
+kafka:
+  # if disabled, subchart will not be deployed
+  deployChart: true
+  # this address will be used if subchart deployment is disabled
+  externalAddress: ""
+  zookeeper:
+    deployChart: true
+    externalAddress: ""
+    replicas: 3
+
+schemaRegistry:
+  enabled: true
+  image:
+    repository: confluent/
+    name: schema-registry
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  port: 8081
+  ui:
+    enabled: true
+    port: 8000
+    image:
+      repository: landoop/
+      name: schema-registry-ui
+      tag: 0.9.1
+      pullPolicy: IfNotPresent
+  resources:
+    #requests:
+    #  cpu: 1
+    #  memory: 1Gi
+    #limits:
+    #  cpu: 4
+    #  memory: 4Gi
+
+kafkaRest:
+  enabled: true
+  image:
+    repository: confluentinc/
+    name: cp-kafka-rest
+    tag: 3.2.2
+    pullPolicy: IfNotPresent
+  port: 8082
+  ui:
+    enabled: true
+    port: 8000
+    image:
+      repository: landoop/
+      name: kafka-topics-ui
+      tag: 0.9.2
+      pullPolicy: IfNotPresent
+
+kafkaConnector:
+  enabled: true
+  image:
+    repository: landoop/
+    name: fast-data-dev-connect-cluster
+    tag: cp3.2.0
+    pullPolicy: IfNotPresent
+
+  port: 8083
+  replicas: 1
+  ui:
+    enabled: true
+    port: 8000
+    image:
+      repository: landoop/
+      name: kafka-connect-ui
+      tag: 0.9.2
+      pullPolicy: IfNotPresent
+  config:
+    cluster_id: 1
