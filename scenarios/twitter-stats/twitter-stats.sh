@@ -195,6 +195,18 @@ function command_up() {
     header "Deploying or Upgrading Twitter Stats services"
 
     _kubectl get ns ${TS_NAMESPACE} 1>/dev/null 2>/dev/null || _kubectl create ns ${TS_NAMESPACE}
+    local ok=0
+    for i in $(seq 1 60); do
+        if [[ $(_kubectl get ns ${TS_NAMESPACE} -o jsonpath="{ .metadata.name }") == "${TS_NAMESPACE}" ]]; then
+            ok=1
+            break
+        else
+            sleep 1
+        fi
+    done
+    if [[ ${ok} != 1 ]]; then
+        log_error "Failed to create ${TS_NAMESPACE} namespace."
+    fi
 
     local tmp=$(mktemp -d)
     log "Calculated configs and Helm logs: ${tmp}"
