@@ -15,7 +15,9 @@ def run(helm_home) {
           "TS_KUBECTL_CMD=" + pwd() + "/kubectl",
           "TS_NAME=${namespace}"
         ]) {
-          sh("./scenarios/twitter-stats/twitter-stats.sh up test down")
+          ansiColor("xterm") {
+            sh("./scenarios/twitter-stats/twitter-stats.sh up test down")
+          }
         }
       }
     }
