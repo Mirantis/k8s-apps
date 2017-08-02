@@ -25,7 +25,7 @@ spec:
       http:
         paths:
           - backend:
-              serviceName: {{ printf "tweeviz-%s" $.Release.Name  | trunc 63 | trimSuffix "-" }}
+              serviceName: {{ printf "tweeviz-%s" $.Release.Name  | trunc 55 | trimSuffix "-" }}
               servicePort: {{ $.Values.port }}
     {{- end -}}
 {{- end -}}

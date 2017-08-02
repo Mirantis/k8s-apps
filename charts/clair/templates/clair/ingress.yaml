@@ -25,7 +25,7 @@ spec:
       http:
         paths:
           - backend:
-              serviceName: {{ printf "clair-%s" $.Release.Name  | trunc 63 | trimSuffix "-" }}
+              serviceName: {{template "clair.fullname" . }}
               servicePort: {{ $.Values.port }}
     {{- end -}}
 {{- end -}}

@@ -4,7 +4,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: {{ printf "postgresql-test-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+  name: {{ printf "postgresql-test-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: {{ .Release.Name | quote }}

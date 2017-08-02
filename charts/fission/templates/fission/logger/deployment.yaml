@@ -48,7 +48,7 @@ spec:
       volumes:
       - name: filebeat-config
         configMap:
-          name: {{ printf "fission-fb-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+          name: {{ printf "fission-fb-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
           items:
             - key: filebeat-yml
               path: filebeat.yml

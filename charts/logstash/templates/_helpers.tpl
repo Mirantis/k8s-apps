@@ -1,9 +1,9 @@
 {{- define "ls-fullname" -}}
-{{- printf "logstash-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- printf "logstash-%s" .Release.Name | trunc 55 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "ls-cm-fullname" -}}
-{{- printf "logstash-cm-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- printf "logstash-cm-%s" .Release.Name | trunc 55 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "ls-es-url" -}}

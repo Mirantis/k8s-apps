@@ -2,7 +2,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ printf "fission-ingress-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+  name: {{ printf "fission-ingress-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
   labels:
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
@@ -25,7 +25,7 @@ spec:
       http:
         paths:
           - backend:
-              serviceName: {{ printf "fission-ui-%s" $.Release.Name  | trunc 63 | trimSuffix "-" }}
+              serviceName: {{ template "fission-ui" . }}
               servicePort: {{ $.Values.port }}
     {{- end -}}
 {{- end -}}

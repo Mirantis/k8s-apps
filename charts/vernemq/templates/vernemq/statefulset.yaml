@@ -120,7 +120,7 @@ spec:
         {{- if .Values.logCollector.enabled }}
         - name: filebeat-config
           configMap:
-            name: {{ printf "vernemq-fb-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+            name: {{ printf "vernemq-fb-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
             items:
               - key: filebeat-yml
                 path: filebeat.yml

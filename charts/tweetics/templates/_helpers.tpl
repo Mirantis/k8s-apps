@@ -1,13 +1,16 @@
 {{- define "tweetics.fullname" -}}
-{{- printf "tweetics-%s" .Release.Name  | trunc 63 | trimSuffix "-" -}}
+{{- printf "tweetics-%s" .Release.Name  | trunc 55 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "tweetics.kafka-address" -}}
     {{- if .Values.kafka.deployChart -}}
-        {{- $release := (.Release.Name | trunc 63 | trimSuffix "-") -}}
+        {{- $ctx := . -}}
         {{- range $i, $e := until (int $.Values.kafka.replicas) -}}
             {{- if $i }},{{- end -}}
-            {{- printf "kafka-%s-%d.kafka-%s:%d" $release $i $release (int $.Values.kafka.port) -}}
+            {{- template "kafka-fullname" $ctx -}}
+            {{- printf "-%d." $i -}}
+            {{- template "kafka-fullname" $ctx -}}
+            {{- printf ":%d" (int $.Values.kafka.port) -}}
         {{- end -}}
     {{- else -}}
         {{- printf "%s" .Values.kafka.externalAddress -}}
@@ -16,11 +19,14 @@
 
 {{- define "tweetics.zk-address" -}}
     {{- if .Values.zookeeper.deployChart -}}
-        {{- $release := (.Release.Name | trunc 63 | trimSuffix "-") -}}
+        {{- $ctx := . -}}
         {{- range $i, $e := until (int $.Values.zookeeper.replicas) -}}
             {{- if $i }},{{- end -}}
-            {{- printf "zk-%s-%d.zk-%s:%d" $release $i $release (int $.Values.zookeeper.clientPort) -}}
-        {{- end -}}
+            {{- template "zk-fullname" $ctx -}}
+            {{- printf "-%d." $i -}}
+            {{- template "zk-fullname" $ctx -}}
+            {{- printf ":%d" (int $.Values.zookeeper.clientPort) -}}
+         {{- end -}}
     {{- else -}}
         {{- printf "%s" .Values.zookeeper.externalAddress -}}
     {{- end -}}
@@ -28,10 +34,13 @@
 
 {{- define "tweetics.spark-address" -}}
     {{- if .Values.spark.deployChart -}}
-        {{- $release := (.Release.Name | trunc 63 | trimSuffix "-") -}}
-        {{- range $i, $e := until (int $.Values.spark.spark.master.replicas) -}}
+        {{- $ctx := . -}}
+        {{- range $i, $e := until (int .Values.spark.spark.master.replicas) -}}
             {{- if $i }},{{- end -}}
-            {{- printf "spark-master-%s-%d.spark-master-%s:%d" $release $i $release (int $.Values.spark.spark.master.rpcPort) -}}
+            {{- template "master-fullname" $ctx -}}
+            {{- printf "-%d." $i -}}
+            {{- template "master-fullname" $ctx -}}
+            {{- printf ":%d" (int $ctx.Values.spark.spark.master.rpcPort) -}}
         {{- end -}}
     {{- else -}}
         {{- printf "%s" .Values.spark.externalAddress -}}
@@ -40,7 +49,7 @@
 
 {{- define "tweetics.hdfs-address" -}}
     {{- if .Values.hdfs.deployChart -}}
-        {{- printf "hdfs-namenode-%s" .Release.Name  | trunc 63 | trimSuffix "-" }}-0.{{ printf "hdfs-namenode-%s" .Release.Name  | trunc 63 | trimSuffix "-" -}}:{{ .Values.hdfs.namenode.port }}
+        {{- template "namenode-fullname" . -}}-0.{{- template "namenode-fullname" . -}}:{{ .Values.hdfs.namenode.port }}
     {{- else -}}
         {{- printf "%s" .Values.hdfs.externalAddress -}}
     {{- end -}}
@@ -48,7 +57,7 @@
 
 {{- define "tweetics.cassandra-address" -}}
     {{- if .Values.cassandra.deployChart -}}
-        {{- printf "cassandra-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
+        {{- printf "cassandra-%s" .Release.Name | trunc  | trimSuffix "-" -}}
     {{- else -}}
         {{- .Values.cassandra.externalAddress -}}
     {{- end -}}

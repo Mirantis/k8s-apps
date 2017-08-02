@@ -74,7 +74,7 @@ spec:
           value: {{ .Values.storage }}
         - name: TWEEVIZ_CASSANDRA_ADDRESS
           {{- if .Values.cassandra.deployChart }}
-          value: {{- printf "cassandra-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+          value: {{- printf "cassandra-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
           {{- else }}
           value: "{{ .Values.cassandra.externalAddress }}"
           {{- end }}
@@ -84,7 +84,7 @@ spec:
           value: "{{ .Values.cassandra.table }}"
         - name: TWEEVIZ_HDFS_ADDRESS
           {{- if .Values.hdfs.deployChart }}
-          value: {{ printf "hdfs-namenode-%s" .Release.Name  | trunc 63 | trimSuffix "-" }}
+          value: {{ printf "hdfs-namenode-%s" .Release.Name  | trunc 55 | trimSuffix "-" }}
           {{- else  }}
           value: "{{ .Values.hdfs.externalAddress }}"
           {{- end }}

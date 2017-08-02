@@ -1,4 +1,4 @@
-{{ $testname := printf "full-elk-test-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+{{ $testname := printf "full-elk-test-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
 {{ $es_url := include "ls-es-url" . }}
 apiVersion: v1
 kind: Pod

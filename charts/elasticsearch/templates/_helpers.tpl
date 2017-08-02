@@ -1,18 +1,18 @@
 {{- define "es-data-fullname" -}}
-{{- printf "elasticsearch-data-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- printf "elasticsearch-data-%s" .Release.Name | trunc 55 | trimSuffix "-" -}}
 {{- end -}}
 
 
 {{- define "es-master-fullname" -}}
-{{- printf "elasticsearch-master-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- printf "elasticsearch-master-%s" .Release.Name | trunc 55 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "es-client-fullname" -}}
-{{- printf "elasticsearch-client-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- printf "elasticsearch-client-%s" .Release.Name | trunc 55 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "es-fullname" -}}
-{{- printf "elasticsearch-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- printf "elasticsearch-%s" .Release.Name | trunc 55 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "es-address" -}}

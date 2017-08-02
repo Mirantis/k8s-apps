@@ -1,15 +1,15 @@
 {{- define "rabbitmq.fullname" -}}
-{{- printf "rabbitmq-%s" .Release.Name  | trunc 63 | trimSuffix "-" -}}
+{{- printf "rabbitmq-%s" .Release.Name  | trunc 55 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "rabbitmq-management.fullname" -}}
-{{- printf "rabbitmq-management-%s" .Release.Name  | trunc 63 | trimSuffix "-" -}}
+{{- printf "rabbitmq-management-%s" .Release.Name  | trunc 55 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "rabbitmq.address" -}}
-{{- $release := (.Release.Name | trunc 63 | trimSuffix "-") -}}
+{{- $ctx := . -}}
 {{- range $i, $e := until (int $.Values.replicas) -}}
     {{- if $i }},{{- end -}}
-         {{- printf "rabbitmq-%s-%d.rabbitmq-%s:%d" $release $i $release (int $.Values.amqpPort) -}}
+         {{- template "rabbitmq.fullname" $ctx -}}-{{ $i }}.{{- template "rabbitmq.fullname" $ctx -}}:{{ $.Values.amqpPort }}
     {{- end -}}
 {{- end -}}

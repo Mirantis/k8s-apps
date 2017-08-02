@@ -170,7 +170,7 @@ spec:
       {{- if .Values.logCollector.enabled }}
       - name: filebeat-config
         configMap:
-          name: {{ printf "kafka-fb-%s" .Release.Name | trunc 63 }}
+          name: {{ printf "kafka-fb-%s" .Release.Name | trunc 55 }}
           items:
             - key: filebeat-yml
               path: filebeat.yml

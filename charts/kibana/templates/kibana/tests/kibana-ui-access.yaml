@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: {{ printf "kibana-ui-access-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+  name: {{ printf "kibana-ui-access-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
   annotations:
     helm.sh/hook: test-success
 spec:

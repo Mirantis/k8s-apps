@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: {{ printf "zk-test-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+  name: {{ printf "zk-test-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
   annotations:
     helm.sh/hook: test-success
 spec:
@@ -15,9 +15,9 @@ spec:
         - >
           path="/test-{{ randAlphaNum 10 }}" &&
           /opt/zookeeper/bin/zkCli.sh -server {{ template "zookeeper.address" . }} create $path test &&
-          {{- $release := (.Release.Name | trunc 63 | trimSuffix "-") -}}
+          {{ $ctx := . }}
           {{ range $i, $e := until (int $.Values.replicas) }}
-          /opt/zookeeper/bin/zkCli.sh -server {{ printf "zk-%s-%d.zk-%s:%d" $release $i $release (int $.Values.clientPort) }} get $path &&
+          /opt/zookeeper/bin/zkCli.sh -server {{ template "zk-fullname" $ctx }}-{{ $i }}.{{ template "zk-fullname" $ctx }}{{ printf ":%d" (int $.Values.clientPort) }} get $path &&
           {{- end }}
           /opt/zookeeper/bin/zkCli.sh -server {{ template "zookeeper.address" . }} delete $path
   restartPolicy: Never
