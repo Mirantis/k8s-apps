@@ -13,7 +13,7 @@ def run(helm_home) {
           "HELM_HOME=" + helm_home,
           "TS_HELM_CMD=" + pwd() + "/helm",
           "TS_KUBECTL_CMD=" + pwd() + "/kubectl",
-          "TS_NAMESPACE=${namespace}"
+          "TS_NAME=${namespace}"
         ]) {
           sh("./scenarios/twitter-stats/twitter-stats.sh up test down")
         }
