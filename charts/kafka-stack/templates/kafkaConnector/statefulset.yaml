@@ -31,6 +31,11 @@ spec:
           value: {{ template "schema-registry.address" . }}
         - name: PORT
           value: "{{ .Values.kafkaConnector.port }}"
+        volumeMounts:
+        {{- if .Values.kafkaConnector.logCollector.enabled }}
+        - name: logdir
+          mountPath: /var/log/
+        {{- end }}
         ports:
         - name: api
           containerPort: {{ .Values.kafkaConnector.port }}
@@ -48,5 +53,35 @@ spec:
         ports:
         - name: ui
           containerPort: {{ .Values.kafkaConnector.ui.port }}
+      {{ end }}
+      {{- if .Values.kafkaConnector.logCollector.enabled }}
+      - name: filebeat
+        image: "{{ .Values.kafkaConnector.logCollector.image.repository }}{{ .Values.kafkaConnector.logCollector.image.name }}:{{ .Values.kafkaConnector.logCollector.image.tag }}"
+        imagePullPolicy: {{ .Values.kafkaConnector.logCollector.image.pullPolicy | quote }}
+        volumeMounts:
+        - name: filebeat-config
+          mountPath: /etc/filebeat
+        - name: logdir
+          mountPath: /var/log
+        command:
+          - "filebeat"
+          - "-c"
+          - "/etc/filebeat/filebeat.yml"
+          - "-e"
+          - "-d"
+          - "\"*\""
+      {{- end }}
+
+      volumes:
+      {{- if .Values.kafkaConnector.logCollector.enabled }}
+      - name: filebeat-config
+        configMap:
+            name: {{ printf "kafka-connector-fb-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
+            items:
+              - key: filebeat-yml
+                path: filebeat.yml
+
+      - name: logdir
+        emptyDir: {}
       {{ end }}
 {{- end -}}

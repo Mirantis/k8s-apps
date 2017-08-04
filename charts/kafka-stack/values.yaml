@@ -68,5 +68,15 @@ kafkaConnector:
       name: kafka-connect-ui
       tag: 0.9.2
       pullPolicy: IfNotPresent
+  logCollector:
+    enabled: false
+    image:
+      repository: mirantisworkloads/
+      name: filebeat
+      tag: 5.2.2
+      pullPolicy: IfNotPresent
+    # external logstash hosts
+    logstashHost:
+      - "" # host:port Ex: "logstash-logstash:5043"
   config:
     cluster_id: 1

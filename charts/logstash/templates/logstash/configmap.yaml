@@ -15,7 +15,29 @@ data:
         }
     }
     filter {
-        if ([fields][log_host] == "rabbitmq") {
+        if ([fields][log_host] == "kafka-connector") {
+          grok {
+            match => {
+               "message" => ["\[%{TIMESTAMP_ISO8601:message_time}\] %{LOGLEVEL:log_level} %{GREEDYDATA:message}", "%{GREEDYDATA:message}"]
+            }
+            overwrite => [ "message" ]
+            add_field => {
+              "received_at"   => "%{@timestamp}"
+              "received_from" => "%{host}"
+              "app"           => "kafka-connector"
+            }
+            remove_field => [
+              "beat",
+              "input_type",
+              "offset",
+              "fields",
+              "tags",
+              "host",
+              "type"
+            ]
+          }
+        }
+        else if ([fields][log_host] == "rabbitmq") {
           grok {
             match => {
                "message" => ["=%{LOGLEVEL:log_level} REPORT=+ %{MONTHDAY}-%{MONTH}-%{YEAR}::%{HOUR}:%{MINUTE}:%{SECOND} ===%{GREEDYDATA:message}", "%{GREEDYDATA:message}"]
