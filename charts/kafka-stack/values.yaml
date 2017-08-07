@@ -11,9 +11,9 @@ kafka:
 schemaRegistry:
   enabled: true
   image:
-    repository: confluent/
-    name: schema-registry
-    tag: latest
+    repository: confluentinc/
+    name: cp-schema-registry
+    tag: 3.2.2
     pullPolicy: IfNotPresent
 
   port: 8081

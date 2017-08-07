@@ -1,0 +1,23 @@
+{{ if .Values.kafkaRest.deployChart }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ printf "kafka-rest-test-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
+  annotations:
+    helm.sh/hook: test-success
+spec:
+  containers:
+    - name: schema-registry-test
+      image: {{ .Values.kafkaRest.image.repository }}{{ .Values.kafkaRest.image.name }}:{{ .Values.kafkaRest.image.tag }}
+      imagePullPolicy: {{ .Values.kafkaRest.image.pullPolicy }}
+      command:
+        - bash
+        - -c
+        - >
+          curl -X POST -H "Content-Type: application/vnd.kafka.json.v2+json" -H "Accept: application/vnd.kafka.v2+json" --data '{"records":[{"value":{"foo":"bar"}}]}' 'http://{{ template "kafka-rest.address" . }}/topics/jsontest' &&
+          curl -X POST -H "Content-Type: application/vnd.kafka.v2+json" --data '{"name": "my_consumer_instance", "format": "json", "auto.offset.reset": "earliest"}' http://{{ template "kafka-rest.address" . }}/consumers/my_json_consumer && 
+          curl -X POST -H "Content-Type: application/vnd.kafka.v2+json" --data '{"topics":["jsontest"]}' http://{{ template "kafka-rest.address" . }}/consumers/my_json_consumer/instances/my_consumer_instance/subscription &&
+          curl -X GET -H "Accept: application/vnd.kafka.json.v2+json"  http://{{ template "kafka-rest.address" . }}/consumers/my_json_consumer/instances/my_consumer_instance/records &&
+          curl -X DELETE -H "Content-Type: application/vnd.kafka.v2+json" http://{{ template "kafka-rest.address" . }}/consumers/my_json_consumer/instances/my_consumer_instance
+  restartPolicy: Never
+{{ end }}

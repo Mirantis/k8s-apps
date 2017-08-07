@@ -1,0 +1,20 @@
+{{ if .Values.schemaRegistry.deployChart }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ printf "schema-registry-test-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
+  annotations:
+    helm.sh/hook: test-success
+spec:
+  containers:
+    - name: schema-registry-test
+      image: {{ .Values.schemaRegistry.image.repository }}{{ .Values.schemaRegistry.image.name }}:{{ .Values.schemaRegistry.image.tag }}
+      imagePullPolicy: {{ .Values.schemaRegistry.image.pullPolicy }}
+      command:
+        - bash
+        - -c
+        - >
+          curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" --data '{"schema": "{\"type\": \"string\"}"}' http://{{ template "schema-registry.address" . }}/subjects/Kafka-key/versions && 
+          curl -X GET http://{{ template "schema-registry.address" . }}/subjects/Kafka-key/versions/1 
+  restartPolicy: Never
+{{ end }}

@@ -22,6 +22,10 @@ spec:
         env:
         - name: SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL
           value: {{ template "kafka-stack.zk-address" . }}
+        - name: SCHEMA_REGISTRY_HOST_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
         ports:
         - name: api
           containerPort: {{ .Values.schemaRegistry.port }}
