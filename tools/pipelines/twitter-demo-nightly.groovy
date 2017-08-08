@@ -1,5 +1,4 @@
-def run(helm_home) {
-  def namespace = "twitter-nightly-${env.BUILD_NUMBER}"
+def run(helm_home, namespace) {
   try {
     stage("Run tests") {
       withCredentials([
@@ -17,18 +16,6 @@ def run(helm_home) {
         ]) {
           ansiColor("xterm") {
             sh("./scenarios/twitter-stats/twitter-stats.sh up test down")
-          }
-        }
-      }
-    }
-  } finally {
-    stage("Cleanup") {
-      timeout(15) {
-        withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-          def ok = false
-          while (!ok) {
-            sleep(5)
-            ok = sh(script: "./kubectl delete ns --ignore-not-found ${namespace}", returnStatus: true) == 0
           }
         }
       }
