@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "minio.svc-fullname" . }}
+  labels:
+    app: {{ template "minio.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  clusterIP: None
+  ports:
+    - name: port
+      port: {{ .Values.port }}
+  selector:
+    app: {{ template "minio.fullname" . }}

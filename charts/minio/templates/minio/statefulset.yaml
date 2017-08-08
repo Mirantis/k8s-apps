@@ -1,0 +1,92 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: {{ template "minio.fullname" . }}
+  labels:
+    app: {{ template "minio.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  serviceName: {{ template "minio.svc-fullname" . }}
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ template "minio.fullname" . }}
+  template:
+    metadata:
+      name: {{ template "minio.fullname" . }}
+      labels:
+        app: {{ template "minio.fullname" . }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        release: "{{ .Release.Name }}"
+        heritage: "{{ .Release.Service }}"
+    spec:
+      volumes:
+        {{- if eq .Values.persistence.type "emptyDir" }}
+        - name: datadir
+          emptyDir: {}
+        {{- else if eq .Values.persistence.type "hostPath" }}
+        - name: datadir
+          hostPath:
+            path: "{{ .Values.persistence.hostPath }}"
+        {{- end }}
+        - name: minio-user
+          secret:
+            secretName: {{ template "minio.fullname" . }}
+        - name: minio-server-config
+          configMap:
+            name: {{ template "minio.fullname" . }}
+        - name: podinfo
+          downwardAPI:
+            items:
+              - path: "labels"
+                fieldRef:
+                  fieldPath: metadata.labels
+      containers:
+        - name: minio
+          image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - server
+            {{ $nodeCount := .Values.replicas | int }}
+            {{- range $i := until $nodeCount }}
+            - http://{{ template "minio.fullname" $ }}-{{ $i }}.{{ template "minio.svc-fullname" $ }}.{{ $.Release.Namespace }}:{{ $.Values.port }}/datadir
+            {{- end }}
+          volumeMounts:
+            - name: datadir
+              mountPath: /datadir
+            - name: minio-server-config
+              mountPath: /root/.minio/
+            - name: podinfo
+              mountPath: /podinfo
+          ports:
+            - name: port
+              containerPort: {{ .Values.port }}
+          env:
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "minio.fullname" . }}
+                  key: accesskey
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "minio.fullname" . }}
+                  key: secretkey
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+  {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+      {{- if .Values.persistence.storageClass }}
+      annotations:
+        volume.beta.kubernetes.io/storage-class: "{{ .Values.persistence.storageClass }}"
+      {{- end }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.persistence.volumeSize }}
+  {{- end }}
