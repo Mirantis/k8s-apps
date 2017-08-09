@@ -1,0 +1,22 @@
+{{- if .Values.kafkaConnector.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "kafka-connector.fullname" . }}
+  labels:
+    app: {{ template "kafka-connector.fullname" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  clusterIP: None
+  ports:
+  - name: api
+    port: {{ .Values.kafkaConnector.port }}
+  {{ if .Values.kafkaConnector.ui.enabled }}
+  - name: ui
+    port: {{ .Values.kafkaConnector.ui.port }}
+  {{ end }}
+  selector:
+    app: {{ template "kafka-connector.fullname" . }}
+{{- end -}}

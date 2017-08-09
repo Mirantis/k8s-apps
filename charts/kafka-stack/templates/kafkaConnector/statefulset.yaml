@@ -1,0 +1,52 @@
+{{- if .Values.kafkaConnector.enabled -}}
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: {{ template "kafka-connector.fullname" . }}
+  labels:
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "kafka-connector.fullname" . }}
+spec:
+  serviceName: {{ template "kafka-connector.fullname" . }}
+  replicas: {{ .Values.kafkaConnector.replicas }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "kafka-connector.fullname" . }}
+    spec:
+      containers:
+      - name: kafka-connector
+        image: "{{ .Values.kafkaConnector.image.repository }}{{ .Values.kafkaConnector.image.name }}:{{ .Values.kafkaConnector.image.tag }}"
+        imagePullPolicy: {{ .Values.kafkaConnector.image.pullPolicy }}
+        env:
+        - name: ID
+          value: "{{ .Values.kafkaConnector.config.cluster_id }}"
+        - name: BS
+          value: {{ template "kafka-stack.kafka-address" . }}
+        - name: ZK
+          value: {{ template "kafka-stack.zk-address" . }}
+        - name: SR
+          value: {{ template "schema-registry.address" . }}
+        - name: PORT
+          value: "{{ .Values.kafkaConnector.port }}"
+        ports:
+        - name: api
+          containerPort: {{ .Values.kafkaConnector.port }}
+        resources:
+{{ toYaml .Values.kafkaConnector.resources | indent 12 }}
+      {{ if .Values.kafkaConnector.ui.enabled }}
+      - name: kafka-connector-ui
+        image: "{{ .Values.kafkaConnector.ui.image.repository }}{{ .Values.kafkaConnector.ui.image.name }}:{{ .Values.kafkaConnector.ui.image.tag }}"
+        imagePullPolicy: {{ .Values.kafkaConnector.ui.image.pullPolicy }}
+        env:
+        - name: CONNECT_URL
+          value: {{ template "kafka-connector.address" . }}
+        - name: PROXY
+          value: "true"
+        ports:
+        - name: ui
+          containerPort: {{ .Values.kafkaConnector.ui.port }}
+      {{ end }}
+{{- end -}}

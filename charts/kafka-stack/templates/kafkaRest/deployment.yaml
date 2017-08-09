@@ -1,0 +1,49 @@
+{{- if .Values.kafkaRest.enabled -}}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "kafka-rest.fullname" . }}
+  labels:
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "kafka-rest.fullname" . }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ template "kafka-rest.fullname" . }}
+    spec:
+      containers:
+      - name: kafka-rest
+        image: "{{ .Values.kafkaRest.image.repository }}{{ .Values.kafkaRest.image.name }}:{{ .Values.kafkaRest.image.tag }}"
+        imagePullPolicy: {{ .Values.kafkaRest.image.pullPolicy }}
+        env:
+        - name: KAFKA_REST_BOOTSTRAP_SERVERS
+          value: {{ template "kafka-stack.kafka-address" . }}
+        - name: KAFKA_REST_ZOOKEEPER_CONNECT
+          value: {{ template "kafka-stack.zk-address" . }}
+        - name: KAFKA_REST_SCHEMA_REGISTRY_URL
+          value: {{ template "schema-registry.address" . }}
+        - name: KAFKA_REST_HOST_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        ports:
+        - name: api
+          containerPort: {{ .Values.kafkaRest.port }}
+        resources:
+{{ toYaml .Values.kafkaRest.resources | indent 12 }}
+      {{ if .Values.kafkaRest.ui.enabled }}
+      - name: kafka-rest-ui
+        image: "{{ .Values.kafkaRest.ui.image.repository }}{{ .Values.kafkaRest.ui.image.name }}:{{ .Values.kafkaRest.ui.image.tag }}"
+        imagePullPolicy: {{ .Values.kafkaRest.ui.image.pullPolicy }}
+        env:
+        - name: KAFKA_REST_PROXY_URL
+          value: {{ template "kafka-rest.address" . }}
+        - name: PROXY
+          value: "true"
+      {{- end -}}
+
+{{- end -}}

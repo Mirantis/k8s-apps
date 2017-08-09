@@ -1,3 +1,4 @@
+{{- if .Values.schemaRegistry.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -11,10 +12,11 @@ spec:
   clusterIP: None
   ports:
   - name: api
-    port: {{ .Values.port }}
-  {{ if .Values.ui.enabled }}
+    port: {{ .Values.schemaRegistry.port }}
+  {{ if .Values.schemaRegistry.ui.enabled }}
   - name: ui
-    port: {{ .Values.ui.port }}
+    port: {{ .Values.schemaRegistry.ui.port }}
   {{ end }}
   selector:
     app: {{ template "schema-registry.fullname" . }}
+{{- end -}}

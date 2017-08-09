@@ -1,3 +1,4 @@
+{{- if .Values.schemaRegistry.enabled -}}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -16,20 +17,20 @@ spec:
     spec:
       containers:
       - name: schema-registry
-        image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: "{{ .Values.schemaRegistry.image.repository }}{{ .Values.schemaRegistry.image.name }}:{{ .Values.schemaRegistry.image.tag }}"
+        imagePullPolicy: {{ .Values.schemaRegistry.image.pullPolicy }}
         env:
         - name: SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL
-          value: {{ template "schema-registry.zk-address" . }}
+          value: {{ template "kafka-stack.zk-address" . }}
         ports:
         - name: api
-          containerPort: {{ .Values.port }}
+          containerPort: {{ .Values.schemaRegistry.port }}
         resources:
-{{ toYaml .Values.resources | indent 12 }}
-      {{ if .Values.ui.enabled }}
+{{ toYaml .Values.schemaRegistry.resources | indent 12 }}
+      {{ if .Values.schemaRegistry.ui.enabled }}
       - name: schema-registry-ui
-        image: "{{ .Values.ui.image.repository }}{{ .Values.ui.image.name }}:{{ .Values.ui.image.tag }}"
-        imagePullPolicy: {{ .Values.ui.image.pullPolicy }}
+        image: "{{ .Values.schemaRegistry.ui.image.repository }}{{ .Values.schemaRegistry.ui.image.name }}:{{ .Values.schemaRegistry.ui.image.tag }}"
+        imagePullPolicy: {{ .Values.schemaRegistry.ui.image.pullPolicy }}
         env:
         - name: SCHEMAREGISTRY_URL
           value: {{ template "schema-registry.address" . }}
@@ -37,5 +38,6 @@ spec:
           value: "true"
         ports:
         - name: ui
-          containerPort: {{ .Values.ui.port }}
+          containerPort: {{ .Values.schemaRegistry.ui.port }}
       {{- end -}}
+{{- end -}}

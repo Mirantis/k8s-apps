@@ -1,0 +1,24 @@
+{{- if .Values.kafkaRest.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "kafka-rest.fullname" . }}
+  labels:
+    app: {{ template "kafka-rest.fullname" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  clusterIP: None
+  ports:
+  - name: api
+    port: {{ .Values.kafkaRest.port }}
+  {{ if .Values.kafkaRest.ui.enabled }}
+  - name: ui
+    port: {{ .Values.kafkaRest.ui.port }}
+  {{ end }}
+  selector:
+    app: {{ template "kafka-rest.fullname" . }}
+
+
+{{- end -}}
