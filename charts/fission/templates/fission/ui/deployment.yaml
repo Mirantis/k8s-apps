@@ -30,5 +30,5 @@ spec:
       volumes:
       - name: conf
         configMap:
-          name: {{ printf "fission-ui-fb-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+          name: {{ printf "fission-ui-fb-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
 {{- end -}}

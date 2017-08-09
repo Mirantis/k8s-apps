@@ -1,13 +1,13 @@
 {{- define "kib-fullname" -}}
-{{- printf "kibana-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- printf "kibana-%s" .Release.Name | trunc 55 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "kib-cm-fullname" -}}
-{{- printf "kibana-cm-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- printf "kibana-cm-%s" .Release.Name | trunc 55 | trimSuffix "-" -}}
 {{- end }}
 
 {{- define "kib-ingress-fullname" -}}
-{{- printf "kibana-ingress-%s" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- printf "kibana-ingress-%s" .Release.Name | trunc 55 | trimSuffix "-" -}}
 {{- end }}
 
 {{- define "kib-es-url" -}}

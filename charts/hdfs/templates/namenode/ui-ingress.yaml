@@ -25,7 +25,7 @@ spec:
       http:
         paths:
           - backend:
-              serviceName: {{ printf "hdfs-ui-%s" $.Release.Name  | trunc 63 | trimSuffix "-" }}
+              serviceName: {{ template "hdfs-ui-fullname" . }}
               servicePort: {{ $.Values.namenode.ui.port }}
     {{- end -}}
 {{- end -}}

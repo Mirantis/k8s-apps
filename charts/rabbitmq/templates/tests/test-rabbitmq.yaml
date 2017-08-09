@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: {{ printf "rabbitmq-test-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+  name: {{ printf "rabbitmq-test-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
   annotations:
     helm.sh/hook: test-success
 spec:
@@ -20,11 +20,11 @@ spec:
       - "-cxe"
       - |
         set -o pipefail
-        {{- $release := (.Release.Name | trunc 63 | trimSuffix "-") -}}
+        {{ $ctx := . }}
         {{ range $i, $e := until (int $.Values.replicas) }}
         success=0
         for i in $(seq 1 20); do
-          if curl -u {{ $.Values.user }}:$PASSWORD -f {{ printf "rabbitmq-%s-%d.rabbitmq-%s:15672" $release $i $release }}/api/aliveness-test/%2F | [ `jq -r .status` == ok ]; then
+          if curl -u {{ $.Values.user }}:$PASSWORD -f {{ template "rabbitmq.fullname" $ctx }}-{{ $i }}.{{ template "rabbitmq.fullname" $ctx }}{{ printf ":15672" }}/api/aliveness-test/%2F | [ `jq -r .status` == ok ]; then
             success=1
             break
           else
@@ -39,7 +39,7 @@ spec:
         {{ range $j, $er := until (int $.Values.replicas) }}
         success=0
         for i in $(seq 1 20); do
-          if curl -u {{ $.Values.user }}:$PASSWORD -f {{ printf "rabbitmq-%s-%d.rabbitmq-%s:15672" $release $i $release }}/api/nodes | [ `jq -r .[{{ $j }}].running` == true ]; then
+          if curl -u {{ $.Values.user }}:$PASSWORD -f {{ template "rabbitmq.fullname" $ctx }}-{{ $i }}.{{ template "rabbitmq.fullname" $ctx }}{{ printf ":15672" }}/api/nodes | [ `jq -r .[{{ $j }}].running` == true ]; then
             success=1
             break
           else

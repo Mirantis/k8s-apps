@@ -1,3 +1,3 @@
 {{- define "fullname" -}}
-{{- printf "tweeviz-%s" .Release.Name  | trunc 63 | trimSuffix "-" -}}
+{{- printf "tweeviz-%s" .Release.Name  | trunc 55 | trimSuffix "-" -}}
 {{- end -}}

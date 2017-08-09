@@ -3,7 +3,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ printf "elasticsearch-ingress-%s" .Release.Name | trunc 63 | trimSuffix "-" }}
+  name: {{ printf "elasticsearch-ingress-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
   annotations:
   {{- range $key, $value := .Values.client.ingress.annotations }}
     {{ $key }}: {{ $value | quote }}
@@ -29,7 +29,7 @@ spec:
         paths:
           - path: /
             backend:
-              serviceName: {{ printf "elasticsearch-%s" $releaseName | trunc 63 | trimSuffix "-" }}
+              serviceName: {{ template "es-fullname" . }} 
               servicePort: {{ $.Values.port }}
   {{- end -}}
 {{- end -}}

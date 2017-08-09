@@ -36,7 +36,7 @@ charts directory
 templates
 ~~~~~~~~~
 
-* Use  `{{ | trunc 63 | trimSuffix "-" }}` in places where the release name is a
+* Use  `{{ | trunc 55 | trimSuffix "-" }}` in places where the release name is a
   part of the template.
 * All k8s object names should have the format `<service-name>-<release-name>`
 * All file names should use dashed notation to separate words
@@ -144,7 +144,7 @@ _helpers.tpl
   .. code-block:: smarty
 
       {{- define "namenode.fullname" -}}
-      {{- printf "hdfs-namenode-%s" .Release.Name  | trunc 63 | trimSuffix "-" -}}
+      {{- printf "hdfs-namenode-%s" .Release.Name  | trunc 55 | trimSuffix "-" -}}
       {{- end -}}
 
 * Use for addresses if convenient:
@@ -152,7 +152,7 @@ _helpers.tpl
   .. code-block:: smarty
 
       {{- define "namenode.address" -}}
-      {{- printf "some address"  | trunc 63 | trimSuffix "-" -}}
+      {{- printf "some address"  | trunc 55 | trimSuffix "-" -}}
       {{- end -}}
 
 * Use for anything that will be referenced more than once

@@ -1,10 +1,10 @@
 {{- define "clair.fullname" -}}
-{{- printf "clair-%s" .Release.Name  | trunc 63 | trimSuffix "-" -}}
+{{- printf "clair-%s" .Release.Name  | trunc 55 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "clair.postgresql-connection-string" -}}
     {{- if .Values.postgresql.deployChart -}}
-        host={{ printf "postgresql-%s" .Release.Name | trunc 63 | trimSuffix "-" }} port={{ .Values.postgresql.port }} user={{ .Values.postgresql.credentials.user }} password={{ .Values.postgresql.credentials.password }} sslmode=disable statement_timeout=60000
+        host={{ printf "postgresql-%s" .Release.Name | trunc 55 | trimSuffix "-" }} port={{ .Values.postgresql.port }} user={{ .Values.postgresql.credentials.user }} password={{ .Values.postgresql.credentials.password }} sslmode=disable statement_timeout=60000
     {{- else -}}
         {{- printf "%s" .Values.postgresql.externalAddress -}}
     {{- end -}}

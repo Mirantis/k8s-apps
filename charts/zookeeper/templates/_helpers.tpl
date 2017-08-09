@@ -1,11 +1,14 @@
 {{- define "zk-fullname" -}}
-{{- printf "zk-%s" .Release.Name  | trunc 63 | trimSuffix "-" -}}
+{{- printf "zk-%s" .Release.Name  | trunc 55 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "zookeeper.address" -}}
-{{- $release := (.Release.Name | trunc 63 | trimSuffix "-") -}}
+{{- $ctx := . -}}
 {{- range $i, $e := until (int $.Values.replicas) -}}
-    {{- if $i }},{{- end -}}
-         {{- printf "zk-%s-%d.zk-%s:%d" $release $i $release (int $.Values.clientPort) -}}
-    {{- end -}}
+  {{- if $i }},{{- end -}}
+  {{- template "zk-fullname" $ctx -}}
+  {{- printf "-%d." $i -}}
+  {{- template "zk-fullname" $ctx -}}
+  {{- printf ":%d" (int $.Values.clientPort) -}}
+{{- end -}}
 {{- end -}}
