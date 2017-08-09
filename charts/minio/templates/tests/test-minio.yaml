@@ -11,10 +11,23 @@ spec:
       imagePullPolicy: IfNotPresent
       command:
         - bash
-        - -cxe
+        - -cx
         - |
           bucket="test-{{ randAlphaNum 10 | lower }}"
           mc config host add {{ template "minio.fullname" . }} http://{{ template "minio.fullname" . }}:{{ .Values.port }} {{ .Values.accessKey }} {{ .Values.secretKey }} S3v4
-          mc mb {{ template "minio.fullname" . }}/$bucket
-          mc rm {{ template "minio.fullname" . }}/$bucket
+
+          success=0
+          for i in $(seq 1 20); do
+            mc admin service status {{ template "minio.fullname" . }}
+            mc mb {{ template "minio.fullname" . }}/$bucket
+            mc rm {{ template "minio.fullname" . }}/$bucket
+            if [ $? -eq 0 ]; then
+              success=1
+              break
+            fi
+            sleep 5
+          done
+          if [ ${success} -eq 0 ]; then
+            exit 1
+          fi
   restartPolicy: Never
