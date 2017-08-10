@@ -1,0 +1,124 @@
+# Default values for jenkins.
+# This is a YAML-formatted file.
+# Declare name/value pairs to be passed into your templates.
+# name: value
+
+Master:
+  port: 8080
+  slaveListenerPort: 50000
+  image:
+    repository: jenkinsci/
+    name: jenkins
+    tag: "2.67"
+    pullPolicy: IfNotPresent
+
+  persistence:
+    type: emptyDir # or hostPath or PersistentVolumeClaim
+
+    #storageClass: ""
+    volumeSize: 10Gi
+    accessMode: ReadWriteOnce
+
+    hostPath: ""
+
+  service:
+    type: NodePort # or ClusterIP or LoadBalancer
+
+    nodePort: ""
+
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+
+    annotations: {}
+
+  ingress:
+    enabled: false
+    hosts: []
+      #   - some.domain
+    tls:
+      enabled: false
+      secretName: ""
+    annotations: {}
+      #   kubernetes.io/ingress.class: nginx
+
+  resources:
+  #  requests:
+  #    memory: 256Mi
+  #    cpu: 250m
+  #  limits:
+  #    memory: 256Mi
+  #    cpu: 250m
+
+  Component: "jenkins-master"
+  UseSecurity: true
+  AdminUser: admin
+# AdminPassword: <defaults to random>
+
+# Set min/max heap here if needed with:
+# JavaOpts: "-Xms512m -Xmx512m"
+
+# Optionally configure a JMX port
+# requires additional JavaOpts, ie
+# JavaOpts: >
+#   -Dcom.sun.management.jmxremote.port=4000
+#   -Dcom.sun.management.jmxremote.authenticate=false
+#   -Dcom.sun.management.jmxremote.ssl=false
+# JMXPort: 4000
+# List of plugins to be install during Jenkins master start
+  InstallPlugins:
+      - kubernetes:0.11
+      - workflow-aggregator:2.5
+      - workflow-job:2.13
+      - credentials-binding:1.12
+      - git:3.4.0
+# Used to approve a list of groovy functions in pipelines used the script-security plugin. Can be viewed under /scriptApproval
+  # ScriptApproval:
+  #   - "method groovy.json.JsonSlurperClassic parseText java.lang.String"
+  #   - "new groovy.json.JsonSlurperClassic"
+# List of groovy init scripts to be executed during Jenkins master start
+  InitScripts:
+#  - |
+#    print 'adding global pipeline libraries, register properties, bootstrap jobs...'
+  CustomConfigMap: false
+# Node labels and tolerations for pod assignment
+# ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+# ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#taints-and-tolerations-beta-feature
+  NodeSelector: {}
+  Tolerations: {}
+
+Agent:
+  Enabled: true
+  image:
+    repository: jenkinsci/
+    name: jnlp-slave
+    tag: "2.62"
+
+  Component: "jenkins-slave"
+  Privileged: false
+  Cpu: "200m"
+  Memory: "256Mi"
+  # You may want to change this to true while testing a new image
+  AlwaysPullImage: false
+  # You can define the volumes that you want to mount for this container
+  # Allowed types are: ConfigMap, EmptyDir, HostPath, Nfs, Pod, Secret
+  # Configure the attributes as they appear in the corresponding Java class for that type
+  # https://github.com/jenkinsci/kubernetes-plugin/tree/master/src/main/java/org/csanchez/jenkins/plugins/kubernetes/volumes
+  volumes:
+  # - type: Secret
+  #   secretName: mysecret
+  #   mountPath: /var/myapp/mysecret
+
+NetworkPolicy:
+  # Enable creation of NetworkPolicy resources.
+  Enabled: false
+  # For Kubernetes v1.4, v1.5 and v1.6, use 'extensions/v1beta1'
+  # For Kubernetes v1.7, use 'networking.k8s.io/v1'
+  ApiVersion: extensions/v1beta1
+
+## Install Default RBAC roles and bindings
+rbac:
+  install: false
+  # RBAC api version (currently either v1beta1 or v1alpha1)
+  apiVersion: v1beta1
+  # Cluster role reference
+  roleRef: cluster-admin

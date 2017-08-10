@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ printf "jenkins-test-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
+  annotations:
+    "helm.sh/hook": test-success
+    "pod.beta.kubernetes.io/init-containers": '[
+      {
+        "name": "test-framework",
+        "image": "dduportal/bats:0.4.0",
+        "command": ["bash", "-c", "
+          set -ex\n
+          # copy bats to tools dir\n
+          cp -R /usr/local/libexec/ /tools/bats/\n
+        "],
+        "volumeMounts": [
+          {"name": "tools", "mountPath": "/tools"}
+        ]
+      }
+    ]'
+spec:
+  {{- if .Values.Master.NodeSelector }}
+  nodeSelector:
+{{ toYaml .Values.Master.NodeSelector | indent 4 }}
+  {{- end }}
+  {{- if .Values.Master.Tolerations }}
+  tolerations:
+{{ toYaml .Values.Master.Tolerations | indent 4 }}
+  {{- end }}
+  containers:
+    - name: test
+      image: "{{ .Values.Master.image.repository }}{{ .Values.Master.image.name }}:{{ .Values.Master.image.tag }}"
+      command: ["/tools/bats/bats", "-t", "/tests/run.sh"]
+      volumeMounts:
+      - mountPath: /tests
+        name: tests
+        readOnly: true
+      - mountPath: /tools
+        name: tools
+  volumes:
+  - name: tests
+    configMap:
+      name: {{ printf "jenkins-test-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
+  - name: tools
+    emptyDir: {}
+  restartPolicy: Never

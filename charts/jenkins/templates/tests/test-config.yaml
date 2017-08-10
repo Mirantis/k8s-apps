@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "jenkins-test-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
+data:
+  run.sh: |-
+    @test "Testing Jenkins UI is accessible" {
+      curl --retry 12 --retry-delay 10 {{ template "fullname" . }}:{{ .Values.Master.port }}/login
+    }

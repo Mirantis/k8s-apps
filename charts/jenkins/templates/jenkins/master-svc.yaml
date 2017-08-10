@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{template "fullname" . }}
+  labels:
+    app: {{ template "fullname" . }}
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    component: "{{.Release.Name}}-{{.Values.Master.Component}}"
+{{- if .Values.Master.service.annotations }}
+  annotations:
+{{ toYaml .Values.Master.service.annotations | indent 4}}
+{{- end }}
+spec:
+  ports:
+  - port: {{ .Values.Master.port }}
+    name: webui
+    {{- if eq .Values.Master.service.type "NodePort" }}
+    {{- if .Values.Master.service.nodePort }}
+    nodePort: {{ .Values.Master.service.nodePort }}
+    {{- end -}}
+    {{- end }}
+  selector:
+    component: "{{.Release.Name}}-{{.Values.Master.Component}}"
+  type: "{{ .Values.Master.service.type }}"
+{{- if eq .Values.Master.service.type "LoadBalancer" }}
+  {{- if .Values.Master.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.Master.service.loadBalancerIP }}
+  {{- end -}}
+  {{- if .Values.Master.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+  {{- range .Values.Master.service.loadBalancerSourceRanges }}
+  - {{ . }}
+  {{- end }}
+  {{- end -}}
+{{- end -}}
