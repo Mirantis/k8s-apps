@@ -1,7 +1,7 @@
 image:
   repository: mirantisworkloads/
   name: cassandra
-  tag: 3.0.13
+  tag: 3.11.0
   pullPolicy: IfNotPresent
 
 antiAffinity: "soft" # or hard or null
