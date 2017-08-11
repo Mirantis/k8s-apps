@@ -86,7 +86,7 @@ spec:
         {{- end }}
         livenessProbe:
           exec:
-            command: [ "/bin/sh", "-c", "nodetool status | grep -E \"^UN\\s+${POD_IP}\"" ]
+            command: [ "/bin/sh", "-c", "nodetool status" ]
           initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
           periodSeconds: {{ .Values.probePeriodSeconds }}
         readinessProbe:
