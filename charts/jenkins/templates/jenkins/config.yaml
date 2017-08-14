@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ template "jenkins.master-fullname" . }}
 data:
   config.xml: |-
     <?xml version='1.0' encoding='UTF-8'?>
@@ -76,8 +76,8 @@ data:
           <serverUrl>https://kubernetes.default</serverUrl>
           <skipTlsVerify>false</skipTlsVerify>
           <namespace>{{ .Release.Namespace }}</namespace>
-          <jenkinsUrl>http://{{ template "fullname" . }}:{{ .Values.Master.port }}</jenkinsUrl>
-          <jenkinsTunnel>{{ template "fullname" . }}-agent:50000</jenkinsTunnel>
+          <jenkinsUrl>http://{{ template "jenkins.master-address" . }}</jenkinsUrl>
+          <jenkinsTunnel>{{ template "jenkins.agent-address" . }}</jenkinsTunnel>
           <containerCap>10</containerCap>
           <retentionTimeout>5</retentionTimeout>
           <connectTimeout>0</connectTimeout>
@@ -96,7 +96,7 @@ data:
         </hudson.model.AllView>
       </views>
       <primaryView>All</primaryView>
-      <slaveAgentPort>50000</slaveAgentPort>
+      <slaveAgentPort>{{ .Values.Agent.port }}</slaveAgentPort>
       <label></label>
       <nodeProperties/>
       <globalNodeProperties/>

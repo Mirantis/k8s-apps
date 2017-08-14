@@ -1,7 +1,8 @@
 Jenkins chart has been deployed.
 
 Internal URL:
-    jenkins: {{ template "fullname" . }}:{{ .Values.Master.port }}
+    jenkins-master: {{ template "jenkins.master-address" . }}
+    jenkins-agent: {{ template "jenkins.agent-address" . }}
 
 External URL:
 {{- if .Values.Master.ingress.enabled }}
@@ -22,14 +23,14 @@ Get the Jenkins UI URL to visit by running these commands in the same shell:
     {{- if .Values.Master.service.nodePort }}
     export NODE_PORT={{ .Values.Master.service.nodePort }}
     {{- else }}
-    export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "fullname" . }})
+    export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "jenkins.master-fullname" . }})
     {{- end }}
     export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
     echo http://$NODE_IP:$NODE_PORT
 {{ else if contains "LoadBalancer" .Values.Master.service.type -}}
 NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-You can watch the status of it by running in the same shell 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "fullname" . }}'
-    export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+You can watch the status of it by running in the same shell 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "jenkins.master-fullname" . }}'
+    export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "jenkins.master-fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
     echo http://$SERVICE_IP:{{ .Values.Master.port }}
 {{- end }}
 {{- end }}

@@ -5,7 +5,6 @@
 
 Master:
   port: 8080
-  slaveListenerPort: 50000
   image:
     repository: jenkinsci/
     name: jenkins
@@ -52,7 +51,7 @@ Master:
   Component: "jenkins-master"
   UseSecurity: true
   AdminUser: admin
-# AdminPassword: <defaults to random>
+  AdminPassword: admin
 
 # Set min/max heap here if needed with:
 # JavaOpts: "-Xms512m -Xmx512m"
@@ -87,6 +86,7 @@ Master:
   Tolerations: {}
 
 Agent:
+  port: 50000
   Enabled: true
   image:
     repository: jenkinsci/
@@ -107,18 +107,3 @@ Agent:
   # - type: Secret
   #   secretName: mysecret
   #   mountPath: /var/myapp/mysecret
-
-NetworkPolicy:
-  # Enable creation of NetworkPolicy resources.
-  Enabled: false
-  # For Kubernetes v1.4, v1.5 and v1.6, use 'extensions/v1beta1'
-  # For Kubernetes v1.7, use 'networking.k8s.io/v1'
-  ApiVersion: extensions/v1beta1
-
-## Install Default RBAC roles and bindings
-rbac:
-  install: false
-  # RBAC api version (currently either v1beta1 or v1alpha1)
-  apiVersion: v1beta1
-  # Cluster role reference
-  roleRef: cluster-admin

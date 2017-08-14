@@ -2,12 +2,12 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ template "jenkins.master-fullname" . }}
   labels:
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: {{ template "fullname" . }}
+    app: {{ template "jenkins.master-fullname" . }}
   annotations:
 {{ toYaml .Values.namenode.Master.ingress.annotations | indent 4 }}
 spec:
@@ -25,7 +25,7 @@ spec:
       http:
         paths:
           - backend:
-              serviceName: {{ template "fullname" . }}
+              serviceName: {{ template "jenkins.master-fullname" . }}
               servicePort: {{ .Values.Master.port }}
     {{- end -}}
 {{- end -}}
