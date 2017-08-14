@@ -53,10 +53,15 @@ spec:
             }
         {{- end }}
     spec:
+      terminationGracePeriodSeconds: 60
       containers:
       - name: cassandra
         image: {{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        lifecycle:
+          preStop:
+            exec:
+              command: ["nodetool", "decommission"]
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         env:
