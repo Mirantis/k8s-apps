@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ template "jenkins.master-fullname" . }}
   labels:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
@@ -17,7 +17,7 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ template "fullname" . }}
+        app: {{ template "jenkins.master-fullname" . }}
         heritage: {{ .Release.Service | quote }}
         release: {{ .Release.Name | quote }}
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
@@ -62,7 +62,7 @@ spec:
       securityContext:
         runAsUser: 0
       containers:
-        - name: {{ template "fullname" . }}
+        - name: {{ template "jenkins.master-fullname" . }}
           image: "{{ .Values.Master.image.repository }}{{ .Values.Master.image.name }}:{{ .Values.Master.image.tag }}"
           imagePullPolicy: "{{ .Values.Master.image.pullPolicy }}"
           {{- if .Values.Master.UseSecurity }}
@@ -75,18 +75,18 @@ spec:
             - name: ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "fullname" . }}
+                  name: {{ template "jenkins.master-fullname" . }}
                   key: jenkins-admin-password
             - name: ADMIN_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "fullname" . }}
+                  name: {{ template "jenkins.master-fullname" . }}
                   key: jenkins-admin-user
             {{- end }}
           ports:
             - containerPort: {{ .Values.Master.port }}
               name: http
-            - containerPort: {{ .Values.Master.slaveListenerPort }}
+            - containerPort: {{ .Values.Agent.port }}
               name: slavelistener
             {{- if .Values.Master.JMXPort }}
             - containerPort: {{ .Values.Master.JMXPort }}
@@ -114,7 +114,7 @@ spec:
       volumes:
       - name: jenkins-config
         configMap:
-          name: {{ template "fullname" . }}
+          name: {{ template "jenkins.master-fullname" . }}
       - name: plugin-dir
         emptyDir: {}
       - name: secrets-dir
@@ -127,5 +127,5 @@ spec:
           path: "{{ .Values.Master.persistence.hostPath }}"
         {{- else if eq .Values.Master.persistence.type "PersistentVolumeClaim" }}
         persistentVolumeClaim:
-          claimName: {{ template "fullname" . }}
+          claimName: {{ template "jenkins.master-fullname" . }}
         {{- end }}
