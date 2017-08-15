@@ -31,6 +31,10 @@ spec:
               name: docker-bin
             - mountPath: /var/run/docker.sock
               name: docker-sock
+            {{ if .Values.providers.google.enabled }}
+            - mountPath: /root/.google
+              name: google
+            {{ end }}
           readinessProbe:
             httpGet:
               path: /env
@@ -47,3 +51,8 @@ spec:
         - name: docker-sock
           hostPath:
             path: /var/run/docker.sock
+        {{ if .Values.providers.google.enabled }}
+        - name: google
+          secret:
+            secretName: {{ template "fullname" . }}-google
+        {{ end }}
