@@ -23,12 +23,12 @@ spec:
         {{ $ctx := . }}
         {{ range $i, $e := until (int $.Values.replicas) }}
         success=0
-        for i in $(seq 1 20); do
+        for i in $(seq 1 30); do
           if curl -u {{ $.Values.user }}:$PASSWORD -f {{ template "rabbitmq.fullname" $ctx }}-{{ $i }}.{{ template "rabbitmq.fullname" $ctx }}{{ printf ":15672" }}/api/aliveness-test/%2F | [ `jq -r .status` == ok ]; then
             success=1
             break
           else
-            sleep 5
+            sleep 10
           fi
         done
         if [ ${success} -eq 0 ]; then
@@ -38,12 +38,12 @@ spec:
         {{ range $i, $e := until (int $.Values.replicas) }}
         {{ range $j, $er := until (int $.Values.replicas) }}
         success=0
-        for i in $(seq 1 20); do
+        for i in $(seq 1 30); do
           if curl -u {{ $.Values.user }}:$PASSWORD -f {{ template "rabbitmq.fullname" $ctx }}-{{ $i }}.{{ template "rabbitmq.fullname" $ctx }}{{ printf ":15672" }}/api/nodes | [ `jq -r .[{{ $j }}].running` == true ]; then
             success=1
             break
           else
-            sleep 5
+            sleep 10
           fi
         done
         if [ ${success} -eq 0 ]; then

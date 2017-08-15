@@ -5,5 +5,5 @@ metadata:
 data:
   run.sh: |-
     @test "Testing Jenkins UI is accessible" {
-      curl --retry 12 --retry-delay 10 {{ template "jenkins.master-address" . }}/login
+      curl --retry 30 --retry-delay 10 {{ template "jenkins.master-address" . }}/login
     }
