@@ -29,6 +29,10 @@ spec:
               name: {{ template "fullname" . }}-spinnaker-config
             - mountPath: /tmp/registry
               name: {{ template "fullname" . }}-registry
+            {{ if .Values.providers.google.enabled }}
+            - mountPath: /root/.google
+              name: google
+            {{ end }}
           readinessProbe:
             httpGet:
               path: /credentials
@@ -42,3 +46,8 @@ spec:
         - name: {{ template "fullname" . }}-registry
           secret:
             secretName: {{ template "fullname" . }}-registry
+        {{ if .Values.providers.google.enabled }}
+        - name: google
+          secret:
+            secretName: {{ template "fullname" . }}-google
+        {{ end }}

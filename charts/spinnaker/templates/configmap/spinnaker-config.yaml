@@ -74,15 +74,15 @@ data:
         - name: ${providers.kubernetes.primaryCredentials.name}
           serviceAccount: true
           dockerRegistries:
-          {{- range $index, $account := .Values.accounts }}
+          {{- range $index, $account := .Values.providers.docker.accounts }}
           - accountName: {{ $account.name }}
           {{ end }}
 
     dockerRegistry:
-      {{ if .Values.accounts }}
+      {{ if .Values.providers.docker.accounts }}
       enabled: true
       accounts:
-        {{- range $index, $account := .Values.accounts }}
+        {{- range $index, $account := .Values.providers.docker.accounts }}
         - name: {{ $account.name }}
           address: {{ $account.address }}
           {{- if $account.username }}
@@ -175,7 +175,7 @@ data:
     var bakeryDetailUrl = gateHost + '/bakery/logs/global/{{ "{{ " }}context.status.id{{ " }}" }}';
 
     window.spinnakerSettings = {
-      defaultProviders: ['kubernetes'],
+      defaultProviders: ['kubernetes', 'gce'],
       feedbackUrl: feedbackUrl,
       gateUrl: gateHost,
       bakeryDetailUrl: bakeryDetailUrl,
@@ -188,6 +188,18 @@ data:
             namespace: 'default'
           },
         }
+        {{- if .Values.providers.google.enabled -}}
+        ,
+        gce: {
+          defaults: {
+            {{- with $account := first .Values.providers.google.accounts }}
+            account: '{{ $account.name }}',
+            {{- end }}
+            region: '{{ .Values.providers.google.defaultRegion }}',
+            zone: '{{ .Values.providers.google.defaultZone }}'
+          }
+        }
+        {{- end }}
       },
       notifications: {
         email: {
@@ -237,14 +249,14 @@ data:
       accounts:
         - name: local
           dockerRegistries:
-            {{- range $index, $account := .Values.accounts }}
+            {{- range $index, $account := .Values.providers.docker.accounts }}
             - accountName: {{ $account.name }}
             {{- end }}
 
     dockerRegistry:
       enabled: true
       accounts:
-      {{- range $index, $account := .Values.accounts }}
+      {{- range $index, $account := .Values.providers.docker.accounts }}
         - name: {{ $account.name }}
           address: {{ $account.address }}
           {{- if $account.username }}
@@ -261,9 +273,22 @@ data:
             {{- end }}
           {{ end }}
       {{- end }}
+    {{- if .Values.providers.google.enabled }}
+    google:
+      enabled: true
+
+      accounts:
+      {{- range $index, $account := .Values.providers.google.accounts }}
+        - name: {{ $account.name }}
+          project: {{ $account.project }}
+          jsonPath: "/root/.google/{{ $account.name }}.json"
+          consul:
+            enabled: {{ $account.consul.enabled }}
+      {{- end }}
+    {{- end }}
     credentials:
-      primaryAccountTypes: ${providers.kubernetes.primaryCredentials.name}
-      challengeDestructiveActionsEnvironments: ${providers.kubernetes.primaryCredentials.name}
+      primaryAccountTypes: ${providers.kubernetes.primaryCredentials.name}, ${providers.google.primaryCredentials.name}
+      challengeDestructiveActionsEnvironments: ${providers.kubernetes.primaryCredentials.name}, ${providers.google.primaryCredentials.name}
   spinnaker-local.yml: |
     global:
       spinnaker:
@@ -430,7 +455,7 @@ data:
         connection: {{ template "spinnaker.redis-address" . }}
 
     providers:
-    {{ with $account := first .Values.accounts }}
+    {{ with $account := first .Values.providers.docker.accounts }}
       kubernetes:
         enabled: true
         primaryCredentials:
@@ -452,3 +477,17 @@ data:
           passwordFile: /tmp/registry/password-{{ $account.name }}
           {{- end }}
     {{ end }}
+    {{- if .Values.providers.google.enabled }}
+      google:
+        enabled: true
+        defaultRegion: "{{ .Values.providers.google.defaultRegion }}"
+        defaultZone: "{{ .Values.providers.google.defaultZone }}"
+        {{- with $account := first .Values.providers.google.accounts }}
+        primaryCredentials:
+          name: {{ $account.name }}
+          project: {{ $account.project }}
+          jsonPath: "/root/.google/{{ $account.name }}.json"
+          consul:
+            enabled: {{ $account.consul.enabled }}
+        {{- end }}
+    {{- end }}

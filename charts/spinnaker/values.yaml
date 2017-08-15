@@ -3,20 +3,38 @@
 # For more info visit:
 #   http://www.spinnaker.io/v1.0/docs/target-deployment-configuration#section-docker-registry
 
-# Configure your Docker registries here
-accounts:
-- name: dockerhub
-  address: https://index.docker.io
-  repositories:
-    - library/alpine
-    - library/ubuntu
-    - library/centos
-    - library/nginx
-# - name: gcr
-#   address: https://gcr.io
-#   username: _json_key
-#   password: '<INSERT YOUR SERVICE ACCOUNT JSON HERE>'
-#   email: 1234@5678.com
+
+providers:
+  docker:
+    # Configure your Docker registries here
+    accounts:
+    - name: dockerhub
+      address: https://index.docker.io
+      repositories:
+        - library/alpine
+        - library/ubuntu
+        - library/centos
+        - library/nginx
+    # - name: gcr
+    #   address: https://gcr.io
+    #   username: _json_key
+    #   password: '<INSERT YOUR SERVICE ACCOUNT JSON HERE>'
+    #   email: 1234@5678.com
+
+  google:
+    enabled: false
+    defaultRegion: us-central1
+    defaultZone: us-central1-f
+
+    accounts:
+      - name: example
+        # The project is the Google Project ID for the project to manage with
+        # Spinnaker. The jsonKey is the JSON service credentials
+        # downloaded from the Google Developer's Console.
+        project: example
+        jsonKey: '<JSON_CREDENTIALS>'
+        consul:
+          enabled: false
 
 # Settings for notifications via email
 # For more info visit:
@@ -39,12 +57,6 @@ images:
   gate: gcr.io/spinnaker-marketplace/gate:0.5.0-72
   front50: gcr.io/spinnaker-marketplace/front50:0.4.1-72
   rosco: gcr.io/spinnaker-marketplace/rosco:0.4.0-72
-
-# Change this if youd like to expose Spinnaker outside the cluster
-deck:
-  host: localhost
-  port: 9000
-  protocol: http
 
 gate:
   allowedOriginsPattern: '^https?://(?:localhost|127.0.0.1|[^/]+\.example\.com)(?::[1-9]\d*)?/?$'
