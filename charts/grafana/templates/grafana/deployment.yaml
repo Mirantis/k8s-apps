@@ -5,8 +5,8 @@ metadata:
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: {{ template "fullname" . }}
-  name: {{ template "fullname" . }}
+    app: {{ template "grafana.fullname" . }}
+  name: {{ template "grafana.fullname" . }}
 spec:
   replicas: 1
   template:
@@ -14,7 +14,7 @@ spec:
       labels:
         release: "{{ .Release.Name }}"
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-        app: {{ template "fullname" . }}
+        app: {{ template "grafana.fullname" . }}
     spec:
       containers:
         - name: grafana
@@ -24,12 +24,12 @@ spec:
             - name: GF_SECURITY_ADMIN_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "fullname" . }}
+                  name: {{ template "grafana.fullname" . }}
                   key: grafana-admin-user
             - name: GF_SECURITY_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "fullname" . }}
+                  name: {{ template "grafana.fullname" . }}
                   key: grafana-admin-password
           ports:
             - containerPort: {{ .Values.port }}
@@ -71,11 +71,11 @@ spec:
       volumes:
         - name: config-volume
           configMap:
-            name: {{ template "fullname" . }}
+            name: {{ template "grafana.fullname" . }}
         - name: data
       {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
           persistentVolumeClaim:
-            claimName: {{ template "fullname" . }}
+            claimName: {{ template "grafana.fullname" . }}
       {{- else if eq .Values.persistence.type "emptyDir" }}
           emptyDir: {}
       {{- else if eq .Values.persistence.type "hostPath" }}

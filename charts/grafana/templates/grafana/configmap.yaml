@@ -5,7 +5,7 @@ metadata:
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: {{ template "fullname" . }}
-  name: {{ template "fullname" . }}
+    app: {{ template "grafana.fullname" . }}
+  name: {{ template "grafana.fullname" . }}
 data:
 {{ toYaml .Values.serverConfigFile | indent 2 }}
