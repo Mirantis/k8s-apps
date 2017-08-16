@@ -1,13 +1,12 @@
-{{- if .Values.zeppelin.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "zeppelin-fullname" . }}
+  name: {{ template "zeppelin.fullname" . }}
   labels:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: {{ template "zeppelin-fullname" . }}
+    app: {{ template "zeppelin.fullname" . }}
 {{- if .Values.service.annotations }}
   annotations:
 {{ toYaml .Values.service.annotations | indent 4}}
@@ -15,14 +14,14 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.zeppelin.port }}
+    - port: {{ .Values.port }}
       {{- if eq .Values.service.type "NodePort" }}
-      {{- if .Values.zeppelin.nodePort }}
-      nodePort: {{ .Values.zeppelin.nodePort }}
+      {{- if .Values.service.nodePort }}
+      nodePort: {{ .Values.service.nodePort }}
       {{- end }}
       {{- end }}
   selector:
-    app: {{ template "zeppelin-fullname" . }}
+    app: {{ template "zeppelin.fullname" . }}
 {{- if eq .Values.service.type "LoadBalancer" }}
   {{- if .Values.service.loadBalancerIP }}
   loadBalancerIP: {{ .Values.service.loadBalancerIP }}
@@ -34,4 +33,3 @@ spec:
     {{- end }}
   {{- end }}
 {{- end }}
-{{- end -}}

@@ -1,11 +1,13 @@
 FROM openjdk:8
 
-ARG ZEPPELIN_VERSION=0.7.2
+ARG ZEPPELIN_VERSION=0.7.3-SNAPSHOT
 
 # install zeppelin
-RUN curl http://www-eu.apache.org/dist/zeppelin/zeppelin-${ZEPPELIN_VERSION}/zeppelin-${ZEPPELIN_VERSION}-bin-all.tgz -o zeppelin.tgz \
+# use apache.org when zeppelin will be released 0.7.3
+# RUN curl http://www-eu.apache.org/dist/zeppelin/zeppelin-${ZEPPELIN_VERSION}/zeppelin-${ZEPPELIN_VERSION}-bin-all.tgz -o zeppelin.tgz \
+RUN curl https://mirantisworkloads.storage.googleapis.com/bin/zeppelin/zeppelin-${ZEPPELIN_VERSION}.tar.gz -o zeppelin.tgz \
     && tar xvf zeppelin.tgz \
-    && ln -s zeppelin-${ZEPPELIN_VERSION}-bin-all zeppelin\
+    && ln -s zeppelin-${ZEPPELIN_VERSION} zeppelin\
     && rm zeppelin.tgz
 
 # install matplotlib integration

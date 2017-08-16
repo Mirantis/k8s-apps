@@ -1,14 +1,13 @@
-{{- if .Values.zeppelin.enabled -}}
 {{- if .Values.ingress.enabled -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ template "zeppelin-fullname" . }}
+  name: {{ template "zeppelin.fullname" . }}
   labels:
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: {{ template "zeppelin-fullname" . }}
+    app: {{ template "zeppelin.fullname" . }}
   annotations:
 {{ toYaml .Values.ingress.annotations | indent 4 }}
 spec:
@@ -26,8 +25,7 @@ spec:
       http:
         paths:
           - backend:
-              serviceName: {{ template "zeppelin-fullname" . }}
-              servicePort: {{ $.Values.zeppelin.port }}
+              serviceName: {{ template "zeppelin.fullname" . }}
+              servicePort: {{ $.Values.port }}
     {{- end -}}
-{{- end -}}
 {{- end -}}

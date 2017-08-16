@@ -31,20 +31,6 @@ spark:
       #  cpu: "100m"
       #  memory: "512Mi"
 
-zeppelin:
-  enabled: true
-  image:
-    repository: mirantisworkloads/
-    name: zeppelin
-    tag: 0.7.2
-    pullPolicy: IfNotPresent
-  port: 8080
-  nodePort: null
-  resources:
-    #requests:
-    #  cpu: "100m"
-    #  memory: "512Mi"
-
 ingress:
   enabled: false
   hosts: []
