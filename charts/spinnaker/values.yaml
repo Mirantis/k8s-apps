@@ -36,6 +36,18 @@ providers:
         consul:
           enabled: false
 
+  aws:
+    enabled: false
+    defaultRegions:
+      - us-west-2
+    defaultIAMRole: BaseIAMRole
+    # {{name}} will be interpolated with the aws account name (e.g. "example-keypair").
+    defaultKeyPairTemplate: "{{name}}-keypair"
+
+    account:
+      accessKey: example
+      secretKey: example
+
 # Settings for notifications via email
 # For more info visit:
 #   http://www.spinnaker.io/docs/notifications-and-events-guide#section-email

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "fullname" . }}-s3-config
+  name: {{ template "fullname" . }}-minio-config
   labels:
     app: {{ template "fullname" . }}
 data:
