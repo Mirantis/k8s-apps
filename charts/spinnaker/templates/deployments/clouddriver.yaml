@@ -33,6 +33,10 @@ spec:
             - mountPath: /root/.google
               name: google
             {{ end }}
+            {{ if .Values.providers.aws.enabled }}
+            - mountPath: /root/.aws
+              name: {{ template "fullname" . }}-aws-test
+            {{ end }}
           readinessProbe:
             httpGet:
               path: /credentials
@@ -50,4 +54,9 @@ spec:
         - name: google
           secret:
             secretName: {{ template "fullname" . }}-google
+        {{ end }}
+        {{ if .Values.providers.aws.enabled }}
+        - name: {{ template "fullname" . }}-aws-test
+          configMap:
+            name: {{ template "fullname" . }}-aws-test
         {{ end }}

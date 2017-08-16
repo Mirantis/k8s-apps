@@ -175,7 +175,7 @@ data:
     var bakeryDetailUrl = gateHost + '/bakery/logs/global/{{ "{{ " }}context.status.id{{ " }}" }}';
 
     window.spinnakerSettings = {
-      defaultProviders: ['kubernetes', 'gce'],
+      defaultProviders: ['kubernetes', 'gce', 'aws'],
       feedbackUrl: feedbackUrl,
       gateUrl: gateHost,
       bakeryDetailUrl: bakeryDetailUrl,
@@ -197,6 +197,15 @@ data:
             {{- end }}
             region: '{{ .Values.providers.google.defaultRegion }}',
             zone: '{{ .Values.providers.google.defaultZone }}'
+          }
+        }
+        {{- end }}
+        {{- if .Values.providers.aws.enabled -}}
+        ,
+        aws: {
+          defaults: {
+            account: 'default',
+            region: '{{ first .Values.providers.aws.defaultRegions }}'
           }
         }
         {{- end }}
@@ -286,9 +295,20 @@ data:
             enabled: {{ $account.consul.enabled }}
       {{- end }}
     {{- end }}
+    {{- if .Values.providers.aws.enabled }}
+    aws:
+      enabled: true
+      defaults:
+        iamRole: {{ .Values.providers.aws.defaultIAMRole }}
+      defaultRegions:
+        {{- range $index, $region := .Values.providers.aws.defaultRegions }}
+        - name: {{ $region }}
+        {{- end }}
+      defaultKeyPairTemplate: {{ .Values.providers.aws.defaultKeyPairTemplate }}
+    {{- end }}
     credentials:
-      primaryAccountTypes: ${providers.kubernetes.primaryCredentials.name}, ${providers.google.primaryCredentials.name}
-      challengeDestructiveActionsEnvironments: ${providers.kubernetes.primaryCredentials.name}, ${providers.google.primaryCredentials.name}
+      primaryAccountTypes: ${providers.kubernetes.primaryCredentials.name}, ${providers.google.primaryCredentials.name}, ${providers.aws.primaryCredentials.name}
+      challengeDestructiveActionsEnvironments: ${providers.kubernetes.primaryCredentials.name}, ${providers.google.primaryCredentials.name}, ${providers.aws.primaryCredentials.name}
   spinnaker-local.yml: |
     global:
       spinnaker:
@@ -490,4 +510,14 @@ data:
           consul:
             enabled: {{ $account.consul.enabled }}
         {{- end }}
+    {{- end }}
+    {{- if .Values.providers.aws.enabled }}
+    aws:
+      enabled: true
+      defaultRegion: {{ first .Values.providers.aws.defaultRegions }}
+      defaultIAMRole: {{ .Values.providers.aws.defaultIAMRole }}
+      primaryCredentials:
+        name: default
+
+      defaultKeyPairTemplate: {{ .Values.providers.aws.defaultKeyPairTemplate }}
     {{- end }}

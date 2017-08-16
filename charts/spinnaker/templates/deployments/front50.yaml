@@ -28,7 +28,7 @@ spec:
             - mountPath: /opt/spinnaker/config
               name: {{ template "fullname" . }}-spinnaker-config
             - mountPath: /root/.aws
-              name: {{ template "fullname" . }}-s3-config
+              name: {{ template "fullname" . }}-minio-config
             {{ if .Values.gcs.enabled }}
             - mountPath: /root/.kube
               name: {{ template "fullname" . }}-gcs
@@ -43,9 +43,9 @@ spec:
         - name: {{ template "fullname" . }}-spinnaker-config
           configMap:
             name: {{ template "fullname" . }}-spinnaker-config
-        - name: {{ template "fullname" . }}-s3-config
+        - name: {{ template "fullname" . }}-minio-config
           configMap:
-            name: {{ template "fullname" . }}-s3-config
+            name: {{ template "fullname" . }}-minio-config
         {{ if .Values.gcs.enabled }}
         - name: {{ template "fullname" . }}-gcs
           secret:
