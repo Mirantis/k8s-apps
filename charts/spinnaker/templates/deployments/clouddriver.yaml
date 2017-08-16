@@ -35,7 +35,7 @@ spec:
             {{ end }}
             {{ if .Values.providers.aws.enabled }}
             - mountPath: /root/.aws
-              name: {{ template "fullname" . }}-aws-test
+              name: {{ template "fullname" . }}-aws
             {{ end }}
           readinessProbe:
             httpGet:
@@ -56,7 +56,7 @@ spec:
             secretName: {{ template "fullname" . }}-google
         {{ end }}
         {{ if .Values.providers.aws.enabled }}
-        - name: {{ template "fullname" . }}-aws-test
+        - name: {{ template "fullname" . }}-aws
           configMap:
-            name: {{ template "fullname" . }}-aws-test
+            name: {{ template "fullname" . }}-aws
         {{ end }}
