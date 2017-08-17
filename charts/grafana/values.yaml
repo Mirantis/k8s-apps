@@ -54,8 +54,6 @@ prometheus:
 # Set datasource in beginning
 setDatasource:
   ## If true, an initial Grafana Datasource will be set
-  ## Default: false
-  ##
   enabled: true
 
   ## How long should it take to commit failure
@@ -87,6 +85,13 @@ logCollector:
   # external logstash hosts
   logstashHost:
     - "" # host:port Ex: "logstash-logstash:5043"
+
+dashboards:
+  # Specify dashboards that will be uploaded
+  cassandra: false
+  kafka: false
+  spark: false
+  zookeeper: false
 
 ## Grafana config file ConfigMap entry
 ##

@@ -6,8 +6,8 @@ metadata:
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: {{ template "fullname" . }}
-  name: {{ template "fullname" . }}-set-datasource
+    app: {{ template "grafana.fullname" . }}
+  name: {{ template "grafana.fullname" . }}-set-datasource
 spec:
   activeDeadlineSeconds: 300
   template:
@@ -15,19 +15,21 @@ spec:
       labels:
         release: "{{ .Release.Name }}"
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-        app: {{ template "fullname" . }}
+        app: {{ template "grafana.fullname" . }}
     spec:
       containers:
       - name: set-datasource
         image: "{{ .Values.setDatasource.image.repository }}{{ .Values.setDatasource.image.name }}:{{ .Values.setDatasource.image.tag }}"
         imagePullPolicy: {{ .Values.setDatasource.image.pullPolicy }}
         args:
-          - "http://{{ .Values.adminUser }}:{{ .Values.adminPassword }}@{{ template "fullname" . }}:{{ .Values.port }}/api/datasources"
+          - "http://{{ .Values.adminUser }}:{{ .Values.adminPassword }}@{{ template "grafana.fullname" . }}:{{ .Values.port }}/api/datasources"
           - "-X"
           - POST
           - "-H"
           - "Content-Type: application/json;charset=UTF-8"
           - "--data-binary"
           - {{ template "prometheus-datasource" . }}
+          - "--max-time"
+          - "10"
       restartPolicy: {{ .Values.setDatasource.restartPolicy }}
 {{- end -}}

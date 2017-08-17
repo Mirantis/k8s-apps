@@ -1,9 +1,9 @@
-{{- define "fullname" -}}
+{{- define "grafana.fullname" -}}
 {{- printf "grafana-%s" .Release.Name  | trunc 55 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "grafana-address" -}}
-{{ template "fullname" . }}:{{ .Values.port }}
+{{ template "grafana.fullname" . }}:{{ .Values.port }}
 {{- end -}}
 
 {{- define "prometheus-datasource" -}}

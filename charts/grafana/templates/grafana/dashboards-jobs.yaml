@@ -1,0 +1,46 @@
+{{- $serviceName := include "grafana.fullname" . -}}
+{{- range $dashboard, $enabled := .Values.dashboards }}
+{{ if $enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    heritage: "{{ $.Release.Service }}"
+    release: "{{ $.Release.Name }}"
+    chart: "{{ $.Chart.Name }}-{{ $.Chart.Version }}"
+    app: {{ $serviceName }}
+  name: {{ $serviceName }}-{{ $dashboard }}-dashboard
+spec:
+  activeDeadlineSeconds: 300
+  template:
+    metadata:
+      labels:
+        release: "{{ $.Release.Name }}"
+        chart: "{{ $.Chart.Name }}-{{ $.Chart.Version }}"
+        app: {{ $serviceName }}
+    spec:
+      containers:
+      - name: add-dashboard
+        image: "{{ $.Values.setDatasource.image.repository }}{{ $.Values.setDatasource.image.name }}:{{ $.Values.setDatasource.image.tag }}"
+        imagePullPolicy: {{ $.Values.image.pullPolicy }}
+        args:
+          - "http://{{ $.Values.adminUser }}:{{ $.Values.adminPassword }}@{{ $serviceName }}:{{ $.Values.port }}/api/dashboards/db"
+          - "-X"
+          - POST
+          - "-H"
+          - "Content-Type: application/json"
+          - "-d"
+          - "@/etc/dashboards/{{ $dashboard }}.json"
+          - "--max-time"
+          - "10"
+        volumeMounts:
+          - name: dashboards
+            mountPath: /etc/dashboards
+      volumes:
+        - name: dashboards
+          configMap:
+            name: {{ $serviceName }}-dashboards
+      restartPolicy: {{ $.Values.setDatasource.restartPolicy }}
+---
+{{- end }}
+{{- end }}
