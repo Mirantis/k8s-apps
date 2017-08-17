@@ -92,6 +92,7 @@ dashboards:
   kafka: false
   spark: false
   zookeeper: false
+  istio: false
 
 ## Grafana config file ConfigMap entry
 ##
