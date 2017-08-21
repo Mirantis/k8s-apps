@@ -1,0 +1,30 @@
+apiVersion: apps/v1beta1 
+kind: Deployment
+metadata:
+  name: "{{ .Values.Services.ElasticProxy.Name }}"
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    component: "{{.Release.Name}}-{{.Values.Services.ElasticProxy.Component}}"
+spec:
+  replicas: {{.Values.Services.ElasticProxy.Replicas | default 1}}
+  template:
+    metadata:
+      labels:
+        run: {{ .Values.Services.ElasticProxy.Name }}
+    spec:
+      containers:
+      - name: {{.Values.Services.ElasticProxy.Name | default "nignx"}}
+        image: "{{.Values.Services.ElasticProxy.Image}}:{{.Values.Services.ElasticProxy.ImageTag}}"
+        imagePullPolicy: {{.Values.Services.ElasticProxy.PullPolicy | default "IfNotPresent"}}
+        ports:
+        - containerPort: {{.Values.Services.ElasticProxy.ContainerPort | default 9200}}
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: {{ .Values.Services.ElasticProxy.Name }}

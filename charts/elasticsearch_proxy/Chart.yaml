@@ -1,0 +1,7 @@
+name: nginx_proxy_elasticsearch
+version: 1.7.9 
+description: |
+  Nginx based HTTP proxy for loadbalance traffic betweend elasticsearch nodes 
+keywords:
+- elasticsearch
+- nginx

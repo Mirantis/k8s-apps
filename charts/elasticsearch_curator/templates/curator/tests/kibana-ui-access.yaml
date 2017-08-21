@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ printf "kibana-ui-access-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
+  annotations:
+    helm.sh/hook: test-success
+spec:
+  containers:
+    - name: kibana-ui-access
+      image: appropriate/curl:latest
+      imagePullPolicy: IfNotPresent
+      command:
+        - curl
+        - "-f"
+        - {{ template "kib-fullname" . }}/app/kibana
+  restartPolicy: Never

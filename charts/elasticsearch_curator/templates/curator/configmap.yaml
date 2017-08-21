@@ -1,0 +1,100 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "curator-cm-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "curator-fullname" . }}
+data:
+  conf: |
+    client:
+      hosts:
+        - {{ .Values.elasticsearch.host }}
+      port: {{ .Values.elasticsearch.port }}
+      url_prefix:
+      use_ssl: False
+      certificate:
+      client_cert:
+      client_key:
+      ssl_no_validate: False
+      http_auth:
+      timeout: 30
+      master_only: False
+
+    logging:
+      loglevel: INFO
+      logfile:
+      logformat: default
+      blacklist: ['elasticsearch', 'urllib3']
+  actions: |
+    actions:
+      1:
+        action: close
+        description: "close logs"
+        options:
+          ignore_empty_list: True
+          disable_action: False 
+        filters:
+          - filtertype: pattern
+            kind: prefix
+            value: logstash
+          - filtertype: age
+            source: name
+            direction: older
+            timestring: '%Y.%m.%d'
+            unit: days
+            unit_count: 1
+            exclude:
+      2:
+        action: delete_indices 
+        description: "delete logs"
+        options:
+          ignore_empty_list: True
+          disable_action: False 
+        filters:
+          - filtertype: pattern
+            kind: prefix
+            value: logstash
+          - filtertype: age
+            source: name
+            direction: older
+            timestring: '%Y.%m.%d'
+            unit: days 
+            unit_count: 2
+            exclude:
+          - filtertype: opened
+            exclude: True
+      3:
+        action: close
+        description: "close other"
+        options:
+          ignore_empty_list: True
+          disable_action: False
+        filters:
+          - filtertype: age
+            source: name
+            direction: older
+            timestring: '%Y.%m.%d'
+            unit: days
+            unit_count: 2
+            exclude:
+          - filtertype: kibana
+            exclude: True
+      4:
+        action: delete_indices
+        description: "delete monitor logs"
+        options:
+          ignore_empty_list: True
+          disable_action: False 
+        filters:
+          - filtertype: age
+            source: name
+            direction: older
+            timestring: '%Y.%m.%d'
+            unit: days
+            unit_count: 3
+        exclude:
+          - filtertype: opened
+            exclude: True

@@ -1,0 +1,17 @@
+#not compleated
+name: "elastic-proxy" 
+
+image:
+  repository:
+  name: "nginx"
+  tag: "1.7.9"
+    Component: "elastic-proxy"
+    Cpu: "100m"
+    Memory: "512Mi"
+    ContainerPort: 9200
+    ExposedPort: 9200
+    Replicas: 1
+    ServiceType: NodePort #FIXME - only for local minikube
+    Nodes:
+      - elastic-node1
+      - elastic-node2

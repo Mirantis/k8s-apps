@@ -1,0 +1,34 @@
+apiVersion: v1 
+kind: ConfigMap
+metadata:
+  name: {{ .Values.Services.Elasticsearch.Name }}
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    component: "{{.Release.Name}}-{{.Values.Services.Elasticsearch.Component}}"
+data:
+  elasticsearch.yml: |- 
+    cluster.name: {{ .Values.Services.Elasticsearch.ClusterName | default "elastic" }}
+    bootstrap.memory_lock: true
+    xpack.security.enabled: false
+
+    discovery.type: zen
+    discovery.zen.minimum_master_nodes: 1
+    discovery.zen.ping.unicast.hosts: [
+        {{- $root := . -}}
+        {{- range .Values.Services.Elasticsearch.Nodes }}
+        {{ $root.Values.Services.Elasticsearch.Name }}-{{.}},
+        {{- end}}    
+    ] 
+    http.host: 0.0.0.0
+    transport.host: 0.0.0.0
+
+    node.data: true
+    node.master: true
+
+    gateway.expected_master_nodes: 2
+    gateway.expected_data_nodes: 1
+    gateway.recover_after_time: 5m
+    gateway.recover_after_master_nodes: 2
+    gateway.recover_after_data_nodes: 1

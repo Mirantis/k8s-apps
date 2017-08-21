@@ -1,0 +1,43 @@
+ports:
+ - targetPort: 8087
+ - targetPort: 8087
+   protocol: udp 
+ - targetPort: 2003
+ - targetPort: 8083
+
+replicas: 1
+
+environment_variables:
+  - name: INFLUXDB_GRAPHITE_ENABLED
+    value: "true"
+  - name: INFLUXDB_ADMIN_ENABLED
+    value: "true" 
+
+image:
+  repository: "registry.hub.docker.com/"
+  name: "influxdb"
+  tag: "1.3.3"
+  pullPolicy: "IfNotPresent"
+
+testImage:
+  repository: "mirantisworkloads/"
+  name: "test-base"
+  tag: "1.0.0"
+  pullPolicy: "IfNotPresent"
+
+# Configure resource requests and limits.
+resources:
+  #requests:
+  #  memory: "256Mi"
+  #  cpu: "250m"
+  #limits:
+    #cpu: "256Mi"
+    #memory: "250m"
+
+service:
+  type: "ClusterIP"
+  nodePort: ""
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  annotations: {}
+
