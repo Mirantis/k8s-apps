@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.Services.ElasticProxy.Name }}
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    component: "{{.Release.Name}}-{{.Values.Services.ElasticProxy.Component}}"
+    run: {{ .Values.Services.ElasticProxy.Name }} 
+spec:
+  type: {{ .Values.Services.ElasticProxy.ServiceType | default "ClusterIP" }}
+  ports:
+  - name: elasticsearch
+    protocol: TCP
+    port: {{.Values.Services.ElasticProxy.ExposedPort | default 9200}}
+    targetPort: {{.Values.Services.ElasticProxy.ContainerPort | default 9200}}
+  selector:
+    run: {{ .Values.Services.ElasticProxy.Name }}

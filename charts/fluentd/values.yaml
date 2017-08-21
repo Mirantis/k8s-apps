@@ -1,0 +1,42 @@
+ports:
+ - targetPort: 24224
+ - targetPort: 24224
+   protocol: udp
+
+replicas: 1
+
+environment_variables:
+  - name: FLUENTD_CONF 
+    value: "fluentd.conf"
+  - name: DOCKER_FLUENTD_REPLICAS 
+    value: 1 
+
+image:
+  repository: "registry.hub.docker.com/"
+  name: "fluentd"
+  tag: "0.14.20"
+  pullPolicy: "IfNotPresent"
+
+testImage:
+  repository: "mirantisworkloads/"
+  name: "test-base"
+  tag: "1.0.0"
+  pullPolicy: "IfNotPresent"
+
+# Configure resource requests and limits.
+resources:
+  #requests:
+  #  memory: "256Mi"
+  #  cpu: "250m"
+  #limits:
+    #cpu: "256Mi"
+    #memory: "250m"
+
+service:
+  type: "ClusterIP"
+  nodePort: ""
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  annotations: {}
+
+#configurations: {}

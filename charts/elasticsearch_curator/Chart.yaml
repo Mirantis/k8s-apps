@@ -1,0 +1,4 @@
+name: curator 
+version: 1.2.1
+description: |
+    Like a museum curator manages the exhibits and collections on display, Elasticsearch Curator helps you curate, or manage your indices.

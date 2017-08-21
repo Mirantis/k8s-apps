@@ -1,0 +1,54 @@
+{{- $root := . -}}
+{{- range .Values.Services.Elasticsearch.Nodes }}
+apiVersion: apps/v1beta1 
+kind: Deployment
+metadata:
+  name: "{{ $root.Values.Services.Elasticsearch.Name }}-{{.}}"
+  labels:
+    heritage: {{$root.Release.Service | quote }}
+    release: {{$root.Release.Name | quote }}
+    chart: "{{$root.Chart.Name}}-{{$root.Chart.Version}}"
+    component: "{{$root.Release.Name}}-{{$root.Values.Services.Elasticsearch.Component}}-{{.}}"
+spec:
+  replicas: {{$root.Values.Services.Elasticsearch.Replicas | default 1}}
+  template:
+    metadata:
+      labels:
+        run: "{{ $root.Values.Services.Elasticsearch.Name }}-{{.}}"
+    spec:
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+      - name: {{.}}
+        securityContext:
+          runAsUser: 1000
+        resources:
+          limits:
+            memory: {{$root.Values.Services.Elasticsearch.Memory}}
+          requests:
+            memory: {{$root.Values.Services.Elasticsearch.Memory}}
+        image: "{{$root.Values.Services.Elasticsearch.Image}}:{{$root.Values.Services.Elasticsearch.ImageTag}}"
+        imagePullPolicy: {{$root.Values.Services.Elasticsearch.PullPolicy | default "IfNotPresent"}}
+        ports:
+        - containerPort: {{$root.Values.Services.Elasticsearch.ContainerPort | default 9200}}
+        volumeMounts:
+        - name: elastic-config
+          mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+          subPath: elasticsearch.yml
+        - name: elastic-data
+          mountPath: /usr/share/elasticsearch/data
+        env:
+        - name: ES_JAVA_OPTS
+          value: "-Xms{{ $root.Values.Services.Elasticsearch.HeapSize }} -Xmx{{ $root.Values.Services.Elasticsearch.HeapSize }}"
+      volumes:
+        - name: elastic-config
+          configMap:
+            name: {{ $root.Values.Services.Elasticsearch.Name }}
+        #FIXME - local volume moount only for lab
+        - name: elastic-data
+          emptyDir: {}
+          #hostPath:
+          #  path: {{$root.Values.Services.Elasticsearch.DataOverallPath}}/{{.}}
+---
+{{- end}}

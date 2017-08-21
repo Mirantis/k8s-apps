@@ -1,0 +1,32 @@
+apiVersion: v1 
+kind: ConfigMap
+metadata:
+  name: "{{ .Values.Services.ElasticProxy.Name }}"
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    component: "{{.Release.Name}}-{{.Values.Services.ElasticProxy.Component}}"
+data:
+  nginx.conf: |-
+    events {
+      worker_connections  1024;
+    }
+    http {
+      upstream elasticsearch {
+        {{- $root := . -}}
+        {{- range .Values.Services.Elasticsearch.Nodes }}
+        server {{ $root.Values.Services.Elasticsearch.Name }}-{{.}}:9200;
+        {{- end}} 
+        keepalive 15;
+      } 
+      server {
+        listen 9200;
+        location / {
+          proxy_pass http://elasticsearch;
+          proxy_http_version 1.1;
+          proxy_set_header Connection "Keep-Alive";
+          proxy_set_header Proxy-Connection "Keep-Alive";
+        }
+      }
+    }

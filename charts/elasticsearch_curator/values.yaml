@@ -1,0 +1,39 @@
+replicas: 1
+
+# The Elasticsearch instance to use for all your queries.
+elasticsearch:
+  host: "" # elasticsearch cluster svc name, e.g. elasticsearch-elasticsearch
+  port: 9200
+
+environment_variables:
+  - name: INTERVAL_IN_HOURS 
+    value: 1 
+
+image:
+  repository: "github.com/inthuriel/"
+  name: "docker-elasticsearch-curator"
+  tag: "5.1.1"
+  pullPolicy: "IfNotPresent"
+
+testImage:
+  repository: "mirantisworkloads/"
+  name: "test-base"
+  tag: "1.0.0"
+  pullPolicy: "IfNotPresent"
+
+# Configure resource requests and limits.
+resources:
+  #requests:
+  #  memory: "256Mi"
+  #  cpu: "250m"
+  #limits:
+    #cpu: "256Mi"
+    #memory: "250m"
+
+service:
+  type: "ClusterIP"
+  nodePort: ""
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  annotations: {}
+
