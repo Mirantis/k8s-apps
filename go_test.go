@@ -130,10 +130,10 @@ func RunImage(t *testing.T, image string) {
 
 func RunCharts(t *testing.T) {
 	artifacts := DiscoverArtifacts(t, "charts")
-	for range [2]struct{}{} {
+	for i, _ := range [2]struct{}{} {
 		for _, chart := range artifacts {
 			chartDir := path.Join(*repoPathPtr, chart)
-			res := RunCmdTest(t, "dependencies", helmCmd, "dependency", "update", chartDir)
+			res := RunCmdTest(t, fmt.Sprintf("dependencies/%s/iteration_%d", chart, i+1), helmCmd, "dependency", "update", chartDir)
 			if !res {
 				t.Fatalf("Failed to update dependencies")
 			}
