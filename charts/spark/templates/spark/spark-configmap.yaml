@@ -7,6 +7,16 @@ metadata:
     release: {{ .Release.Name | quote }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
 data:
+  {{ if .Values.configs.sparkDefaults }}
+  spark-defaults.conf: |+
+    # spark-defaults.conf configs
+    {{ .Values.configs.sparkDefaults | indent 4 | trim }}
+  {{ end }}
+  {{ if .Values.configs.sparkEnv }}
+  spark-env.sh: |+
+    # spark-env.sh configs
+    {{ .Values.configs.sparkEnv | indent 4 | trim }}
+  {{ end }}
   log4j.properties: |-
     log4j.rootLogger=INFO, file, console
 
