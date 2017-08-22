@@ -1,4 +1,3 @@
-{{- if .Values.zeppelin.enabled -}}
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -7,7 +6,7 @@ metadata:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    app: {{ template "zeppelin-fullname" . }}
+    app: {{ template "zeppelin.fullname" . }}
 data:
   filebeat-yml: |-
     filebeat.prospectors:
@@ -24,4 +23,3 @@ data:
     path:
       data: "/usr/share/filebeat/data"
       home: "/usr/share/filebeat"
-{{- end -}}

@@ -1,13 +1,12 @@
-{{- if .Values.zeppelin.enabled -}}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "zeppelin-fullname" . }}
+  name: {{ template "zeppelin.fullname" . }}
   labels:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: {{ template "zeppelin-fullname" . }}
+    app: {{ template "zeppelin.fullname" . }}
 spec:
   replicas: 1
   template:
@@ -15,19 +14,21 @@ spec:
       labels:
         release: {{ .Release.Name | quote }}
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-        app: {{ template "zeppelin-fullname" . }}
+        app: {{ template "zeppelin.fullname" . }}
     spec:
       containers:
         - name: zeppelin
-          image: {{ .Values.zeppelin.image.repository }}{{ .Values.zeppelin.image.name }}:{{ .Values.zeppelin.image.tag }}
-          imagePullPolicy: {{ .Values.zeppelin.image.pullPolicy }}
+          image: {{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             - zeppelin.sh
+          {{- if .Values.spark.enabled }}
           env:
             - name: MASTER
-              value: spark://{{ template "spark-address" . }}
+              value: {{ template "zeppelin.spark-address" . }}
+          {{- end }}
           resources:
-{{ toYaml .Values.zeppelin.resources | indent 12 }}
+{{ toYaml .Values.resources | indent 12 }}
           {{- if .Values.logCollector.enabled }}
           volumeMounts:
             - name: logdir
@@ -61,4 +62,3 @@ spec:
         - name: logdir
           emptyDir: {}
       {{- end }}
-{{- end -}}

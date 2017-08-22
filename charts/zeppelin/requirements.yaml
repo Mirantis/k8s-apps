@@ -1,0 +1,5 @@
+dependencies:
+- name: spark
+  version: ^2.x
+  repository: https://mirantisworkloads.storage.googleapis.com/
+  condition: spark.deployChart

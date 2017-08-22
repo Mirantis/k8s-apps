@@ -15,10 +15,6 @@ Expand the name of the chart.
 {{- printf "spark-worker-%s" .Release.Name | trunc 55 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "zeppelin-fullname" -}}
-{{- printf "zeppelin-%s" .Release.Name | trunc 55 | trimSuffix "-" -}}
-{{- end -}}
-
 {{- define "spark-address" -}}
 {{- $ctx := . -}}
 {{- range $i, $e := until (int .Values.spark.master.replicas) -}}
@@ -28,10 +24,6 @@ Expand the name of the chart.
     {{- template "master-fullname" $ctx -}}
     {{- printf ":%d" (int $ctx.Values.spark.master.rpcPort) -}}
 {{- end -}}
-{{- end -}}
-
-{{- define "zeppelin-address" -}}
-{{ template "zeppelin-fullname" . }}:{{ .Values.zeppelin.port }}
 {{- end -}}
 
 {{- define "zk-address" -}}

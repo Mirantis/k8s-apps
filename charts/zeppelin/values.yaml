@@ -1,0 +1,45 @@
+# Default values for zeppelin.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  repository: mirantisworkloads/
+  name: zeppelin
+  tag: 0.7.3-SNAPSHOT
+  pullPolicy: IfNotPresent
+port: 8080
+resources:
+  #requests:
+  #  cpu: "100m"
+  #  memory: "512Mi"
+
+spark:
+  enabled: true
+  deployChart: true
+  externalAddress: ""
+
+ingress:
+  enabled: false
+  hosts: []
+  tls:
+    enabled: false
+    secretName: ""
+  annotations: {}
+
+logCollector:
+  enabled: false
+  image:
+    repository: mirantisworkloads/
+    name: filebeat
+    tag: 5.2.2
+    pullPolicy: IfNotPresent
+  # external logstash hosts
+  logstashHost:
+    - "" # host:port
+
+service:
+  type: NodePort # or ClusterIP or LoadBalancer
+  nodePort: null
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  annotations: {}

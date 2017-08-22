@@ -1,9 +1,8 @@
 # Apache Spark Helm Chart
 
-Apache Spark is a fast and general-purpose cluster computing system including Apache Zeppelin.
+Apache Spark is a fast and general-purpose cluster computing system.
 
 * http://spark.apache.org/
-* https://zeppelin.apache.org/
 
 Inspired from Helm Classic chart https://github.com/helm/charts
 
@@ -12,7 +11,6 @@ This chart will do the following:
 
 * 1 x Spark Master with port 8080 exposed on an external LoadBalancer
 * 3 x Spark Workers with HorizontalPodAutoscaler to scale to max 10 pods when CPU hits 50% of 100m
-* 1 x Zeppelin with port 8080 exposed on an external LoadBalancer
 * All using Kubernetes Deployments
 
 ## Prerequisites
@@ -71,21 +69,6 @@ The following tables lists the configurable parameters of the Spark chart and th
 | `Worker.CpuTargetPercentage` | k8s hpa cpu targetPercentage       | `50`                                                       |
 | `Worker.DaemonMemory`        | Worker JVM Xms and Xmx setting     | `1g`                                                       |
 | `Worker.ExecutorMemory`      | Worker memory available for executor | `1g`                                                       |
-
-
-
-### Zeppelin
-
-|       Parameter         |           Description            |                         Default                          |
-|-------------------------|----------------------------------|----------------------------------------------------------|
-| `Zeppelin.Name`         | Zeppelin name                    | `zeppelin-controller`                                    |
-| `Zeppelin.Image`        | Container image name             | `gcr.io/google_containers/zeppelin`                      |
-| `Zeppelin.ImageTag`     | Container image tag              | `v0.5.5_v2`                                              |
-| `Zeppelin.Replicas`     | k8s deployment replicas          | `1`                                                      |
-| `Zeppelin.Component`    | k8s selector key                 | `zeppelin`                                               |
-| `Zeppelin.Cpu`          | container requested cpu          | `100m`                                                   |
-| `Zeppelin.ServicePort`  | k8s service port                 | `8080`                                                   |
-| `Zeppelin.ContainerPort`| Container listening port         | `8080`                                                   |
 
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
