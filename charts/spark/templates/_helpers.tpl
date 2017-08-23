@@ -7,10 +7,6 @@ Expand the name of the chart.
 {{- printf "spark-master-%s" .Release.Name | trunc 55 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "master-external" -}}
-{{- printf "spark-master-ext-%s" .Release.Name | trunc 55 | trimSuffix "-" -}}
-{{- end -}}
-
 {{- define "worker-fullname" -}}
 {{- printf "spark-worker-%s" .Release.Name | trunc 55 | trimSuffix "-" -}}
 {{- end -}}
@@ -20,9 +16,7 @@ Expand the name of the chart.
 {{- range $i, $e := until (int .Values.spark.master.replicas) -}}
     {{- if $i }},{{- end -}}
     {{- template "master-fullname" $ctx -}}
-    {{- printf "-%d." $i -}}
-    {{- template "master-fullname" $ctx -}}
-    {{- printf ":%d" (int $ctx.Values.spark.master.rpcPort) -}}
+    {{- printf "-%d:%d" $e (int $ctx.Values.spark.master.rpcPort) -}}
 {{- end -}}
 {{- end -}}
 

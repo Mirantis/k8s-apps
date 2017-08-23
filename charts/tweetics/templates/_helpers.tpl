@@ -38,9 +38,7 @@
         {{- range $i, $e := until (int .Values.spark.spark.master.replicas) -}}
             {{- if $i }},{{- end -}}
             {{- template "master-fullname" $ctx -}}
-            {{- printf "-%d." $i -}}
-            {{- template "master-fullname" $ctx -}}
-            {{- printf ":%d" (int $ctx.Values.spark.spark.master.rpcPort) -}}
+            {{- printf "-%d:%d" $i (int $ctx.Values.spark.spark.master.rpcPort) -}}
         {{- end -}}
     {{- else -}}
         {{- printf "%s" .Values.spark.externalAddress -}}

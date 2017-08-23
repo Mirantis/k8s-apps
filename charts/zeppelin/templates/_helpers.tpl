@@ -14,9 +14,7 @@ Expand the name of the chart.
     {{- range $i, $e := until (int .Values.spark.spark.master.replicas) -}}
         {{- if $i }},{{- end -}}
         {{- printf "spark-master-%s" $.Release.Name | trunc 55 | trimSuffix "-" -}}
-        {{- printf "-%d." $i -}}
-        {{- printf "spark-master-%s" $.Release.Name | trunc 55 | trimSuffix "-" -}}
-        {{- printf ":%d" (int $ctx.Values.spark.spark.master.rpcPort) -}}
+        {{- printf "-%d:%d" $i (int $ctx.Values.spark.spark.master.rpcPort) -}}
     {{- end -}}
 {{- else -}}
     {{- printf "spark://%s" .Values.spark.externalAddress -}}
