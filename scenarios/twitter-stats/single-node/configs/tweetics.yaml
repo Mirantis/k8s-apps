@@ -11,7 +11,7 @@ kafka:
 
 spark:
   deployChart: false
-  externalAddress: spark-master-${TS_SPARK_RELEASE}-0.spark-master-${TS_SPARK_RELEASE}:7077
+  externalAddress: spark-master-${TS_SPARK_RELEASE}-0:7077
 
 storage: ${TS_STORAGE}
 
