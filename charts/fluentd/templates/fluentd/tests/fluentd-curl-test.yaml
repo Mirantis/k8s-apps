@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ printf "fluentd-api-test-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
+  annotations:
+    helm.sh/hook: test-success
+spec:
+  containers:
+    - name: fluentd-api-test
+      image: appropriate/curl:latest
+      imagePullPolicy: IfNotPresent
+      command:
+        - curl
+        - "-f"
+        - {{ template "fluent-fullname" . }}:{{ .Values.ports.monitoring.port }}/api/plugins.json
+  restartPolicy: Never
