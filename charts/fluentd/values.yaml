@@ -1,0 +1,44 @@
+ports:
+ fluent:
+   port: 24224
+ monitoring:
+   port: 24220
+
+replicas: 1
+
+environment_variables:
+  - name: FLUENTD_CONF
+    value: "fluentd.conf"
+
+image:
+  repository: ""
+  name: "fluent/fluentd"
+  tag: "v0.14.20"
+  pullPolicy: "IfNotPresent"
+
+elasticsearch:
+  # if disabled, subchart will not be deployed
+  deployChart: true
+  # this address will be used if subchart deployment is disabled
+  externalAddress: ""
+
+testImage:
+  repository: "mirantisworkloads/"
+  name: "test-base"
+  tag: "1.0.0"
+  pullPolicy: "IfNotPresent"
+
+# Configure resource requests and limits.
+resources:
+  #requests:
+  #  memory: "256Mi"
+  #  cpu: "250m"
+  #limits:
+    #cpu: "256Mi"
+    #memory: "250m"
+
+configurations: {}
+
+service:
+  type: "NodePort"
+  annotations: {}

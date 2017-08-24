@@ -1,0 +1,61 @@
+{{ $url := include "elasticsearch-url" . }}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fluent-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "fluent-fullname" . }}
+spec:
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      name: {{ template "fluent-fullname" . }}
+      labels:
+        heritage: {{ .Release.Service | quote }}
+        release: {{ .Release.Name | quote }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "fluent-fullname" . }}
+      annotations:
+        pod.beta.kubernetes.io/init-containers: '[
+          {
+              "name": "wait-for-es",
+              "image": "{{ .Values.testImage.repository }}{{ .Values.testImage.name }}:{{ .Values.testImage.tag }}",
+              "imagePullPolicy": {{ .Values.testImage.pullPolicy | quote }},
+              "command": ["sh", "-c", "until [ $(curl -o /dev/null --silent -f {{ $url }}/; echo $?) -eq 0 ]; do sleep 10; done"]
+          }
+        ]'
+    spec:
+      containers:
+      - name: fluentd
+        image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        command:
+          - fluentd
+        env:
+          - name: DOCKER_FLUENTD_REPLICAS
+            value: "{{ .Values.replicas  }}"
+{{ toYaml .Values.environment_variables | indent 10 }}
+        ports:
+        {{- range $name, $settings := .Values.ports }}
+         - containerPort: {{ $settings.port }}
+           name: '{{ $name | trunc 15 | trimSuffix "-" }}'
+        {{- end }}
+        volumeMounts:
+          - name: default-config
+            mountPath: /etc/fluent
+      volumes:
+      - name: default-config
+        configMap:
+          name: {{ template "fluent-cm-fullname" . }}
+          items:
+            - key: fluentd-conf
+              path: fluent.conf
+            {{- range $name, $content := .Values.configurations }}
+            - key: {{ $name }}
+              path: {{ $name }}.conf
+            {{- end}}

@@ -1,0 +1,4 @@
+name: fluentd
+version: 1.0.0
+description: |
+    Fluentd is an open source data collector for unified logging layer.
