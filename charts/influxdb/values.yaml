@@ -1,0 +1,68 @@
+ports:
+  default:
+    port: 8088
+  http:
+    port: 8087
+    nodePort: 30807
+  defaultUdp:
+    port: 8087
+    protocol: udp
+  graphite:
+    port: 2003
+
+replicas: 1
+
+environment_variables:
+  - name: INFLUXDB_GRAPHITE_ENABLED
+    value: "true"
+  - name: INFLUXDB_ADMIN_ENABLED
+    value: "true"
+
+image:
+  repository: ""
+  name: "influxdb"
+  tag: "1.3.4"
+  pullPolicy: "IfNotPresent"
+
+testImage:
+  repository: "mirantisworkloads/"
+  name: "test-base"
+  tag: "1.0.0"
+  pullPolicy: "IfNotPresent"
+
+# Configure additional databases and listen interfaces for them
+additionalDatabasesInterfacesConfigs:
+  #sample collectd config
+  #definition
+  collectd:
+    #standard values
+    enabled: "false"
+    port: 25826
+    database: "collectd"
+    #additional values
+    additionalValues: |
+      retention-policy = ""
+      consistency-level = "one"
+      batch-size = 5000
+      batch-pending = 10
+      batch-timeout = "10s"
+      read-buffer = 0
+      typesdb = "/usr/share/collectd/types.db"
+      security-level = "none"
+      auth-file = "/etc/collectd/auth_file"
+
+# Configure resource requests and limits.
+resources:
+  #requests:
+  #  memory: "256Mi"
+  #  cpu: "250m"
+  #limits:
+    #cpu: "256Mi"
+    #memory: "250m"
+
+service:
+  type: "NodePort"
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  annotations: {}
+

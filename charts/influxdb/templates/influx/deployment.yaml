@@ -1,0 +1,47 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "influx-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "influx-fullname" . }}
+spec:
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      name: {{ template "influx-fullname" . }}
+      labels:
+        heritage: {{ .Release.Service | quote }}
+        release: {{ .Release.Name | quote }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "influx-fullname" . }}
+    spec:
+      containers:
+      - name: influx
+        image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        env:
+{{ toYaml .Values.environment_variables | indent 10 }}
+        ports:
+        {{- range $name, $settings := .Values.ports }}
+         - containerPort: {{ $settings.port }}
+           name: '{{ $name | lower | trunc 15 | trimSuffix "-" }}'
+        {{- end }}
+        {{- range $name, $values := .Values.additionalDatabasesInterfacesConfigs }}
+         - containerPort: {{ $values.port }}
+           name: '{{ $name | lower | trunc 15 | trimSuffix "-" }}'
+        {{- end }}
+        volumeMounts:
+          - name: config
+            mountPath: /etc/influxdb
+      volumes:
+      - name: config
+        configMap:
+          name: {{ template "influx-cm-fullname" . }}
+          items:
+            - key: influx-conf
+              path: influxdb.conf

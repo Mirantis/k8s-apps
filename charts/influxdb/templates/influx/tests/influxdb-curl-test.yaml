@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ printf "influx-api-reposnse-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
+  annotations:
+    helm.sh/hook: test-success
+spec:
+  containers:
+    - name: influxdb-api-reposnse
+      image: "{{ .Values.testImage.repository }}{{ .Values.testImage.name }}:{{ .Values.testImage.tag }}"
+      imagePullPolicy: {{ .Values.testImage.pullPolicy | quote }}
+      command:  ["curl", "-f", "{{ template "influx-fullname" . }}:{{ .Values.ports.http.port  }}/ping"]
+  restartPolicy: Never

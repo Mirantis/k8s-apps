@@ -43,7 +43,7 @@ spec:
         ports:
         {{- range $name, $settings := .Values.ports }}
          - containerPort: {{ $settings.port }}
-           name: '{{ $name | trunc 15 | trimSuffix "-" }}'
+           name: '{{ $name | lower | trunc 15 | trimSuffix "-" }}'
         {{- end }}
         volumeMounts:
           - name: default-config

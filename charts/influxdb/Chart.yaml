@@ -1,0 +1,4 @@
+name: influxdb
+version: 1.0.0
+description: |
+   InfluxDB is an open source time series database for recording metrics, events, and analytics.

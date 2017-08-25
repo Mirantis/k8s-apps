@@ -18,7 +18,7 @@ spec:
   ports:
     {{- $fluent_fullname := include "fluent-fullname" . -}}
     {{- range $name, $settings := .Values.ports }}
-    - name: '{{ $fluent_fullname }}-{{ $name }}-{{ default "default" $settings.targetPort}}-{{ default "tcp" $settings.protocol | lower }}'
+    - name: '{{ $fluent_fullname }}-{{ $name | lower }}-{{ $settings.port}}-{{ default "tcp" $settings.protocol | lower }}'
       port: {{ $settings.port }}
       protocol: {{ default "tcp" $settings.protocol | upper }}
       {{- if $settings.nodePort }}
