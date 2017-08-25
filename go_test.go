@@ -13,8 +13,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"gopkg.in/yaml.v2"
 )
 
 func LookupEnvDefault(key string, def string) string {
@@ -38,10 +36,10 @@ var (
 	imageRepoPtr       = flag.String("image-repo", "127.0.0.1:5000", "Image repo address for test")
 	pushRepoPtr        = flag.String("push-repo", "mirantisworkloads", "Image repo address for push")
 	buildImagesOptsPtr = flag.String("build-images-opts", "", "Docker opts for building images")
-	verifyVersion = flag.Bool("verify-version", false, "Run tests to verify new helm/k8s version")
-	remoteCluster = flag.String("remote-cluster", "127.0.0.1", "Cluster IP if remote kubernetes cluster is used")
-	verifyIngress = flag.Bool("verify-ingress", false, "Ensure ingress is working correctly")
-	ingressSvc    = flag.String("ingress-svc", "", "Ingress service host:port to connect the ingress resource")
+	verifyVersion      = flag.Bool("verify-version", false, "Run tests to verify new helm/k8s version")
+	remoteCluster      = flag.String("remote-cluster", "127.0.0.1", "Cluster IP if remote kubernetes cluster is used")
+	verifyIngress      = flag.Bool("verify-ingress", false, "Ensure ingress is working correctly")
+	ingressSvc         = flag.String("ingress-svc", "", "Ingress service host:port to connect the ingress resource")
 	helmCmd            = LookupEnvDefault("HELM_CMD", "helm")
 	kubectlCmd         = LookupEnvDefault("KUBECTL_CMD", "kubectl")
 )
@@ -316,42 +314,6 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 		}
 	}
 
-	imageParams := []string{}
-	valuesData, err := ioutil.ReadFile(path.Join(chartDir, "values.yaml"))
-	if err != nil {
-		t.Fatalf("Failed to read values.yaml for %s chart", chart)
-	}
-	values := make(map[interface{}]interface{})
-	err = yaml.Unmarshal(valuesData, &values)
-	if err != nil {
-		t.Fatalf("Error parsing values.yaml file")
-	}
-	image := values["image"]
-	if image != nil {
-		img, ok := image.(map[interface{}]interface{})
-		if !ok {
-			t.Fatalf("Incorrect image section\n%+v", image)
-		}
-		if img["repository"].(string) == "mirantisworkloads/" {
-			imageParams = append(imageParams, fmt.Sprintf("image.repository=%s/", *imageRepoPtr))
-		}
-	}
-	for key, item := range values {
-		value, ok := item.(map[interface{}]interface{})
-		if ok {
-			image = value["image"]
-			if image != nil {
-				img, ok := image.(map[interface{}]interface{})
-				if !ok {
-					t.Fatalf("Incorrect image section\n%+v", image)
-				}
-				if img["repository"].(string) == "mirantisworkloads/" {
-					imageParams = append(imageParams, fmt.Sprintf("%s.image.repository=%s/", key, *imageRepoPtr))
-				}
-			}
-		}
-	}
-
 	createNsResult := RunCmdTest(t, "create_ns", kubectlCmd, "create", "ns", ns)
 	if createNsResult {
 		defer RunCmdTest(t, "delete_ns", kubectlCmd, "delete", "ns", ns)
@@ -386,9 +348,6 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 	installArgs := []string{helmCmd, "--tiller-namespace", ns, "--home", helmHome, "install", chartDir, "--namespace", ns, "--name", rel, "--wait", "--timeout", "600"}
 	if config != "" {
 		installArgs = append(installArgs, "--values", config)
-	}
-	if len(imageParams) > 0 {
-		installArgs = append(installArgs, "--set", strings.Join(imageParams, ","))
 	}
 	installResult := RunCmdTest(t, "install", installArgs...)
 
