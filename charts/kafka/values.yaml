@@ -9,6 +9,17 @@ probeInitialDelaySeconds: 15
 probeTimeoutSeconds: 5
 port: 9092
 
+# You can pass custom config files here. Default configs will be used otherwise.
+# Note, that the following configs will be overriden:
+# - broker.id
+# - zookeeper.connect
+# - advertised.listeners
+# - listeners
+# - log.dirs
+configFiles:
+  #server.properties: |
+  #  zookeeper.connection.timeout.ms=10000
+
 image:
   repository: mirantisworkloads/
   name: kafka
@@ -55,4 +66,3 @@ logCollector:
   # external logstash hosts
   logstashHost:
     - "" # host:port
-  

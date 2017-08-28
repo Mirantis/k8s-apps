@@ -126,6 +126,13 @@ spec:
           initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
           timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
         volumeMounts:
+        {{- if .Values.configFiles  }}
+        {{- range $name, $content := .Values.configFiles  }}
+        - name: configs
+          mountPath: /opt/kafka/config/{{ $name }}
+          subPath: {{ $name }}
+        {{- end  }}
+        {{- end  }}
         {{- if .Values.prometheusExporter.enabled }}
         - name: kafka-jmx
           mountPath: /opt/kafka/configmap
@@ -154,10 +161,15 @@ spec:
           - "\"*\""
       {{- end }}
       volumes:
+      {{- if .Values.configFiles  }}
+      - name: configs
+        configMap:
+          name: {{ template "kafka-fullname" . }}
+      {{- end  }}
       {{- if .Values.prometheusExporter.enabled }}
       - name: kafka-jmx
         configMap:
-          name: jmx-{{ template "kafka-fullname" . }}
+          name: {{ printf "kafka-jmx-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
       {{- end }}
       {{- if eq .Values.persistence.type "emptyDir" }}
       - name: datadir
