@@ -1,0 +1,4 @@
+name: etcd
+version: 0.1.0
+description: Distributed reliable key-value store for the most critical data of a
+  distributed system.
