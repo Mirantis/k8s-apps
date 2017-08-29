@@ -80,21 +80,21 @@ def _start_mongo(command):
 
 
 def start_shard(port):
-    command = ("mongod --logpath /var/log/mongodb/mongo.log --shardsvr"
-               " --replSet shard --port %d") % port
-    return _start_mongo(command)
+    command = ("mongod --config /etc/mongo/mongo.conf --replSet shard"
+               " --logpath /var/log/mongodb/mongo.log --shardsvr --port %d")
+    return _start_mongo(command % port)
 
 
 def start_configsvr(port):
-    command = ("mongod --logpath /var/log/mongodb/mongo.log --configsvr"
-               " --replSet config --port %d") % port
-    return _start_mongo(command)
+    command = ("mongod --config /etc/mongo/mongo.conf --replSet config"
+               " --logpath /var/log/mongodb/mongo.log --configsvr --port %d")
+    return _start_mongo(command % port)
 
 
 def start_router(port, configdb_address):
-    command = ("mongos --logpath /var/log/mongodb/mongo.log"
-               " --configdb config/%s --port %d") % (configdb_address, port)
-    return _start_mongo(command)
+    command = ("mongos  --config /etc/mongo/mongo.conf  --configdb config/%s"
+               " --logpath /var/log/mongodb/mongo.log --port %d")
+    return _start_mongo(command % (configdb_address, port))
 
 
 def init_replicaset(master_address, replicaset):

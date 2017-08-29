@@ -4,21 +4,27 @@
 image:
   repository: mirantisworkloads/
   name: mongodb
-  tag: "3.4-r6"
+  tag: "3.4-r7"
   pullPolicy: IfNotPresent
 
 configServer:
   replicas: 3
   port: 27019
+  # additional parameters for mongo-configsvr
+  config:
 
 shard:
   replicas: 3
   port: 27019
+  # additional parameters for mongo-shard
+  config:
 
 router:
   replicas: 2
   port: 27017
   probeTimeoutSeconds: 5
+  # additional parameters for mongo-router
+  config:
   service:
     type: NodePort # or ClusterIP or LoadBalancer
     nodePort: ""
