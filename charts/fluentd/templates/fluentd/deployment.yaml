@@ -53,8 +53,10 @@ spec:
         configMap:
           name: {{ template "fluent-cm-fullname" . }}
           items:
+            {{if not .Values.configurations.fluent }}
             - key: fluentd-conf
               path: fluent.conf
+            {{end}}
             {{- range $name, $content := .Values.configurations }}
             - key: {{ $name }}
               path: {{ $name }}.conf
