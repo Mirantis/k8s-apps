@@ -1,4 +1,4 @@
-FROM redis:3.2
+FROM redis:4.0
 
 COPY run.sh /run.sh
 CMD [ "/run.sh" ]
