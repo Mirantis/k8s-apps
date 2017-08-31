@@ -6,6 +6,8 @@ image:
 
 antiAffinity: "soft" # or hard or null
 
+kubernetes_domain: cluster.local
+
 probeInitialDelaySeconds: 30
 probePeriodSeconds: 10
 
