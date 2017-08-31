@@ -11,9 +11,9 @@ environment_variables:
     value: "fluentd.conf"
 
 image:
-  repository: ""
-  name: "fluent/fluentd"
-  tag: "v0.14.20"
+  repository: mirantisworkloads/
+  name: "fluentd"
+  tag: "0.14.20"
   pullPolicy: "IfNotPresent"
 
 elasticsearch:
