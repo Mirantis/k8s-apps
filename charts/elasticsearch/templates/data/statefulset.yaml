@@ -19,24 +19,20 @@ spec:
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         app: {{ template "es-fullname" . }}
         type: data
-      {{- if ne .Values.data.persistence.type "emptyDir" }}
-      annotations:
-        pod.beta.kubernetes.io/init-containers: '[
-          {
-            "name": "elasticsearch-init",
-            "image": "busybox",
-            "imagePullPolicy": "IfNotPresent",
-            "command": ["sh", "-c", "chown -R 1000:1000 /usr/share/elasticsearch/data"],
-            "volumeMounts": [
-                {
-                  "name": "elasticsearch-data",
-                  "mountPath": "/usr/share/elasticsearch/data"
-                }
-            ]
-          }
-        ]'
-      {{- end }}
     spec:
+      {{- if ne .Values.data.persistence.type "emptyDir" }}
+      initContainers:
+      - name: elasticsearch-init
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        command:
+        - sh
+        - -c
+        - "chown -R 1000:1000 /usr/share/elasticsearch/data"
+        volumeMounts:
+        - mountPath: /usr/share/elasticsearch/data
+          name: elasticsearch-data
+      {{- end }}
       containers:
       - name: elasticsearch
         env:

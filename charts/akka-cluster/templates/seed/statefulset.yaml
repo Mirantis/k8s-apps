@@ -14,42 +14,30 @@ spec:
     metadata:
       labels:
         app: {{ template "akka.seed.fullname" . }}
-      annotations:
-        {{- if eq .Values.seed.antiAffinity "hard" }}
-        scheduler.alpha.kubernetes.io/affinity: >
-            {
-              "podAntiAffinity": {
-                "requiredDuringSchedulingIgnoredDuringExecution": [{
-                  "labelSelector": {
-                    "matchExpressions": [{
-                      "key": "app",
-                      "operator": "In",
-                      "values": ["{{ template "akka.seed.fullname" . }}"]
-                    }]
-                  },
-                  "topologyKey": "kubernetes.io/hostname"
-                }]
-              }
-            }
-        {{- else if eq .Values.seed.antiAffinity "soft" }}
-        scheduler.alpha.kubernetes.io/affinity: >
-            {
-              "podAntiAffinity": {
-                "preferredDuringSchedulingIgnoredDuringExecution": [{
-                  "weight": 100,
-                  "preference": {
-                    "matchExpressions": [{
-                      "key": "app",
-                      "operator": "In",
-                      "values": ["{{ template "akka.seed.fullname" . }}"]
-                    }]
-                  },
-                  "topologyKey": "kubernetes.io/hostname"
-                }]
-              }
-            }
-        {{- end }}
     spec:
+      {{- if eq .Values.seed.antiAffinity "hard"}}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values: ["{{ template "akka.seed.fullname" . }}"]
+            topologyKey: kubernetes.io/hostname
+      {{- else if eq .Values.seed.antiAffinity "soft"}}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values: ["{{ template "akka.seed.fullname" . }}"]
+              topologyKey: kubernetes.io/hostname
+      {{- end}}
       containers:
         - name: seed
           image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"

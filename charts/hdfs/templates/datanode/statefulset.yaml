@@ -16,49 +16,38 @@ spec:
         release: "{{ .Release.Name }}"
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         app: {{ template "datanode-fullname" . }}
-      annotations:
-        pod.beta.kubernetes.io/init-containers: '[
-        {
-            "name": "wait-namenode",
-            "image": "{{ .Values.datanode.image.repository }}{{ .Values.datanode.image.name }}:{{ .Values.datanode.image.tag }}",
-            "imagePullPolicy": "{{ .Values.datanode.image.pullPolicy }}",
-            "command": ["bash", "-c", "while [[ $ready != 0 ]]; do curl {{ template "namenode-fullname" . }}:50070; ready=$?; sleep 3; done"]
-        }]'
-        {{- if eq .Values.datanode.antiAffinity "hard" }}
-        scheduler.alpha.kubernetes.io/affinity: >
-            {
-              "podAntiAffinity": {
-                "requiredDuringSchedulingIgnoredDuringExecution": [{
-                  "labelSelector": {
-                    "matchExpressions": [{
-                      "key": "app",
-                      "operator": "In",
-                      "values": ["{{ template "datanode-fullname" . }}"]
-                    }]
-                  },
-                  "topologyKey": "kubernetes.io/hostname"
-                }]
-              }
-            }
-        {{- else if eq .Values.datanode.antiAffinity "soft" }}
-        scheduler.alpha.kubernetes.io/affinity: >
-            {
-              "podAntiAffinity": {
-                "preferredDuringSchedulingIgnoredDuringExecution": [{
-                  "weight": 100,
-                  "preference": {
-                    "matchExpressions": [{
-                      "key": "app",
-                      "operator": "In",
-                      "values": ["{{ template "datanode-fullname" . }}"]
-                    }]
-                  },
-                  "topologyKey": "kubernetes.io/hostname"
-                }]
-              }
-            }
-        {{- end}}
     spec:
+      initContainers:
+      - name: wait-namenode
+        image: '{{ .Values.datanode.image.repository }}{{ .Values.datanode.image.name }}:{{ .Values.datanode.image.tag }}'
+        imagePullPolicy: '{{ .Values.datanode.image.pullPolicy }}'
+        command:
+        - bash
+        - -c
+        - while [[ $ready != 0 ]]; do curl {{ template "namenode-fullname" . }}:50070; ready=$?; sleep 3; done
+      {{- if eq .Values.datanode.antiAffinity "hard"}}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values: ["{{ template "datanode-fullname" . }}"]
+            topologyKey: kubernetes.io/hostname
+      {{- else if eq .Values.datanode.antiAffinity "soft"}}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values: ["{{ template "datanode-fullname" . }}"]
+              topologyKey: kubernetes.io/hostname
+      {{- end}}
       containers:
         - name: datanode
           image: "{{ .Values.datanode.image.repository }}{{ .Values.datanode.image.name }}:{{ .Values.datanode.image.tag }}"

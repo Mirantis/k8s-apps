@@ -19,15 +19,15 @@ spec:
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         app: {{ template "ls-fullname" . }}
       annotations:
-        pod.beta.kubernetes.io/init-containers: '[
-          {
-              "name": "wait-for-es",
-              "image": "{{ .Values.testImage.repository }}{{ .Values.testImage.name }}:{{ .Values.testImage.tag }}",
-              "imagePullPolicy": {{ .Values.testImage.pullPolicy | quote }},
-              "command": ["sh", "-c", "until [ $(curl -o /dev/null --silent -f {{ $url }}/; echo $?) -eq 0 ]; do sleep 10; done"]
-          }
-        ]'
     spec:
+      initContainers:
+      - name: wait-for-es
+        image: '{{ .Values.testImage.repository }}{{ .Values.testImage.name }}:{{ .Values.testImage.tag }}'
+        imagePullPolicy: {{ .Values.testImage.pullPolicy }}
+        command:
+        - sh
+        - -c
+        - until [ $(curl -o /dev/null --silent -f {{ $url }}/; echo $?) -eq 0 ]; do sleep 10; done
       containers:
       - name: logstash
         env:

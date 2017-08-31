@@ -13,42 +13,30 @@ spec:
     metadata:
       labels:
         app: {{ template "akka.consumer.fullname" . }}
-      annotations:
-        {{- if eq .Values.consumer.antiAffinity "hard" }}
-        scheduler.alpha.kubernetes.io/affinity: >
-            {
-              "podAntiAffinity": {
-                "requiredDuringSchedulingIgnoredDuringExecution": [{
-                  "labelSelector": {
-                    "matchExpressions": [{
-                      "key": "app",
-                      "operator": "In",
-                      "values": ["{{ template "akka.consumer.fullname" . }}"]
-                    }]
-                  },
-                  "topologyKey": "kubernetes.io/hostname"
-                }]
-              }
-            }
-        {{- else if eq .Values.consumer.antiAffinity "soft" }}
-        scheduler.alpha.kubernetes.io/affinity: >
-            {
-              "podAntiAffinity": {
-                "preferredDuringSchedulingIgnoredDuringExecution": [{
-                  "weight": 100,
-                  "preference": {
-                    "matchExpressions": [{
-                      "key": "app",
-                      "operator": "In",
-                      "values": ["{{ template "akka.consumer.fullname" . }}"]
-                    }]
-                  },
-                  "topologyKey": "kubernetes.io/hostname"
-                }]
-              }
-            }
-        {{- end }}
     spec:
+      {{- if eq .Values.consumer.antiAffinity "hard"}}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values: ["{{ template "akka.consumer.fullname" . }}"]
+            topologyKey: kubernetes.io/hostname
+      {{- else if eq .Values.consumer.antiAffinity "soft"}}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values: ["{{ template "akka.consumer.fullname" . }}"]
+              topologyKey: kubernetes.io/hostname
+      {{- end}}
       containers:
       - name: consumer
         image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"

@@ -24,33 +24,23 @@ spec:
         component: "{{ .Release.Name }}-{{ .Values.Master.Component }}"
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/jenkins/config.yaml") . | sha256sum }}
-        pod.alpha.kubernetes.io/init-containers: '[
-              {
-                  "name": "copy-default-config",
-                  "image": "{{ .Values.Master.image.repository }}{{ .Values.Master.image.name }}:{{ .Values.Master.image.tag }}",
-                  "imagePullPolicy": "{{ .Values.Master.image.pullPolicy }}",
-                  "command": [ "sh", "/var/jenkins_config/apply_config.sh" ],
-                  "volumeMounts": [
-                      {
-                          "name": "jenkins-config",
-                          "mountPath": "/var/jenkins_config"
-                      },
-                      {
-                          "name": "jenkins-home",
-                          "mountPath": "/var/jenkins_home"
-                      },
-                      {
-                          "name": "plugin-dir",
-                          "mountPath": "/usr/share/jenkins/ref/plugins/"
-                      },
-                      {
-                          "name": "secrets-dir",
-                          "mountPath": "/usr/share/jenkins/ref/secrets/"
-                      }
-                  ]
-              }
-          ]'
     spec:
+      initContainers:
+      - name: copy-default-config
+        image: '{{ .Values.Master.image.repository }}{{ .Values.Master.image.name }}:{{ .Values.Master.image.tag }}'
+        imagePullPolicy: '{{ .Values.Master.image.pullPolicy }}'
+        command:
+        - sh
+        - /var/jenkins_config/apply_config.sh
+        volumeMounts:
+        - mountPath: /var/jenkins_config
+          name: jenkins-config
+        - mountPath: /var/jenkins_home
+          name: jenkins-home
+        - mountPath: /usr/share/jenkins/ref/plugins/
+          name: plugin-dir
+        - mountPath: /usr/share/jenkins/ref/secrets/
+          name: secrets-dir
       {{- if .Values.Master.NodeSelector }}
       nodeSelector:
 {{ toYaml .Values.Master.NodeSelector | indent 8 }}

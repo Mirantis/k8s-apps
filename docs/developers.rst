@@ -265,42 +265,30 @@ values.yaml
 
   .. code-block:: yaml
 
-      annotations:
-        {{ - if eq .Values.antiAffinity "hard" }}
-        scheduler.alpha.kubernetes.io/affinity: >
-            {
-              "podAntiAffinity": {
-                "requiredDuringSchedulingIgnoredDuringExecution": [{
-                  "labelSelector": {
-                    "matchExpressions": [{
-                      "key": "app",
-                      "operator": "In",
-                      "values": ["{{ template "fullname" . }}"]
-                    }]
-                  },
-                  "topologyKey": "kubernetes.io/hostname"
-                }]
-              }
-            }
-        {{ - else if eq .Values.antiAffinity "soft" }}
-        scheduler.alpha.kubernetes.io/affinity: >
-            {
-              "podAntiAffinity": {
-                "preferredDuringSchedulingIgnoredDuringExecution": [{
-                  "weight": 100,
-                  "preference": {
-                    "matchExpressions": [{
-                      "key": "app",
-                      "operator": "In",
-                      "values": ["{{ template "fullname" . }}"]
-                    }]
-                  },
-                  "topologyKey": "kubernetes.io/hostname"
-                }]
-              }
-            }
-        {{ - end }}
-
+      spec:
+        {{- if eq .Values.antiAffinity "hard"}}
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values: ["{{ template "fullname" . }}"]
+              topologyKey: kubernetes.io/hostname
+        {{- else if eq .Values.antiAffinity "soft"}}
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values: ["{{ template "fullname" . }}"]
+                topologyKey: kubernetes.io/hostname
+        {{- end}}
 
   Probe-related variables:
 

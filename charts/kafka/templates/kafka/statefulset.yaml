@@ -20,68 +20,52 @@ spec:
         {{- if .Values.prometheusExporter.enabled }}
         prometheus.io/scrape: "true"
         {{- end }}
-        pod.beta.kubernetes.io/init-containers: '[
-        {{- if ne .Values.persistence.type "emptyDir" }}
-        {
-            "name": "set-perm",
-            "image": "busybox",
-            "imagePullPolicy": "IfNotPresent",
-            "command": ["sh", "-c", "chown -R 1000:1000 /var/lib/kafka"],
-            "volumeMounts": [
-                {
-                  "name": "datadir",
-                  "mountPath": "/var/lib/kafka"
-                }
-            ]
-        }
-        {{- end }}
-        {{ if .Values.zookeeper.deployChart }}
-        {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
-        ,
-        {{- end }}
-        {
-            "name": "wait-for-zk",
-            "image": "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}",
-            "imagePullPolicy": "{{ .Values.image.pullPolicy }}",
-            "command": ["sh", "-c", "waitForZK.sh {{ .Values.zookeeper.replicas }} {{ template "zookeeper-fullname" . }}"]
-        }
-        {{- end }}
-        ]'
-        {{- if eq .Values.antiAffinity "hard" }}
-        scheduler.alpha.kubernetes.io/affinity: >
-            {
-              "podAntiAffinity": {
-                "requiredDuringSchedulingIgnoredDuringExecution": [{
-                  "labelSelector": {
-                    "matchExpressions": [{
-                      "key": "app",
-                      "operator": "In",
-                      "values": ["{{ template "kafka-fullname" . }}"]
-                    }]
-                  },
-                  "topologyKey": "kubernetes.io/hostname"
-                }]
-              }
-            }
-        {{- else if eq .Values.antiAffinity "soft"}}
-        scheduler.alpha.kubernetes.io/affinity: >
-            {
-              "podAntiAffinity": {
-                "preferredDuringSchedulingIgnoredDuringExecution": [{
-                  "weight": 100,
-                  "preference": {
-                    "matchExpressions": [{
-                      "key": "app",
-                      "operator": "In",
-                      "values": ["{{ template "kafka-fullname" . }}"]
-                    }]
-                  },
-                  "topologyKey": "kubernetes.io/hostname"
-                }]
-              }
-            }
-        {{- end}}
     spec:
+      initContainers:
+      {{- if ne .Values.persistence.type "emptyDir" }}
+      - name: set-perm
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        command:
+        - sh
+        - -c
+        - chown -R 1000:1000 /var/lib/kafka
+        volumeMounts:
+        - mountPath: /var/lib/kafka
+          name: datadir
+      {{- end }}
+      {{- if .Values.zookeeper.deployChart }}
+      - name: wait-for-zk
+        image: '{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}'
+        imagePullPolicy: '{{ .Values.image.pullPolicy }}'
+        command:
+        - sh
+        - -c
+        - 'waitForZK.sh {{ .Values.zookeeper.replicas }} {{ template "zookeeper-fullname" . }}'
+      {{- end }}
+      {{- if eq .Values.antiAffinity "hard"}}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values: ["{{ template "kafka-fullname" . }}"]
+            topologyKey: kubernetes.io/hostname
+      {{- else if eq .Values.antiAffinity "soft"}}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values: ["{{ template "kafka-fullname" . }}"]
+              topologyKey: kubernetes.io/hostname
+      {{- end}}
       containers:
       - name: kafka
         image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"

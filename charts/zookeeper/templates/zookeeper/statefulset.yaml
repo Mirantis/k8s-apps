@@ -20,57 +20,43 @@ spec:
         {{- if .Values.prometheusExporter.enabled }}
         prometheus.io/scrape: "true"
         {{- end }}
-        {{- if ne .Values.persistence.type "emptyDir" }}
-        pod.beta.kubernetes.io/init-containers: '[
-        {
-            "name": "zookeeper-init",
-            "image": "busybox",
-            "imagePullPolicy": "IfNotPresent",
-            "command": ["sh", "-c", "chown -R 1000:1000 /var/lib/zookeeper"],
-            "volumeMounts": [
-                {
-                  "name": "datadir",
-                  "mountPath": "/var/lib/zookeeper"
-                }
-            ]
-        }
-        ]'
-        {{- end }}
-        {{- if eq .Values.antiAffinity "hard"}}
-        scheduler.alpha.kubernetes.io/affinity: >
-            {
-              "podAntiAffinity": {
-                "requiredDuringSchedulingIgnoredDuringExecution": [{
-                  "labelSelector": {
-                    "matchExpressions": [{
-                      "key": "app",
-                      "operator": "In",
-                      "values": ["{{ template "zk-fullname" . }}"]
-                    }]
-                  },
-                  "topologyKey": "kubernetes.io/hostname"
-                }]
-              }
-            }
-        {{- else if eq .Values.antiAffinity "soft"}}
-        scheduler.alpha.kubernetes.io/affinity: >
-            {
-              "podAntiAffinity": {
-                "preferredDuringSchedulingIgnoredDuringExecution": [{
-                  "weight": 100,
-                  "preference": {
-                    "matchExpressions": [{
-                      "key": "app",
-                      "operator": "In",
-                      "values": ["{{ template "zk-fullname" . }}"]
-                    }]
-                  },
-                  "topologyKey": "kubernetes.io/hostname"
-                }]
-              }
-            }
-        {{- end}}
     spec:
+      {{- if ne .Values.persistence.type "emptyDir" }}
+      initContainers:
+      - name: zookeeper-init
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        command:
+        - sh
+        - -c
+        - chown -R 1000:1000 /var/lib/zookeeper
+        volumeMounts:
+        - mountPath: /var/lib/zookeeper
+          name: datadir
+      {{- end }}
+      {{- if eq .Values.antiAffinity "hard"}}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values: ["{{ template "zk-fullname" . }}"]
+            topologyKey: kubernetes.io/hostname
+      {{- else if eq .Values.antiAffinity "soft"}}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values: ["{{ template "zk-fullname" . }}"]
+              topologyKey: kubernetes.io/hostname
+      {{- end}}
       containers:
       - name: zookeeper
         image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"

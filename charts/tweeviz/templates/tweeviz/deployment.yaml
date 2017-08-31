@@ -15,30 +15,35 @@ spec:
       annotations:
         alpha.istio.io/sidecar: injected
         alpha.istio.io/version: jenkins@ubuntu-16-04-build-12ac793f80be71-0.1.6-dab2033
-        pod.beta.kubernetes.io/init-containers: '[
-         {
-            "args": ["-p","15001","-u","1337"],
-            "image": "docker.io/istio/init:0.1",
-            "imagePullPolicy": "Always",
-            "name": "init",
-            "securityContext": {
-                "capabilities": {
-                "add": ["NET_ADMIN"]
-                }
-            }
-         },
-         {"args": ["-c","sysctl -w kernel.core_pattern=/tmp/core.%e.%p.%t \u0026\u0026 ulimit -c unlimited"],
-          "command": ["/bin/sh"],
-           "image": "alpine",
-           "imagePullPolicy": "Always",
-           "name": "enable-core-dump",
-           "securityContext": {"privileged":true}
-         }
-        ]'
       {{ end }}
       labels:
         app: {{ template "fullname" . }}
     spec:
+      {{ if .Values.istio.enabled }}
+      initContainers:
+      - name: init
+        image: docker.io/istio/init:0.1
+        imagePullPolicy: Always
+        args:
+        - -p
+        - '15001'
+        - -u
+        - '1337'
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+      - name: enable-core-dump
+        image: alpine
+        imagePullPolicy: Always
+        command:
+        - /bin/sh
+        args:
+        - -c
+        - sysctl -w kernel.core_pattern=/tmp/core.%e.%p.%t && ulimit -c unlimited
+        securityContext:
+          privileged: true
+      {{ end }}
       containers:
       {{ if .Values.istio.enabled }}
       - args:
