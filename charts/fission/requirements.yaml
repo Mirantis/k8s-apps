@@ -1,0 +1,5 @@
+dependencies:
+- name: etcd
+  version: ^0.x
+  repository: https://mirantisworkloads.storage.googleapis.com/
+  condition: etcd.deployChart
