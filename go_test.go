@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -383,7 +384,33 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 		return
 	}
 
-	RunCmdTest(t, "test", helmCmd, "--tiller-namespace", ns, "--home", helmHome, "test", rel)
+	t.Run("test", func(t *testing.T) {
+		args := []string{helmCmd, "--tiller-namespace", ns, "--home", helmHome, "test", rel}
+		t.Logf("Running command: %+v", args)
+		cmd := exec.Command(args[0], args[1:]...)
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Logf("Command failed: %s\nCommand output: %s", err, output)
+			re := regexp.MustCompile("`(kubectl logs.*)`")
+			for _, match := range re.FindAllSubmatch(output, -1) {
+				match_str := string(match[1])
+				args := strings.Split(match_str, " ")
+				if args[0] == "kubectl" {
+					args[0] = kubectlCmd
+				}
+				cmd := exec.Command(args[0], args[1:]...)
+				output, err := cmd.CombinedOutput()
+				if err != nil {
+					t.Logf("Failed to get logs from `%s`: %s\nCommand output: %s", match_str, err, output)
+				} else {
+					t.Logf("Output from `%s`:\n%s", match_str, output)
+				}
+			}
+			t.Fail()
+		} else {
+			t.Logf("Command output: %s", output)
+		}
+	})
 }
 
 func CreateChartVersionVerify(t *testing.T, chartPath string, configStr string, configFile string, ns string, rel string) {
