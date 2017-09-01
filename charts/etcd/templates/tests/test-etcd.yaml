@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ printf "etcd-test-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
+  annotations:
+    helm.sh/hook: test-success
+spec:
+  containers:
+    - name: minio-test
+      image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
+      imagePullPolicy: {{ .Values.image.pullPolicy }}
+      command:
+        - sh
+        - -cx
+        - |
+          key="test-{{ randAlphaNum 10 | lower }}"
+
+          for i in $(seq 1 20); do
+            etcdctl -C {{ template "etcd.address" . }} cluster-health
+            if [ $? -ne 0 ]; then
+              sleep 5
+              continue
+            fi
+            etcdctl -C {{ template "etcd.address" . }} set $key test
+            etcdctl -C {{ template "etcd.address" . }} get $key
+            etcdctl -C {{ template "etcd.address" . }} rm $key
+            if [ $? -eq 0 ]; then
+              exit 0
+            fi
+            sleep 5
+          done
+          exit 1
+
+  restartPolicy: Never
