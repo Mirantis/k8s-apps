@@ -20,7 +20,7 @@ RUN apk update \
  && echo 'gem: --no-document' >> /etc/gemrc \
  && gem install oj -v 2.18.3 \
  && gem install json -v 2.1.0 \
- && gem install fluentd -v 0.12.39 \
+ && gem install fluentd -v 0.14.20 \
  && gem install fluent-plugin-elasticsearch \
  && gem install fluent-plugin-mail \
  && apk del .build-deps \
