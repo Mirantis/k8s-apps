@@ -1,0 +1,4 @@
+Etcd chart has been deployed.
+
+Internal URL:
+    etcd: {{ template "etcd.address" . }}
