@@ -17,6 +17,10 @@ spec:
         release: {{ .Release.Name | quote }}
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         app: {{ template "influx-fullname" . }}
+{{- if .Values.deployment.annotations }}
+      annotations:
+{{ toYaml .Values.deployment.annotations | indent 8}}
+{{- end }}
     spec:
       containers:
       - name: influx
