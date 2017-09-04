@@ -16,7 +16,7 @@ clientPort: 2181
 image:
   repository: mirantisworkloads/
   name: zookeeper
-  tag: 3.5.3-rc1
+  tag: 3.5.3-beta
   pullPolicy: IfNotPresent
 
 resources:
