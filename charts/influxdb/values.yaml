@@ -60,6 +60,9 @@ resources:
     #cpu: "256Mi"
     #memory: "250m"
 
+deployment:
+  annotations: {}
+
 service:
   type: "NodePort"
   loadBalancerIP: ""
