@@ -1,12 +1,15 @@
 FROM java:8-jre
 
 ARG JMX_VERSION=0.9
-ARG ZOOKEEPER_VERSION=3.5.2-alpha
+ARG ZOOKEEPER_VERSION=3.5.3-beta
 
 COPY entrypoint.sh zkReconfigAdd.sh zkReconfigRemove.sh zkCheck.sh /usr/bin/
-COPY zookeeper-release-3.5.3-rc1 /opt/zookeeper
 
 RUN set -x && \
+    curl https://storage.googleapis.com/mirantisworkloads/bin/zookeeper/zookeeper-${ZOOKEEPER_VERSION}.tar.gz -o zookeeper.tar.gz && \
+    tar xvf zookeeper.tar.gz && \
+    mv zookeeper-${ZOOKEEPER_VERSION} /opt/zookeeper && \
+    rm zookeeper.tar.gz && \
     useradd --user-group --create-home --home-dir /var/lib/zookeeper zookeeper && \
     mkdir -p /var/log/zookeeper && chown -R zookeeper:zookeeper /var/log/zookeeper && \
     apt-get update && \
