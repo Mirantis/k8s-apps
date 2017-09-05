@@ -44,6 +44,12 @@ spec:
          - containerPort: {{ $settings.port }}
            name: '{{ $name | lower | trunc 15 | trimSuffix "-" }}'
         {{- end }}
+        readinessProbe:
+          httpGet:
+            path: /api/plugins.json
+            port: {{ .Values.ports.monitoring.port }}
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
         volumeMounts:
           - name: default-config
             mountPath: /etc/fluent
