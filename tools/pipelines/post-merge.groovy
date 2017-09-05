@@ -1,9 +1,10 @@
 def run(helm_home, namespace_prefix) {
   stage("Dependencies") {
     def buildId = env.BUILD_NUMBER + '-' + env.GERRIT_CHANGE_NUMBER + '-' + env.GERRIT_PATCHSET_NUMBER
-    sh("find charts/ -name values.yaml | xargs sed -i 's/repository: mirantisworkloads/repository: nexus-scc.ng.mirantis.net:5000\\/${buildId}/g'")
     sh('go run tools/pre-test-local-repos.go')
     sh("go get github.com/kubernetes/apimachinery/pkg/util/yaml")
+    sh("cp -r charts tmp-charts")
+    sh("find charts/ -name values.yaml | xargs sed -i 's/repository: mirantisworkloads/repository: nexus-scc.ng.mirantis.net:5000\\/${buildId}/g'")
   }
   def buildId = "${env.BUILD_NUMBER}-${env.GERRIT_CHANGE_NUMBER}-${env.GERRIT_PATCHSET_NUMBER}"
   stage("Run tests") {
@@ -37,6 +38,7 @@ def run(helm_home, namespace_prefix) {
       'HELM_HOME=' + helm_home,
       'HELM_CMD=' + pwd() + '/helm',
     ]) {
+      sh("mv tmp-charts charts")
       sh("./tools/build-packages.sh")
     }
   }
