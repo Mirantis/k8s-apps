@@ -5,6 +5,10 @@ def run(helm_home, namespace_prefix) {
     }
   }
 
+  stage("Dependencies") {
+    sh("go get github.com/kubernetes/apimachinery/pkg/util/yaml")
+  }
+
   stage("Run tests") {
     try {
       withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
