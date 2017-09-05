@@ -69,3 +69,7 @@ service:
   loadBalancerSourceRanges: []
   annotations: {}
 
+#create initial database in influxdb
+dbInit: # or dbInit: {} to leve empty influx
+  dbName: default_init_db
+
