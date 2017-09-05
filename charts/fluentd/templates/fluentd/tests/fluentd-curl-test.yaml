@@ -10,7 +10,9 @@ spec:
       image: appropriate/curl:latest
       imagePullPolicy: IfNotPresent
       command:
-        - curl
-        - "-f"
-        - {{ template "fluent-fullname" . }}:{{ .Values.ports.monitoring.port }}/api/plugins.json
+      - /bin/sh
+      - -o
+      - pipefail
+      - -exc
+      - 'for i in $(seq 1 6); do date; if curl --connect-timeout 10 -fv {{ template "fluent-fullname" . }}:{{ .Values.ports.monitoring.port }}/api/plugins.json; then return 0; fi; done; return 1'
   restartPolicy: Never
