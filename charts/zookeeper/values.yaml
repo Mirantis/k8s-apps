@@ -38,14 +38,25 @@ persistence:
 heapSize: 1G
 logLevel: INFO
 
-# Zokeeper config (zoo.cfg) parameters
-tickTime: 2000
-initLimit: 10
-syncLimit: 5
 maxClientCnxns: 60
-autopurge:
-  purgeInterval: 1
-  snapRetainCount: 3
+
+configFiles:
+  # You can set zookeeper configs here.
+  # Note, that the following configs will be overriden:
+  # - dataDir=/var/lib/zookeeper/data
+  # - dataLogDir=/var/lib/zookeeper/log
+  # - standaloneEnabled=false
+  # - dynamicConfigFile=/var/lib/zookeeper/conf/zoo.cfg.dynamic
+  # - reconfigEnabled=true
+  # - skipACL=yes
+  # - 4lw.commands.whitelist=*
+  zoo.cfg: |
+    tickTime=2000
+    initLimit=10
+    syncLimit=5
+    autopurge.purgeInterval=1
+    autopurge.snapRetainCount=3
+    maxClientCnxns=60
 
 prometheusExporter:
   enabled: false
