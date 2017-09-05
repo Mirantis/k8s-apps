@@ -31,7 +31,7 @@ spec:
         - "--filepath"
         - "/storage"
         - "--etcdUrl"
-        - "http://{{ template "fission-etcd" . }}:{{ .Values.etcd.port }}"
+        - "{{ template "fission-etcd" . }}"
         volumeMounts:
         - name: file-storage
           mountPath: /storage

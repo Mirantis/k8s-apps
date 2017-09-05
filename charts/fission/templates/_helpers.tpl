@@ -27,5 +27,16 @@
 {{- end -}}
 
 {{- define "fission-etcd" -}}
-{{- printf "fission-etcd-%s" .Release.Name | trunc 55 | trimSuffix "-" -}}
+{{- if .Values.etcd.deployChart -}}
+{{- $ctx := . -}}
+{{- range $i, $e := until (int $.Values.etcd.replicas) -}}
+  {{- if $i }},{{- end -}}
+  http://{{- template "etcd.fullname" $ctx -}}
+  {{- printf "-%d." $i -}}
+  {{- template "etcd.fullname" $ctx -}}
+  {{- printf ":%d" (int $.Values.etcd.clientPort) -}}
+{{- end -}}
+{{- else -}}
+{{- printf "%s" .Values.etcd.externalAddress -}}
+{{- end -}}
 {{- end -}}
