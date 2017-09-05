@@ -1,0 +1,26 @@
+{{ if .Values.dbInit }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ template "influx-fullname" . }}-job"
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "influx-fullname" . }}
+spec:
+  template:
+    metadata:
+      name: {{ template "influx-fullname" . }}
+      labels:
+        heritage: {{ .Release.Service | quote }}
+        release: {{ .Release.Name | quote }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "influx-fullname" . }}
+    spec:
+      containers:
+      - name: influx-db-create
+        image: byrnedo/alpine-curl
+        command:  ["sh", "-c", 'until curl -o /dev/null --silent -i -f -X POST http://{{ template "influx-fullname" . }}:8087/query --data-urlencode "q=CREATE DATABASE {{ .Values.dbInit.dbName  }}" ; do sleep 10; done;']
+      restartPolicy: Never
+{{ end }}
