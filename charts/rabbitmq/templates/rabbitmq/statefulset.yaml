@@ -76,6 +76,8 @@ spec:
           value: /var/log/rabbitmq/rabbitmq.log
         - name: RABBITMQ_NODE_PORT
           value: "{{ .Values.amqpPort }}"
+        - name: K8S_HOST
+          value: kubernetes.default
         - name: K8S_SERVICE_NAME
           value: {{ template "rabbitmq.fullname" . }}
         - name: HOSTNAME
