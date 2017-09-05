@@ -6,7 +6,7 @@ probeTimeoutSeconds: 5
 image:
   repository: mirantisworkloads/
   name: redis
-  tag: "4.0"
+  tag: "4.0-r1"
   pullPolicy: IfNotPresent
 
 resources:
@@ -24,8 +24,52 @@ persistence:
 ## Change redis configuration paramaters below.
 config:
   redisPort: 6379
-  sentinelPort: 26379
-  slaveReadOnly: "no"
+  redisParameters: |-
+    pidfile /var/run/redis.pid
+    tcp-backlog 511
+    timeout 0
+    tcp-keepalive 60
+    loglevel notice
+    databases 16
+    save 900 1
+    save 300 10
+    save 60 10000
+    stop-writes-on-bgsave-error yes
+    rdbcompression yes
+    rdbchecksum yes
+    dbfilename dump.rdb
+    dir /data
+    slave-serve-stale-data yes
+    slave-read-only no
+    repl-diskless-sync no
+    repl-diskless-sync-delay 5
+    repl-disable-tcp-nodelay no
+    slave-priority 100
+    appendfilename "appendonly.aof"
+    appendfsync everysec
+    no-appendfsync-on-rewrite no
+    auto-aof-rewrite-percentage 100
+    auto-aof-rewrite-min-size 64mb
+    aof-load-truncated yes
+    lua-time-limit 5000
+    slowlog-log-slower-than 10000
+    slowlog-max-len 128
+    latency-monitor-threshold 0
+    notify-keyspace-events ""
+    hash-max-ziplist-entries 512
+    hash-max-ziplist-value 64
+    list-max-ziplist-entries 512
+    list-max-ziplist-value 64
+    set-max-intset-entries 512
+    zset-max-ziplist-entries 128
+    zset-max-ziplist-value 64
+    hll-sparse-max-bytes 3000
+    activerehashing yes
+    client-output-buffer-limit normal 0 0 0
+    client-output-buffer-limit slave 256mb 64mb 60
+    client-output-buffer-limit pubsub 32mb 8mb 60
+    hz 10
+    aof-rewrite-incremental-fsync yes
 
 logCollector:
   enabled: false

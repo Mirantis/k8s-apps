@@ -28,7 +28,7 @@
 
 {{- define "spinnaker.redis-address" -}}
     {{- if .Values.redis.deployChart -}}
-        redis://{{ template "cluster-svc-fullname" . }}:{{ .Values.redis.config.redisPort }}
+        redis://{{ template "redis-fullname" . }}-0.{{ template "redis-fullname" . }}:{{ .Values.redis.config.redisPort }}
     {{- else -}}
         {{- printf "%s" .Values.redis.externalAddress -}}
     {{- end -}}
