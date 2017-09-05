@@ -6,7 +6,7 @@
 {{- $ctx := . -}}
 {{- range $i, $e := until (int $.Values.replicas) -}}
   {{- if $i }},{{- end -}}
-  {{- template "etcd.fullname" $ctx -}}
+  http://{{- template "etcd.fullname" $ctx -}}
   {{- printf "-%d." $i -}}
   {{- template "etcd.fullname" $ctx -}}
   {{- printf ":%d" (int $.Values.clientPort) -}}
