@@ -38,7 +38,7 @@ def run(helm_home, namespace_prefix) {
       'HELM_HOME=' + helm_home,
       'HELM_CMD=' + pwd() + '/helm',
     ]) {
-      sh("mv tmp-charts charts")
+      sh("rm -rf charts && mv tmp-charts charts")
       sh("./tools/build-packages.sh")
     }
   }
