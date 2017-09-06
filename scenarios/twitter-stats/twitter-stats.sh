@@ -269,6 +269,24 @@ function command_down() {
 
         _helm delete --purge ${release}
     done
+
+    if [ "${TS_DELETE_NS}" == "yes" ] ; then
+        retries=0
+        until [ ${retries} -ge "${TS_RETRIES}" ] ; do
+            sleep $[2*${TS_RETRY_INTERVAL}]
+
+            log "Waiting for namespace ${TS_NAMESPACE} to be deleted"
+
+            if ! _kubectl get ns ${TS_NAMESPACE}; then
+                log "Namespace ${TS_NAMESPACE} deleted"
+                return
+            fi
+
+            retries=$[${retries}+1]
+        done
+
+        log_error "Failed to wait for namespace ${TS_NAMESPACE} to be deleted"
+    fi
 }
 
 function command_test() {
