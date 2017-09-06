@@ -1,4 +1,4 @@
-def run(helm_home, namespace_prefix) {
+def run(helm_home, namespace_prefix, kubernetes_domain) {
   stage("Add repo") {
     withEnv(["HELM_HOME=${helm_home}"]) {
       sh('./helm repo add mirantisworkloads https://mirantisworkloads.storage.googleapis.com/')
@@ -6,6 +6,7 @@ def run(helm_home, namespace_prefix) {
   }
 
   stage("Dependencies") {
+    sh("find charts/ -name values.yaml | xargs sed -i -e 's/kubernetes_domain: cluster.local/kubernetes_domain: ${kubernetes_domain}/g'")
     sh("go get github.com/kubernetes/apimachinery/pkg/util/yaml")
   }
 

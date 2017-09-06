@@ -1,5 +1,6 @@
-def run(helm_home, namespace) {
+def run(helm_home, namespace, kubernetes_domain) {
   stage("Run tests") {
+    sh("find charts/ -name values.yaml | xargs sed -i -e 's/kubernetes_domain: cluster.local/kubernetes_domain: ${kubernetes_domain}/g'")
     withCredentials([
       file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG'),
       string(credentialsId: "twitter-demo-ts-app-key", variable: "TS_APP_KEY"),

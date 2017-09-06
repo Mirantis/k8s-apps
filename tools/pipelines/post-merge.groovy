@@ -1,10 +1,10 @@
-def run(helm_home, namespace_prefix) {
+def run(helm_home, namespace_prefix, kubernetes_domain) {
   stage("Dependencies") {
     def buildId = env.BUILD_NUMBER + '-' + env.GERRIT_CHANGE_NUMBER + '-' + env.GERRIT_PATCHSET_NUMBER
     sh('go run tools/pre-test-local-repos.go')
     sh("go get github.com/kubernetes/apimachinery/pkg/util/yaml")
     sh("cp -r charts tmp-charts")
-    sh("find charts/ -name values.yaml | xargs sed -i 's/repository: mirantisworkloads/repository: nexus-scc.ng.mirantis.net:5000\\/${buildId}/g'")
+    sh("find charts/ -name values.yaml | xargs sed -i -e 's/repository: mirantisworkloads/repository: nexus-scc.ng.mirantis.net:5000\\/${buildId}/g' -e 's/kubernetes_domain: cluster.local/kubernetes_domain: ${kubernetes_domain}/g'")
   }
   def buildId = "${env.BUILD_NUMBER}-${env.GERRIT_CHANGE_NUMBER}-${env.GERRIT_PATCHSET_NUMBER}"
   stage("Run tests") {
