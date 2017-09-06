@@ -21,6 +21,6 @@ spec:
       containers:
       - name: influx-db-create
         image: byrnedo/alpine-curl
-        command:  ["sh", "-c", 'until curl -o /dev/null --silent -i -f -X POST http://{{ template "influx-fullname" . }}:8087/query --data-urlencode "q=CREATE DATABASE {{ .Values.dbInit.dbName  }}" ; do sleep 10; done;']
+        command:  ["sh", "-cx", 'until curl --connect-timeout 5 -i -f -X POST http://{{ template "influx-fullname" . }}:{{ .Values.ports.http.port  }}/query --data-urlencode "q=CREATE DATABASE {{ .Values.dbInit.dbName  }}" ; do sleep 10; done;']
       restartPolicy: Never
 {{ end }}

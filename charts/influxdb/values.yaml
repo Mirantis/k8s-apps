@@ -3,7 +3,6 @@ ports:
     port: 8088
   http:
     port: 8087
-    nodePort: 30807
   defaultUdp:
     port: 8087
     protocol: udp
@@ -11,6 +10,8 @@ ports:
     port: 2003
 
 replicas: 1
+probeInitialDelaySeconds: 15
+probeTimeoutSeconds: 5
 
 environment_variables:
   - name: INFLUXDB_GRAPHITE_ENABLED

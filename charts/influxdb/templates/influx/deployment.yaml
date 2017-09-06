@@ -42,6 +42,12 @@ spec:
         volumeMounts:
           - name: config
             mountPath: /etc/influxdb
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: {{ .Values.ports.http.port  }}
+          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+          timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
       volumes:
       - name: config
         configMap:
