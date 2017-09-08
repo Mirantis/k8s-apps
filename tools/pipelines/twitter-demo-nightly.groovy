@@ -12,7 +12,8 @@ def run(helm_home, namespace, kubernetes_domain) {
         "HELM_HOME=" + helm_home,
         "TS_HELM_CMD=" + pwd() + "/helm",
         "TS_KUBECTL_CMD=" + pwd() + "/kubectl",
-        "TS_NAME=${namespace}"
+        "TS_NAME=${namespace}",
+        "TS_USE_INTERNAL_IP=yes"
       ]) {
         ansiColor("xterm") {
           sh("./scenarios/twitter-stats/twitter-stats.sh up test down")

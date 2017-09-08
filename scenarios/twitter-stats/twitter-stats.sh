@@ -136,6 +136,10 @@ function main() {
         log_error "TS_APP_KEY, TS_APP_SECRET, TS_TOKEN_KEY, TS_TOKEN_SECRET must be specified"
     fi
 
+    export TS_USE_INTERNAL_IP=${TS_USE_INTERNAL_IP:-}
+    log "\tTS_USE_INTERNAL_IP - if set use internal IPs of nodes if everything else fails"
+    log "\t\tcurrent: $([ "${TS_USE_INTERNAL_IP}" ] && echo set || echo unset) (default: unset)"
+
     export TS_MODE=${TS_MODE:-multi}
     log "\tTS_MODE - single or multi-node deployment"
     log "\t\tcurrent: ${TS_MODE} (default: multi)"
@@ -280,6 +284,9 @@ function command_test() {
         node_ips=$(_kubectl get nodes -o jsonpath='{ $.items[*].status.addresses[?(@.type=="ExternalIP")].address }')
         if [ -z "${node_ips}" ] ; then
             node_ips=$(_kubectl get nodes -o jsonpath='{ $.items[*].status.addresses[?(@.type=="LegacyHostIP")].address }')
+        fi
+        if [ -z "${node_ips}" -a "${TS_USE_INTERNAL_IP}" ] ; then
+            node_ips=$(_kubectl get nodes -o jsonpath='{ $.items[*].status.addresses[?(@.type=="InternalIP")].address }')
         fi
         if [ -z "${node_ips}" ] ; then
             log_error "There are no External IPs for K8s nodes available, need at least one to access NodePort"
