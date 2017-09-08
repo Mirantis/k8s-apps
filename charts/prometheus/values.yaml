@@ -180,7 +180,7 @@ server:
     repository: prom/
     name: prometheus
     tag: master
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
     testImage: mirantisworkloads/test-base
     testImageTag: 1.0.0
 

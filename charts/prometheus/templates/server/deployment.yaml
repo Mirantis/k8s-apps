@@ -46,7 +46,13 @@ spec:
             - containerPort: 9090
           readinessProbe:
             httpGet:
-              path: /status
+              path: /-/ready
+              port: 9090
+            initialDelaySeconds: 15
+            timeoutSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
               port: 9090
             initialDelaySeconds: 30
             timeoutSeconds: 30
