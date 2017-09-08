@@ -9,6 +9,9 @@ port: 9411
 probeInitialDelaySeconds: 15
 probeTimeoutSeconds: 5
 
+prometheusExporter:
+  enabled: false
+
 # Environment settings can be found here: https://github.com/openzipkin/zipkin/tree/master/zipkin-server#environment-variables
 # Note that the following variables will be overriden:
 # - QUERY_PORT

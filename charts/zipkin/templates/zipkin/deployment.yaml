@@ -13,6 +13,12 @@ spec:
     metadata:
       labels:
         app: {{ template "zipkin.fullname" . }}
+      annotations:
+        {{- if .Values.prometheusExporter.enabled }}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "{{ .Values.port }}"
+        prometheus.io/path: "/prometheus"
+        {{- end }}
     spec:
       containers:
       - name: {{ .Chart.Name }}
