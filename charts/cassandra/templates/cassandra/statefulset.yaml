@@ -1,19 +1,19 @@
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ template "cassandra.fullname" . }}
   labels:
-    app: {{ template "fullname" . }}
+    app: {{ template "cassandra.fullname" . }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
-  serviceName: {{ template "fullname" . }}
+  serviceName: {{ template "cassandra.fullname" . }}
   replicas: {{ .Values.config.clusterSize }}
   template:
     metadata:
       labels:
-        app: {{ template "fullname" . }}
+        app: {{ template "cassandra.fullname" . }}
       annotations:
         {{- if .Values.prometheusExporter.enabled }}
         prometheus.io/scrape: "true"
@@ -27,7 +27,7 @@ spec:
               matchExpressions:
               - key: app
                 operator: In
-                values: ["{{ template "fullname" . }}"]
+                values: ["{{ template "cassandra.fullname" . }}"]
             topologyKey: kubernetes.io/hostname
       {{- else if eq .Values.antiAffinity "soft"}}
       affinity:
@@ -39,7 +39,7 @@ spec:
                 matchExpressions:
                 - key: app
                   operator: In
-                  values: ["{{ template "fullname" . }}"]
+                  values: ["{{ template "cassandra.fullname" . }}"]
               topologyKey: kubernetes.io/hostname
       {{- end}}
       terminationGracePeriodSeconds: 60
@@ -57,7 +57,7 @@ spec:
         {{- $seed_size := default 1 .Values.config.seedSize | int -}}
         {{- $global := . }}
         - name: CASSANDRA_SEEDS
-          value: '{{- range $i, $e := until $seed_size }}{{ template "fullname" $global }}-{{ $i }}.{{ template "fullname" $global }}.{{ $global.Release.Namespace }}.svc.{{ $global.Values.kubernetes_domain }},{{- end }}'
+          value: '{{- range $i, $e := until $seed_size }}{{ template "cassandra.fullname" $global }}-{{ $i }}.{{ template "cassandra.fullname" $global }}.{{ $global.Release.Namespace }}.svc.{{ $global.Values.kubernetes_domain }},{{- end }}'
         - name: MAX_HEAP_SIZE
           value: {{ default "8192M" .Values.config.maxHeapSize | quote }}
         - name: HEAP_NEWSIZE
@@ -143,7 +143,7 @@ spec:
         {{- if .Values.prometheusExporter.enabled }}
         - name: cassandra-jmx
           configMap:
-            name: {{ template "fullname" . }}
+            name: {{ template "cassandra.fullname" . }}
         {{- end }}
         {{- if .Values.logCollector.enabled }}
         - name: filebeat-config
@@ -161,7 +161,7 @@ spec:
   - metadata:
       name: data
       labels:
-        app: {{ template "fullname" . }}
+        app: {{ template "cassandra.fullname" . }}
         chart: {{ .Chart.Name }}-{{ .Chart.Version }}
         release: {{ .Release.Name }}
         heritage: {{ .Release.Service }}

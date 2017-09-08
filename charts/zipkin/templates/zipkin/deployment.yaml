@@ -25,5 +25,11 @@ spec:
         {{- end  }}
         - name: QUERY_PORT
           value: "{{ .Values.port }}"
+        {{- if .Values.cassandra.deployChart }}
+        - name: STORAGE_TYPE
+          value: cassandra3
+        - name: CASSANDRA3_CONTACT_POINTS
+          value: "{{ template "zipkin.cassandra-address" . }}"
+        {{- end }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}

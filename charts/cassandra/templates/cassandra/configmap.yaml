@@ -2,12 +2,12 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ template "cassandra.fullname" . }}
   labels:
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    app: {{ template "fullname" . }}
+    app: {{ template "cassandra.fullname" . }}
 data:
   cassandra-jmx.yml: |-
     ---
