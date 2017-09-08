@@ -31,5 +31,17 @@ spec:
         - name: CASSANDRA3_CONTACT_POINTS
           value: "{{ template "zipkin.cassandra-address" . }}"
         {{- end }}
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.port  }}
+          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+          timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.port  }}
+          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+          timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
