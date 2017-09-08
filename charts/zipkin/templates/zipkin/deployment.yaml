@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "zipkin.fullname" . }}
+  labels:
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "zipkin.fullname" . }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ template "zipkin.fullname" . }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        {{- range $name, $value := .Values.env }}
+        - name: {{ $name }}
+          value: {{ $value | quote}}
+        {{- end  }}
+        - name: QUERY_PORT
+          value: "{{ .Values.port }}"
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
