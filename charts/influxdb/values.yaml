@@ -52,6 +52,14 @@ additionalDatabasesInterfacesConfigs:
       security-level = "none"
       auth-file = "/etc/collectd/auth_file"
 
+persistence:
+  type: emptyDir
+  #storageClass: ""
+  #volumeSize: 1Gi
+  #persistentVolumeType: "ReadWriteOnce"
+  #hostPath: ""
+
+
 # Configure resource requests and limits.
 resources:
   #requests:
