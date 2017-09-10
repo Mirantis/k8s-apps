@@ -55,7 +55,7 @@
 
 {{- define "tweetics.cassandra-address" -}}
     {{- if .Values.cassandra.deployChart -}}
-        {{- printf "cassandra-%s" .Release.Name | trunc  | trimSuffix "-" -}}
+        {{- printf "cassandra-%s" .Release.Name | trunc 55 | trimSuffix "-" -}}
     {{- else -}}
         {{- .Values.cassandra.externalAddress -}}
     {{- end -}}
