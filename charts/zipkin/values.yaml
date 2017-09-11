@@ -9,6 +9,10 @@ port: 9411
 # Environment settings can be found here: https://github.com/openzipkin/zipkin/tree/master/zipkin-server#environment-variables
 # Note that the following variables will be overriden:
 # - QUERY_PORT
+# if cassandra.deployChart is enabled, the following variables will be
+# also overriden:
+# - STORAGE_TYPE=cassandra
+# - CASSANDRA_CONTACT_POINTS
 env:
   SELF_TRACING_ENABLED: "true"
 
@@ -39,4 +43,11 @@ resources:
   #limits:
   #  cpu: 100m
   #  memory: 512Mi
+
+cassandra:
+  # Use cassandra as a storage
+  # if disabled, subchart will not be deployed. To configure access to external
+  # cassandra, provide corresponding environment variables in `env` section:
+  # https://github.com/openzipkin/zipkin/tree/master/zipkin-server#cassandra-storage
+  deployChart: false
 

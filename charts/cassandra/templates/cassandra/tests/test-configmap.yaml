@@ -1,12 +1,12 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: test-cm-{{ template "fullname" . }}
+  name: test-cm-{{ template "cassandra.fullname" . }}
   labels:
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    app: {{ template "fullname" . }}
+    app: {{ template "cassandra.fullname" . }}
 data:
   test.sh: |-
     HOST=$1
