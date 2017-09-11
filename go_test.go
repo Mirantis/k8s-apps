@@ -366,73 +366,7 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 
 	// wait deployments
 	waitDeploymentsResult := t.Run("wait_deployments", func(t *testing.T) {
-		cmd := exec.Command(helmCmd, "--tiller-namespace", ns, "--home", helmHome, "get", "manifest", rel)
-		output, err := cmd.Output()
-		if err != nil {
-			t.Fatalf("Failed to get manifest: %s", err)
-		}
-		deployments := make(map[string]bool)
-		var obj struct {
-			Kind     string `json:"kind"`
-			Metadata struct {
-				Name string `json:"name"`
-			} `json:"metadata"`
-		}
-		decoder := yaml.NewYAMLOrJSONDecoder(strings.NewReader(string(output)), 1)
-		for {
-			err := decoder.Decode(&obj)
-			if err != nil {
-				if err != io.EOF {
-					t.Fatalf("Failed to parse manifest: %s", err)
-				}
-				break
-			}
-			if obj.Kind == "Deployment" {
-				deployments[obj.Metadata.Name] = true
-			}
-		}
-		t.Logf("Found deployments: %l", deployments)
-		if len(deployments) == 0 {
-			return
-		}
-		cmd = exec.Command(kubectlCmd, "get", "deployment", "-n", ns, "-o", "json", "-w")
-		stdout, err := cmd.StdoutPipe()
-		if err != nil {
-			t.Fatalf("Failed to get stdout pipe from kubectl to watch deployments: %s", err)
-		}
-		decoder = yaml.NewYAMLOrJSONDecoder(stdout, 1)
-		var deployment struct {
-			Metadata struct {
-				Name string `json:"name"`
-			} `json:"metadata"`
-			Status struct {
-				Replicas      int `json:"replicas"`
-				ReadyReplicas int `json:"readyReplicas"`
-			} `json:"status"`
-		}
-		err = cmd.Start()
-		if err != nil {
-			t.Fatalf("Failed to start kubectl to watch deployments: %s", err)
-		}
-		for {
-			err := decoder.Decode(&deployment)
-			if err != nil {
-				t.Logf("Failed to decode JSON from kubectl: %s", err)
-				t.Fail()
-				break
-			}
-			t.Logf("%s replicas=%d ready=%d\n", deployment.Metadata.Name, deployment.Status.Replicas, deployment.Status.ReadyReplicas)
-			if deployment.Status.Replicas != 0 && deployment.Status.ReadyReplicas == deployment.Status.Replicas {
-				delete(deployments, deployment.Metadata.Name)
-				if len(deployments) == 0 {
-					break
-				}
-			}
-		}
-		err = cmd.Process.Kill()
-		if err != nil {
-			t.Fatalf("Failed to kill kubectl process: %s", err)
-		}
+		WaitForResources(t, helmHome, ns, rel)
 	})
 	if !waitDeploymentsResult {
 		FailTest(t, "test", "Chart is not ready")
@@ -440,32 +374,106 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 	}
 
 	t.Run("test", func(t *testing.T) {
-		args := []string{helmCmd, "--tiller-namespace", ns, "--home", helmHome, "test", rel}
-		t.Logf("Running command: %+v", args)
-		cmd := exec.Command(args[0], args[1:]...)
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			t.Logf("Command failed: %s\nCommand output: %s", err, output)
-			re := regexp.MustCompile("`(kubectl logs.*)`")
-			for _, match := range re.FindAllSubmatch(output, -1) {
-				match_str := string(match[1])
-				args := strings.Split(match_str, " ")
-				if args[0] == "kubectl" {
-					args[0] = kubectlCmd
-				}
-				cmd := exec.Command(args[0], args[1:]...)
-				output, err := cmd.CombinedOutput()
-				if err != nil {
-					t.Logf("Failed to get logs from `%s`: %s\nCommand output: %s", match_str, err, output)
-				} else {
-					t.Logf("Output from `%s`:\n%s", match_str, output)
-				}
-			}
-			t.Fail()
-		} else {
-			t.Logf("Command output: %s", output)
-		}
+		RunHelmTest(t, helmHome, ns, rel)
 	})
+}
+
+func WaitForResources(t *testing.T, helmHome string, ns string, rel string) {
+	cmd := exec.Command(helmCmd, "--tiller-namespace", ns, "--home", helmHome, "get", "manifest", rel)
+	output, err := cmd.Output()
+	if err != nil {
+		t.Fatalf("Failed to get manifest: %s", err)
+	}
+	deployments := make(map[string]bool)
+	var obj struct {
+		Kind     string `json:"kind"`
+		Metadata struct {
+			Name string `json:"name"`
+		} `json:"metadata"`
+	}
+	decoder := yaml.NewYAMLOrJSONDecoder(strings.NewReader(string(output)), 1)
+	for {
+		err := decoder.Decode(&obj)
+		if err != nil {
+			if err != io.EOF {
+				t.Fatalf("Failed to parse manifest: %s", err)
+			}
+			break
+		}
+		if obj.Kind == "Deployment" {
+			deployments[obj.Metadata.Name] = true
+		}
+	}
+	t.Logf("Found deployments: %l", deployments)
+	if len(deployments) == 0 {
+		return
+	}
+	cmd = exec.Command(kubectlCmd, "get", "deployment", "-n", ns, "-o", "json", "-w")
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		t.Fatalf("Failed to get stdout pipe from kubectl to watch deployments: %s", err)
+	}
+	decoder = yaml.NewYAMLOrJSONDecoder(stdout, 1)
+	var deployment struct {
+		Metadata struct {
+			Name string `json:"name"`
+		} `json:"metadata"`
+		Status struct {
+			Replicas      int `json:"replicas"`
+			ReadyReplicas int `json:"readyReplicas"`
+		} `json:"status"`
+	}
+	err = cmd.Start()
+	if err != nil {
+		t.Fatalf("Failed to start kubectl to watch deployments: %s", err)
+	}
+	for {
+		err := decoder.Decode(&deployment)
+		if err != nil {
+			t.Logf("Failed to decode JSON from kubectl: %s", err)
+			t.Fail()
+			break
+		}
+		t.Logf("%s replicas=%d ready=%d\n", deployment.Metadata.Name, deployment.Status.Replicas, deployment.Status.ReadyReplicas)
+		if deployment.Status.Replicas != 0 && deployment.Status.ReadyReplicas == deployment.Status.Replicas {
+			delete(deployments, deployment.Metadata.Name)
+			if len(deployments) == 0 {
+				break
+			}
+		}
+	}
+	err = cmd.Process.Kill()
+	if err != nil {
+		t.Fatalf("Failed to kill kubectl process: %s", err)
+	}
+}
+
+func RunHelmTest(t *testing.T, helmHome string, ns string, rel string) {
+	args := []string{helmCmd, "--tiller-namespace", ns, "--home", helmHome, "test", rel}
+	t.Logf("Running command: %+v", args)
+	cmd := exec.Command(args[0], args[1:]...)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Logf("Command failed: %s\nCommand output: %s", err, output)
+		re := regexp.MustCompile("`(kubectl logs.*)`")
+		for _, match := range re.FindAllSubmatch(output, -1) {
+			match_str := string(match[1])
+			args := strings.Split(match_str, " ")
+			if args[0] == "kubectl" {
+				args[0] = kubectlCmd
+			}
+			cmd := exec.Command(args[0], args[1:]...)
+			output, err := cmd.CombinedOutput()
+			if err != nil {
+				t.Logf("Failed to get logs from `%s`: %s\nCommand output: %s", match_str, err, output)
+			} else {
+				t.Logf("Output from `%s`:\n%s", match_str, output)
+			}
+		}
+		t.Fail()
+	} else {
+		t.Logf("Command output: %s", output)
+	}
 }
 
 func CreateChartVersionVerify(t *testing.T, chartPath string, configStr string, configFile string, ns string, rel string) {
