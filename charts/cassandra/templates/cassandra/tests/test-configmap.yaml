@@ -9,28 +9,23 @@ metadata:
     app: {{ template "cassandra.fullname" . }}
 data:
   test.sh: |-
+    set -ex
     HOST=$1
-    INPUT=/tmp/test_dir/test_cas.csv
-    touch $INPUT
+    INPUT=/tmp/test_cas.csv
+    KEYSPACE=test_{{ randAlphaNum 10 }}
     cqlsh $HOST -e "
-    CREATE KEYSPACE test
+    CREATE KEYSPACE $KEYSPACE
     WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : {{ .Values.config.clusterSize }} };"
 
     cqlsh $HOST -e "
-    CREATE TABLE test.test_table (
+    CREATE TABLE $KEYSPACE.test_table (
         name text,
         age int,
         role text,
-        PRIMARY KEY (name));
-    "
+        PRIMARY KEY (name));"
     cqlsh $HOST -e "
-    INSERT INTO test.test_table (name, age, role) VALUES ('john', 37, 'dev');"
-    cqlsh $HOST -e "COPY test.test_table (name, age, role) TO '$INPUT';"
+    INSERT INTO $KEYSPACE.test_table (name, age, role) VALUES ('john', 37, 'dev');"
+    cqlsh $HOST -e "COPY $KEYSPACE.test_table (name, age, role) TO '$INPUT';"
 
-    IFS=,
-    [ ! -f $INPUT ] && { echo "$INPUT file not found"; exit 1; }
-    read name age role < $INPUT
-    [[ $name=='john' ]] && \
-    [[ $age=='37' ]] && \
-    [[ $role=='dev' ]] && \
-    cqlsh $HOST -e "DROP keyspace test;"; exit 0 || exit 1
+    grep -Fq "john,37,dev" $INPUT
+    cqlsh $HOST -e "DROP keyspace $KEYSPACE;"
