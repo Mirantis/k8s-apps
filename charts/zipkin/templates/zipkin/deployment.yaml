@@ -13,6 +13,12 @@ spec:
     metadata:
       labels:
         app: {{ template "zipkin.fullname" . }}
+      annotations:
+        {{- if .Values.prometheusExporter.enabled }}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "{{ .Values.port }}"
+        prometheus.io/path: "/prometheus"
+        {{- end }}
     spec:
       containers:
       - name: {{ .Chart.Name }}
@@ -31,5 +37,17 @@ spec:
         - name: CASSANDRA3_CONTACT_POINTS
           value: "{{ template "zipkin.cassandra-address" . }}"
         {{- end }}
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.port  }}
+          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+          timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.port  }}
+          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+          timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
