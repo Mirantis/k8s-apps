@@ -1,6 +1,7 @@
 package go_test
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"io"
@@ -14,6 +15,7 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+	"text/template"
 	"time"
 
 	"github.com/kubernetes/apimachinery/pkg/util/yaml"
@@ -349,11 +351,9 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 		return
 	}
 
-	installArgs := []string{helmCmd, "--tiller-namespace", ns, "--home", helmHome, "install", chartDir, "--namespace", ns, "--name", rel, "--wait", "--timeout", "600"}
-	if config != "" {
-		installArgs = append(installArgs, "--values", config)
-	}
-	installResult := RunCmdTest(t, "install", installArgs...)
+	installResult := t.Run("install", func(t *testing.T) {
+		RunHelmInstall(t, helmHome, ns, rel, chartDir, config)
+	})
 
 	if !installResult {
 		for _, name := range []string{"wait_deployments", "test", "delete"} {
@@ -376,6 +376,42 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 	t.Run("test", func(t *testing.T) {
 		RunHelmTest(t, helmHome, ns, rel)
 	})
+}
+
+func RunHelmInstall(t *testing.T, helmHome string, ns string, rel string, chartDir string, config string) {
+	installArgs := []string{helmCmd, "--tiller-namespace", ns, "--home", helmHome, "install", chartDir, "--namespace", ns, "--name", rel, "--wait", "--timeout", "600"}
+	var str_config string
+	if config != "" {
+		installArgs = append(installArgs, "--values", "/dev/stdin")
+		tmpl, err := template.ParseFiles(config)
+		if err != nil {
+			t.Fatalf("Failed to parse template %s: %s", config, err)
+		}
+		var buf bytes.Buffer
+		var obj struct { }
+		err = tmpl.Execute(&buf, obj)
+		if err != nil {
+			t.Fatalf("Failed to execute template %s: %s", config, err)
+		}
+		str_config = buf.String()
+	}
+	cmd := exec.Command(installArgs[0], installArgs[1:]...)
+	if str_config != "" {
+		stdin, err := cmd.StdinPipe()
+		if err != nil {
+			t.Fatalf("Failed to get stding pipe: %s", err)
+		}
+		go func() {
+			defer stdin.Close()
+			io.WriteString(stdin, str_config)
+		}()
+	}
+	t.Logf("Running command: %+v", installArgs)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("Command failed: %s\nCommand output: %s", err, output)
+	}
+	t.Logf("Command output: %s", output)
 }
 
 func WaitForResources(t *testing.T, helmHome string, ns string, rel string) {
