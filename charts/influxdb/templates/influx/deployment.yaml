@@ -42,6 +42,8 @@ spec:
         volumeMounts:
           - name: config
             mountPath: /etc/influxdb
+          - name: data
+            mountPath: /influx_data
         readinessProbe:
           httpGet:
             path: /ping
@@ -49,9 +51,19 @@ spec:
           initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
           timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
       volumes:
-      - name: config
-        configMap:
-          name: {{ template "influx-cm-fullname" . }}
-          items:
-            - key: influx-conf
-              path: influxdb.conf
+        - name: config
+          configMap:
+            name: {{ template "influx-cm-fullname" . }}
+            items:
+              - key: influx-conf
+                path: influxdb.conf
+        - name: data
+      {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
+          persistentVolumeClaim:
+            claimName: {{ template "influx-fullname" . }}
+      {{- else if eq .Values.persistence.type "emptyDir" }}
+          emptyDir: {}
+      {{- else if eq .Values.persistence.type "hostPath" }}
+          hostPath:
+            path: "{{ .Values.persistence.hostPath }}"
+      {{- end }}

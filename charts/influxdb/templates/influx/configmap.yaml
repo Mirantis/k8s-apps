@@ -13,14 +13,14 @@ data:
     bind-address = ":{{ .Values.ports.default.port }}"
 
     [meta]
-      dir = "/var/lib/influxdb/meta"
+      dir = "/influx_data/meta"
       retention-autocreate = true
       logging-enabled = true
 
     [data]
-      dir = "/var/lib/influxdb/data"
+      dir = "/influx_data/data"
       index-version = "inmem"
-      wal-dir = "/var/lib/influxdb/wal"
+      wal-dir = "/influx_data/wal"
       wal-fsync-delay = "0s"
       query-log-enabled = true
       cache-max-memory-size = 1073741824
