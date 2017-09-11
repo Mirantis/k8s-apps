@@ -3,7 +3,7 @@ datanode:
   image:
     repository: mirantisworkloads/
     name: hadoop-datanode
-    tag: 2.7.2
+    tag: 2.8.1
     pullPolicy: IfNotPresent
 
   antiAffinity: "soft" # or "hard"
@@ -29,7 +29,7 @@ namenode:
   image:
     repository: mirantisworkloads/
     name: hadoop-namenode
-    tag: 2.7.2
+    tag: 2.8.1
     pullPolicy: IfNotPresent
 
   persistence:

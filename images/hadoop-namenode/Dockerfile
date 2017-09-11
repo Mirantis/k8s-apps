@@ -1,4 +1,4 @@
-FROM mirantisworkloads/hadoop:2.7.2
+FROM mirantisworkloads/hadoop:2.8.1
 
 ENV HDFS_CONF_dfs_namenode_name_dir=file:///hadoop/dfs/name
 RUN mkdir -p /hadoop/dfs/name
