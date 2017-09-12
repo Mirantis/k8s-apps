@@ -20,12 +20,13 @@ spec:
       secretName: {{ .Values.ingress.tls.secretName }}
   {{- end }}
   rules:
+    {{- $ctx := . }}
     {{- range .Values.ingress.hosts }}
     - host: {{ . }}
       http:
         paths:
           - backend:
-              serviceName: {{ template "zeppelin.fullname" . }}
+              serviceName: {{ template "zeppelin.fullname" $ctx }}
               servicePort: {{ $.Values.port }}
     {{- end -}}
 {{- end -}}

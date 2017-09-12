@@ -20,12 +20,13 @@ spec:
       secretName: {{ .Values.namenode.ui.ingress.tls.secretName }}
   {{- end }}
   rules:
+    {{- $ctx := . }}
     {{- range .Values.namenode.ui.ingress.hosts }}
     - host: {{ . }}
       http:
         paths:
           - backend:
-              serviceName: {{ template "hdfs-ui-fullname" . }}
+              serviceName: {{ template "hdfs-ui-fullname" $ctx }}
               servicePort: {{ $.Values.namenode.ui.port }}
     {{- end -}}
 {{- end -}}

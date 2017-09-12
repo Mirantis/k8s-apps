@@ -20,12 +20,13 @@ spec:
       secretName: {{ .Values.ui.ingress.tls.secretName }}
   {{- end }}
   rules:
+    {{- $ctx := . }}
     {{- range .Values.ui.ingress.hosts }}
     - host: {{ . }}
       http:
         paths:
           - backend:
-              serviceName: {{ template "fission-ui" . }}
+              serviceName: {{ template "fission-ui" $ctx }}
               servicePort: {{ $.Values.port }}
     {{- end -}}
 {{- end -}}

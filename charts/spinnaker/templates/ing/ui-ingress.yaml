@@ -21,12 +21,13 @@ spec:
       secretName: {{ .Values.ui.ingress.tls.secretName }}
   {{- end }}
   rules:
+    {{- $ctx := . }}
     {{- range .Values.ui.ingress.hosts }}
     - host: {{ . }}
       http:
         paths:
           - backend:
-              serviceName: {{ template "fullname" . }}-deck
+              serviceName: {{ template "fullname" $ctx }}-deck
               servicePort: {{ $.Values.ui.port }}
     {{- end -}}
 {{- end -}}

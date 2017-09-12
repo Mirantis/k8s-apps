@@ -20,17 +20,18 @@ spec:
       secretName: {{ .Values.ingress.tls.secretName }}
   {{- end }}
   rules:
+    {{- $ctx := . }}
     {{- range .Values.ingress.hosts }}
     - host: {{ . }}
       http:
         paths:
           - path: /webui
             backend:
-              serviceName: {{ template "master-external" . }}
+              serviceName: {{ template "master-external" $ctx }}
               servicePort: {{ $.Values.spark.master.webuiPort }}
           - path: /rest
             backend:
-              serviceName: {{ template "master-external" . }}
+              serviceName: {{ template "master-external" $ctx }}
               servicePort: {{ $.Values.spark.master.restPort }}
     {{- end -}}
 {{- end -}}

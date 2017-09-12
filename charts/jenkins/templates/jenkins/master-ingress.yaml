@@ -9,7 +9,7 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     app: {{ template "jenkins.master-fullname" . }}
   annotations:
-{{ toYaml .Values.namenode.Master.ingress.annotations | indent 4 }}
+{{ toYaml .Values.Master.ingress.annotations | indent 4 }}
 spec:
   {{- if .Values.Master.ingress.tls.enabled }}
   tls:
@@ -20,12 +20,13 @@ spec:
       secretName: {{ .Values.Master.ingress.tls.secretName }}
   {{- end }}
   rules:
+    {{- $ctx := . }}
     {{- range .Values.Master.ingress.hosts }}
     - host: {{ . }}
       http:
         paths:
           - backend:
-              serviceName: {{ template "jenkins.master-fullname" . }}
-              servicePort: {{ .Values.Master.port }}
+              serviceName: {{ template "jenkins.master-fullname" $ctx }}
+              servicePort: {{ $.Values.Master.port }}
     {{- end -}}
 {{- end -}}

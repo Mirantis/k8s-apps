@@ -1,5 +1,4 @@
 {{- if .Values.client.ingress.enabled -}}
-{{- $releaseName := .Release.Name -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -23,13 +22,14 @@ spec:
       secretName: {{ .Values.client.ingress.tls.secretName }}
   {{- end }}
   rules:
+  {{- $ctx := . }}
   {{- range .Values.client.ingress.hosts }}
     - host: {{ . }}
       http:
         paths:
           - path: /
             backend:
-              serviceName: {{ template "es-fullname" . }} 
+              serviceName: {{ template "es-fullname" $ctx }}
               servicePort: {{ $.Values.port }}
   {{- end -}}
 {{- end -}}
