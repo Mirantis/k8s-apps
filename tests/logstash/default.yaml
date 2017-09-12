@@ -1,0 +1,8 @@
+elasticsearch:
+  image:
+    repository: {{ .Repository }}
+image:
+  repository: {{ .Repository }}
+testImage:
+  repository: {{ .Repository }}
+

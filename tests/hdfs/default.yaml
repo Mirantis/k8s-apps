@@ -1,0 +1,6 @@
+datanode:
+  image:
+    repository: {{ .Repository }}
+namenode:
+  image:
+    repository: {{ .Repository }}

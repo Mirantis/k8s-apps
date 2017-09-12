@@ -1,0 +1,17 @@
+elasticsearch:
+  image:
+    repository: {{ .Repository }}
+logstash:
+  image:
+    repository: {{ .Repository }}
+  testImage:
+    repository: {{ .Repository }}
+kibana:
+  image:
+    repository: {{ .Repository }}
+  testImage:
+    repository: {{ .Repository }}
+testImage:
+  repository: {{ .Repository }}
+filebeatImage:
+  repository: {{ .Repository }}

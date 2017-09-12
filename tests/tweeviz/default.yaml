@@ -1,0 +1,6 @@
+image:
+  repository: {{ .Repository }}
+hdfs:
+  namenode:
+    image:
+      repository: {{ .Repository }}

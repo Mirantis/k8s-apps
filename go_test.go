@@ -31,23 +31,24 @@ func LookupEnvDefault(key string, def string) string {
 }
 
 var (
-	repoPathPtr        = flag.String("repo", "charts/", "Path to charts repository")
-	imagesPathPtr      = flag.String("images-dir", "images/", "Path to Dockerfiles")
-	configPathPtr      = flag.String("config", "tests/", "Path to charts config files")
-	excludePtr         = flag.String("exclude", "", "List of charts to exclude from run")
-	prefixPtr          = flag.String("prefix", "", "Prefix to prepend to object names (releases, namespaces)")
-	chartsPtr          = flag.Bool("charts", true, "Test charts")
-	imagesPtr          = flag.Bool("images", false, "Build images")
-	pushPtr            = flag.Bool("push", false, "Push images after tests")
-	imageRepoPtr       = flag.String("image-repo", "127.0.0.1:5000", "Image repo address for test")
-	pushRepoPtr        = flag.String("push-repo", "mirantisworkloads", "Image repo address for push")
-	buildImagesOptsPtr = flag.String("build-images-opts", "", "Docker opts for building images")
-	verifyVersion      = flag.Bool("verify-version", false, "Run tests to verify new helm/k8s version")
-	remoteCluster      = flag.String("remote-cluster", "127.0.0.1", "Cluster IP if remote kubernetes cluster is used")
-	verifyIngress      = flag.Bool("verify-ingress", false, "Ensure ingress is working correctly")
-	ingressSvc         = flag.String("ingress-svc", "", "Ingress service host:port to connect the ingress resource")
-	helmCmd            = LookupEnvDefault("HELM_CMD", "helm")
-	kubectlCmd         = LookupEnvDefault("KUBECTL_CMD", "kubectl")
+	repoPathPtr         = flag.String("repo", "charts/", "Path to charts repository")
+	imagesPathPtr       = flag.String("images-dir", "images/", "Path to Dockerfiles")
+	configPathPtr       = flag.String("config", "tests/", "Path to charts config files")
+	excludePtr          = flag.String("exclude", "", "List of charts to exclude from run")
+	prefixPtr           = flag.String("prefix", "", "Prefix to prepend to object names (releases, namespaces)")
+	chartsPtr           = flag.Bool("charts", true, "Test charts")
+	kubernetesDomainPtr = flag.String("kubernetes-domain", "cluster.local", "Base domain of Kubernetes cluster tests are run on")
+	imagesPtr           = flag.Bool("images", false, "Build images")
+	pushPtr             = flag.Bool("push", false, "Push images after tests")
+	imageRepoPtr        = flag.String("image-repo", "127.0.0.1:5000", "Image repo address for test")
+	pushRepoPtr         = flag.String("push-repo", "mirantisworkloads", "Image repo address for push")
+	buildImagesOptsPtr  = flag.String("build-images-opts", "", "Docker opts for building images")
+	verifyVersion       = flag.Bool("verify-version", false, "Run tests to verify new helm/k8s version")
+	remoteCluster       = flag.String("remote-cluster", "127.0.0.1", "Cluster IP if remote kubernetes cluster is used")
+	verifyIngress       = flag.Bool("verify-ingress", false, "Ensure ingress is working correctly")
+	ingressSvc          = flag.String("ingress-svc", "", "Ingress service host:port to connect the ingress resource")
+	helmCmd             = LookupEnvDefault("HELM_CMD", "helm")
+	kubectlCmd          = LookupEnvDefault("KUBECTL_CMD", "kubectl")
 )
 
 func TestVerify(t *testing.T) {
@@ -255,19 +256,16 @@ func RunChart(t *testing.T, chart string) {
 		t.Fatalf("lint failed, not proceeding")
 	}
 	t.Run("tests", func(t *testing.T) {
-		configs, err := filepath.Glob(path.Join(*configPathPtr, chart, "*"))
+		configs, err := filepath.Glob(path.Join(*configPathPtr, chart, "*.yaml"))
 		if err != nil {
 			t.Fatalf("Failed to lookup configs: %s", err)
 		}
+		if len(configs) == 0 {
+			t.Fatalf("Didn't find any configs to run tests for chart '%s'", chart)
+		}
 		t.Logf("Found configs for chart %s: %+v", chart, configs)
-		configs = append(configs, "")
 		for _, config := range configs {
-			var testName string
-			if config != "" {
-				testName = config
-			} else {
-				testName = "_default_"
-			}
+			testName := path.Base(config)
 			t.Run(testName, func(t *testing.T) {
 				RunOneConfig(t, chart, config)
 			})
@@ -380,32 +378,30 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 
 func RunHelmInstall(t *testing.T, helmHome string, ns string, rel string, chartDir string, config string) {
 	installArgs := []string{helmCmd, "--tiller-namespace", ns, "--home", helmHome, "install", chartDir, "--namespace", ns, "--name", rel, "--wait", "--timeout", "600"}
-	var str_config string
-	if config != "" {
-		installArgs = append(installArgs, "--values", "/dev/stdin")
-		tmpl, err := template.ParseFiles(config)
-		if err != nil {
-			t.Fatalf("Failed to parse template %s: %s", config, err)
-		}
-		var buf bytes.Buffer
-		var obj struct { }
-		err = tmpl.Execute(&buf, obj)
-		if err != nil {
-			t.Fatalf("Failed to execute template %s: %s", config, err)
-		}
-		str_config = buf.String()
+	installArgs = append(installArgs, "--values", "/dev/stdin")
+	tmpl, err := template.ParseFiles(config)
+	if err != nil {
+		t.Fatalf("Failed to parse template %s: %s", config, err)
 	}
+	var buf bytes.Buffer
+	obj := struct {
+		Repository string;
+		KubernetesDomain string;
+	} { *imageRepoPtr + "/", *kubernetesDomainPtr }
+	err = tmpl.Execute(&buf, obj)
+	if err != nil {
+		t.Fatalf("Failed to execute template %s: %s", config, err)
+	}
+	str_config := buf.String()
 	cmd := exec.Command(installArgs[0], installArgs[1:]...)
-	if str_config != "" {
-		stdin, err := cmd.StdinPipe()
-		if err != nil {
-			t.Fatalf("Failed to get stding pipe: %s", err)
-		}
-		go func() {
-			defer stdin.Close()
-			io.WriteString(stdin, str_config)
-		}()
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		t.Fatalf("Failed to get stding pipe: %s", err)
 	}
+	go func() {
+		defer stdin.Close()
+		io.WriteString(stdin, str_config)
+	}()
 	t.Logf("Running command: %+v", installArgs)
 	output, err := cmd.CombinedOutput()
 	if err != nil {

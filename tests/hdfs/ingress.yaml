@@ -1,6 +1,12 @@
-ui:
-  ingress:
-    enabled: true
-    hosts: ["hdfs.ingress"]
-    annotations:
-     kubernetes.io/ingress.class: nginx
+datanode:
+  image:
+    repository: {{ .Repository }}
+namenode:
+  image:
+    repository: {{ .Repository }}
+  ui:
+    ingress:
+      enabled: true
+      hosts: ["hdfs.ingress"]
+      annotations:
+        kubernetes.io/ingress.class: nginx

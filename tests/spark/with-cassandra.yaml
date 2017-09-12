@@ -1,2 +1,11 @@
+spark:
+  image:
+    repository: {{ .Repository }}
+zookeeper:
+  image:
+    repository: {{ .Repository }}
 cassandra:
   enabled: true
+  image:
+    repository: {{ .Repository }}
+  kubernetes_domain: {{ .KubernetesDomain }}

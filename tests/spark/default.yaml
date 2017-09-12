@@ -1,0 +1,6 @@
+spark:
+  image:
+    repository: {{ .Repository }}
+zookeeper:
+  image:
+    repository: {{ .Repository }}
