@@ -1,0 +1,5 @@
+dependencies:
+- name: zipkin
+  version: ^0.x
+  repository: https://mirantisworkloads.storage.googleapis.com/
+  condition: zipkin.deployChart
