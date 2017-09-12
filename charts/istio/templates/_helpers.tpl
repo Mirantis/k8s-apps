@@ -40,3 +40,11 @@ Example output:
 {{- define "chartref" -}}
   {{- replace "+" "_" .Chart.Version | printf "%s-%s" .Chart.Name -}}
 {{- end -}}
+
+{{- define "istio.zipkin-address" -}}
+    {{- if .Values.zipkin.deployChart -}}
+        {{ template "zipkin.fullname" . }}:{{ .Values.zipkin.port }}
+    {{- else -}}
+        {{- printf "%s" .Values.zipkin.externalAddress -}}
+    {{- end -}}
+{{- end -}}
