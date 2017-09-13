@@ -1,11 +1,9 @@
-def run(helm_home, namespace_prefix, kubernetes_domain) {
+def run(helm_home, namespace_prefix, kubernetes_domain, buildId) {
   stage("Dependencies") {
-    def buildId = env.BUILD_NUMBER + '-' + env.GERRIT_CHANGE_NUMBER + '-' + env.GERRIT_PATCHSET_NUMBER
     sh('go run tools/pre-test-local-repos.go')
     sh("go get github.com/kubernetes/apimachinery/pkg/util/yaml")
     sh("cp -r charts tmp-charts")
   }
-  def buildId = "${env.BUILD_NUMBER}-${env.GERRIT_CHANGE_NUMBER}-${env.GERRIT_PATCHSET_NUMBER}"
   stage("Run tests") {
     try {
       withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
