@@ -93,6 +93,7 @@ dashboards:
   spark: false
   zookeeper: false
   istio: false
+  telegraf_system: false
 
 ## Grafana config file ConfigMap entry
 ##
