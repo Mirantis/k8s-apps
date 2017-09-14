@@ -1,4 +1,5 @@
 {
+  "dashboard": {
   "__inputs": [
     {
       "name": "DS_INFLUXDB_TELEGRAF",
@@ -8113,4 +8114,6 @@
   "timezone": "browser",
   "title": "Telegraf: system dashboard",
   "version": 0
+},
+  "overwrite": false
 }
