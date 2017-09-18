@@ -12,3 +12,7 @@
   {{- printf ":%d" (int $.Values.cassandra.config.ports.cql) -}}
 {{- end -}}
 {{- end -}}
+
+{{- define "zipkin.elasticsearch-address" -}}
+{{ template "es-client-fullname" . }}:{{ .Values.elasticsearch.port }}
+{{- end -}}
