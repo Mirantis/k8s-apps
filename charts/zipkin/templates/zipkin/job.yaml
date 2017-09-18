@@ -1,0 +1,44 @@
+{{- if .Values.dependenciesJob.enabled  }}
+apiVersion: batch/v2alpha1
+kind: CronJob
+metadata:
+  labels:
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "zipkin.fullname" . }}
+  name: {{ template "zipkin.fullname" . }}-job
+spec:
+  schedule: "{{ .Values.dependenciesJob.schedule }}"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            heritage: "{{ .Release.Service }}"
+            release: "{{ .Release.Name }}"
+            chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+            app: {{ template "zipkin.fullname" . }}
+        spec:
+          containers:
+          - name: zipkin-dependencies
+            image: "{{ .Values.dependenciesJob.image.repository }}{{ .Values.dependenciesJob.image.name }}:{{ .Values.dependenciesJob.image.tag }}"
+            imagePullPolicy: "{{ .Values.dependenciesJob.image.pullPolicy }}"
+            env:
+            {{- range $name, $value := .Values.env }}
+            - name: {{ $name }}
+              value: {{ $value | quote}}
+            {{- end }}
+            {{- if .Values.cassandra.deployChart }}
+            - name: STORAGE_TYPE
+              value: cassandra
+            - name: CASSANDRA_CONTACT_POINTS
+              value: "{{ template "zipkin.cassandra-address" . }}"
+            {{- else if .Values.elasticsearch.deployChart  }}
+            - name: STORAGE_TYPE
+              value: elasticsearch
+            - name: ES_HOSTS
+              value: "{{ template "zipkin.elasticsearch-address" . }}"
+            {{- end }}
+          restartPolicy: OnFailure
+{{- end  }}
