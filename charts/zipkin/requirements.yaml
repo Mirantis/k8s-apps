@@ -1,6 +1,9 @@
 dependencies:
 - name: cassandra
   version: ^1.x
-  #repository: https://mirantisworkloads.storage.googleapis.com/
-  repository: file://../cassandra
+  repository: https://mirantisworkloads.storage.googleapis.com/
   condition: cassandra.deployChart
+- name: elasticsearch
+  version: ^1.x
+  repository: https://mirantisworkloads.storage.googleapis.com/
+  condition: elasticsearch.deployChart

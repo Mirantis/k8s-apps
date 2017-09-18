@@ -36,6 +36,11 @@ spec:
           value: cassandra3
         - name: CASSANDRA3_CONTACT_POINTS
           value: "{{ template "zipkin.cassandra-address" . }}"
+        {{- else if .Values.elasticsearch.deployChart  }}
+        - name: STORAGE_TYPE
+          value: elasticsearch
+        - name: ES_HOSTS
+          value: "{{ template "zipkin.elasticsearch-address" . }}"
         {{- end }}
         readinessProbe:
           httpGet:
