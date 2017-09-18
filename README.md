@@ -1,17 +1,14 @@
 # Mirantis Platform Services
 
-## Supported helm and kubernetes versions
+## Recommended helm and kubernetes versions
 
-Currently used kubernetes version **v1.5** with helm version **v2.3.1**. Stable
-work is guaranteed.
+Kubernetes: 1.7.x
+Helm:       2.6.x
 
-Next versions for stable work are:
+## Versions currently used on ci
 
- * kubernetes version **v1.6**
- * helm version **v2.4.2**
+Kubernetes: 1.7.3
+Helm:       2.6.0
 
-These versions are tested together and approved with successful verify version
-check list (https://github.com/Mirantis/k8s-apps/blob/master/docs/check_helm_or_k8s_version.rst).
-
-*NOTE*: Do not use helm version **v2.5.0** - chart dependencies are broken in
-it. Fix will be landed in **v2.5.1**.
+All charts are still compatible with kubernetes 1.6, yet it's not guaranteed
+that compatibility will stay for long.
