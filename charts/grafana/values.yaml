@@ -50,12 +50,16 @@ adminPassword: "admin"
 prometheus:
   deployChart: true
   externalAddress: "http://url:port"
+  setDatasource: true
+  default: "true"
+influxdb:
+  deployChart: true
+  externalAddress: "http://url:port"
+  setDatasource: true
+  default: "false"
 
 # Set datasource in beginning
 setDatasource:
-  ## If true, an initial Grafana Datasource will be set
-  enabled: true
-
   ## How long should it take to commit failure
   ## Default: 300
   ##

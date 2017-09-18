@@ -3,3 +3,7 @@ dependencies:
   version: ^0.x
   repository: https://mirantisworkloads.storage.googleapis.com/
   condition: prometheus.deployChart
+- name: influxdb
+  version: ^1.x
+  repository: https://mirantisworkloads.storage.googleapis.com/
+  condition: influxdb.deployChart

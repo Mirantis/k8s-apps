@@ -1,35 +1,39 @@
-{{- if .Values.setDatasource.enabled -}}
+{{ $root := . }}
+{{- range $source := tuple "prometheus" "influxdb" }}
+{{- if "$root.Values.$source.setDatasource" -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
   labels:
-    heritage: "{{ .Release.Service }}"
-    release: "{{ .Release.Name }}"
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: {{ template "grafana.fullname" . }}
-  name: {{ template "grafana.fullname" . }}-set-datasource
+    heritage: "{{ $root.Release.Service }}"
+    release: "{{ $root.Release.Name }}"
+    chart: "{{ $root.Chart.Name }}-{{ $root.Chart.Version }}"
+    app: {{ template "grafana.fullname" $root }}
+  name: {{ template "grafana.fullname" $root }}-set-{{ $source }}-datasource
 spec:
   activeDeadlineSeconds: 300
   template:
     metadata:
       labels:
-        release: "{{ .Release.Name }}"
-        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-        app: {{ template "grafana.fullname" . }}
+        release: "{{ $root.Release.Name }}"
+        chart: "{{ $root.Chart.Name }}-{{ $root.Chart.Version }}"
+        app: {{ template "grafana.fullname" $root }}
     spec:
       containers:
-      - name: set-datasource
-        image: "{{ .Values.setDatasource.image.repository }}{{ .Values.setDatasource.image.name }}:{{ .Values.setDatasource.image.tag }}"
-        imagePullPolicy: {{ .Values.setDatasource.image.pullPolicy }}
+      - name: set-datasource-{{ $source }}
+        image: "{{ $root.Values.setDatasource.image.repository }}{{ $root.Values.setDatasource.image.name }}:{{ $root.Values.setDatasource.image.tag }}"
+        imagePullPolicy: {{ $root.Values.setDatasource.image.pullPolicy }}
         args:
-          - "http://{{ .Values.adminUser }}:{{ .Values.adminPassword }}@{{ template "grafana.fullname" . }}:{{ .Values.port }}/api/datasources"
+          - "http://{{ $root.Values.adminUser }}:{{ $root.Values.adminPassword }}@{{ template "grafana.fullname" $root }}:{{ $root.Values.port }}/api/datasources"
           - "-X"
           - POST
           - "-H"
           - "Content-Type: application/json;charset=UTF-8"
           - "--data-binary"
-          - {{ template "prometheus-datasource" . }}
+          - {{ if eq $source "prometheus" }}{{ template "prometheus-datasource" $root }}{{ else if eq $source "influxdb" }}{{ template "influxdb-datasource" $root}}{{ end }}
           - "--max-time"
           - "10"
-      restartPolicy: {{ .Values.setDatasource.restartPolicy }}
+      restartPolicy: {{ $root.Values.setDatasource.restartPolicy }}
+---
+{{- end -}}
 {{- end -}}
