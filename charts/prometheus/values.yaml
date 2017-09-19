@@ -241,7 +241,7 @@ server:
 
   ## Prometheus server pod termination grace period
   ##
-  terminationGracePeriodSeconds: 300
+  terminationGracePeriodSeconds: 30
 
 logCollector:
   enabled: false
