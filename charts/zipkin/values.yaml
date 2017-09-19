@@ -26,6 +26,17 @@ prometheusExporter:
 env:
   SELF_TRACING_ENABLED: "true"
 
+dependenciesJob:
+  # The zipkin dependencies job pre-aggregates data to show links between
+  # services. Currently not working for cassandra3 storage type.
+  enabled: false
+  schedule: "@daily"
+  image:
+    repository: openzipkin/
+    name: zipkin-dependencies
+    tag: 1
+    pullPolicy: Always
+
 service:
   type: NodePort # or ClusterIP or LoadBalancer
 
