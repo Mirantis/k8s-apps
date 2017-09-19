@@ -1,6 +1,6 @@
 {{ $root := . }}
 {{- range $source := tuple "prometheus" "influxdb" }}
-{{- if "$root.Values.$source.setDatasource" -}}
+{{- if "$root.Values.$source.setDatasource" }}
 apiVersion: batch/v1
 kind: Job
 metadata:
