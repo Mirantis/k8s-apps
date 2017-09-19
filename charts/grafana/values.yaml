@@ -48,17 +48,21 @@ adminUser: "admin"
 adminPassword: "admin"
 
 prometheus:
-  deployChart: true
+  # if disabled, subchart will not be deployed
+  deployChart: false
+  # this address will be used if subchart deployment is disabled
   externalAddress: "http://url:port"
-  setDatasource: true
+  setDatasource: false
   default: "true"
+
 influxdb:
-  deployChart: true
+  # if disabled, subchart will not be deployed
+  deployChart: false
+  # this address will be used if subchart deployment is disabled
   externalAddress: "http://url:port"
-  setDatasource: true
+  setDatasource: false
   default: "false"
 
-# Set datasource in beginning
 setDatasource:
   ## How long should it take to commit failure
   ## Default: 300
