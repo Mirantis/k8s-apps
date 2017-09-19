@@ -35,5 +35,5 @@ spec:
           - "10"
       restartPolicy: {{ $root.Values.setDatasource.restartPolicy }}
 ---
-{{- end -}}
-{{- end -}}
+{{- end }}
+{{- end }}

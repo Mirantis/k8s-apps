@@ -8115,5 +8115,13 @@
   "title": "Telegraf: system dashboard",
   "version": 0
 },
-  "overwrite": false
+"overwrite": true,
+"inputs": [
+  {
+    "name": "DS_INFLUXDB_TELEGRAF",
+    "type": "datasource",
+    "pluginId": "influxdb",
+    "value": "influxdb"
+  }
+]
 }

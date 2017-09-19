@@ -24,7 +24,7 @@ spec:
         image: "{{ $.Values.setDatasource.image.repository }}{{ $.Values.setDatasource.image.name }}:{{ $.Values.setDatasource.image.tag }}"
         imagePullPolicy: {{ $.Values.image.pullPolicy }}
         args:
-          - "http://{{ $.Values.adminUser }}:{{ $.Values.adminPassword }}@{{ $serviceName }}:{{ $.Values.port }}/api/dashboards/db"
+          - "http://{{ $.Values.adminUser }}:{{ $.Values.adminPassword }}@{{ $serviceName }}:{{ $.Values.port }}/api/dashboards/import"
           - "-X"
           - POST
           - "-H"
