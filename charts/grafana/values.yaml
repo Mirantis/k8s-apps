@@ -94,7 +94,7 @@ logCollector:
   logstashHost:
     - "" # host:port Ex: "logstash-logstash:5043"
 
-dashboards:
+internalDashboards:
   # Specify dashboards that will be uploaded
   cassandra: false
   kafka: false
@@ -102,6 +102,11 @@ dashboards:
   zookeeper: false
   istio: false
   telegraf-system: false
+
+externalDashboards:
+  # Sepecify external repository to install dashboards
+  gitCloneString:
+  dashboards: {}
 
 ## Grafana config file ConfigMap entry
 ##

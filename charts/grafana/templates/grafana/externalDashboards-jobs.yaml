@@ -1,5 +1,5 @@
 {{- $serviceName := include "grafana.fullname" . -}}
-{{- range $dashboard, $enabled := .Values.internalDashboards }}
+{{- range $dashboard, $enabled := .Values.externalDashboards.dashboards }}
 {{ if $enabled }}
 apiVersion: batch/v1
 kind: Job
@@ -9,7 +9,7 @@ metadata:
     release: "{{ $.Release.Name }}"
     chart: "{{ $.Chart.Name }}-{{ $.Chart.Version }}"
     app: {{ $serviceName }}
-  name: {{ $serviceName }}-{{ $dashboard }}-dashboard
+  name: {{ $serviceName }}-{{ $dashboard }}-external-dashboard
 spec:
   activeDeadlineSeconds: 300
   template:
@@ -18,9 +18,18 @@ spec:
         release: "{{ $.Release.Name }}"
         chart: "{{ $.Chart.Name }}-{{ $.Chart.Version }}"
         app: {{ $serviceName }}
+      annotations:
+        pod.beta.kubernetes.io/init-containers: '[
+          {
+            "name": "get-dashboards",
+            "image": "bwits/docker-git-alpine",
+            "command": ["sh", "-c", "git clone {{ $.Values.externalDashboards.gitCloneString }} /etc/dashboards"],
+            "volumeMounts":[{"name":"dashboards","mountPath":"/etc/dashboards"}]
+          }
+        ]'
     spec:
       containers:
-      - name: add-dashboard
+      - name: add-external-dashboard
         image: "{{ $.Values.setDatasource.image.repository }}{{ $.Values.setDatasource.image.name }}:{{ $.Values.setDatasource.image.tag }}"
         imagePullPolicy: {{ $.Values.image.pullPolicy }}
         args:
@@ -38,8 +47,7 @@ spec:
             mountPath: /etc/dashboards
       volumes:
         - name: dashboards
-          configMap:
-            name: {{ $serviceName }}-dashboards
+          emptyDir: {}
       restartPolicy: {{ $.Values.setDatasource.restartPolicy }}
 ---
 {{- end }}
