@@ -1,0 +1,13 @@
+dependencies:
+- name: spark
+  version: ^3.x
+  repository: https://mirantisworkloads.storage.googleapis.com/
+  condition: spark.deployChart
+- name: cassandra
+  version: ^1.x
+  repository: https://mirantisworkloads.storage.googleapis.com/
+  condition: cassandra.deployChart
+- name: kafka
+  version: ^1.x
+  repository: https://mirantisworkloads.storage.googleapis.com/
+  condition: kafka.deployChart

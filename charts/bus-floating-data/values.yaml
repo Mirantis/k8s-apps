@@ -1,0 +1,75 @@
+ingest:
+  image:
+    repository: anierbeck/
+    name: akka-ingest
+    tag: 0.2.1-SNAPSHOT
+    pullPolicy: IfNotPresent
+
+  resources:
+    #requests:
+    #  cpu: 100m
+    #  memory: 512Mi
+    #limits:
+    #  cpu: 100m
+    #  memory: 512Mi
+
+digest:
+  image:
+    repository: anierbeck/
+    name: akka-ingest
+    tag: 0.2.1-SNAPSHOT
+    pullPolicy: IfNotPresent
+
+  submit-args: "--executor-memory 512M --total-executor-cores 4"
+
+  resources:
+    #requests:
+    #  cpu: 100m
+    #  memory: 512Mi
+    #limits:
+    #  cpu: 100m
+    #  memory: 512Mi
+
+dashboard:
+  image:
+    repository: anierbeck/
+    name: akka-server
+    tag: 0.2.1-SNAPSHOT
+    pullPolicy: IfNotPresent
+
+  service:
+    externalIPs: []
+
+  resources:
+    #requests:
+    #  cpu: 100m
+    #  memory: 512Mi
+    #limits:
+    #  cpu: 100m
+    #  memory: 512Mi
+
+spark:
+  deployChart: false
+  externalAddress: ""
+
+  spark:
+    image:
+      repository: mirantisworkloads/
+      name: spark
+      tag: 2.2.0
+      pullPolicy: IfNotPresent
+
+cassandra:
+  deployChart: false
+  externalHost: ""
+  externalPort: 9042
+
+  image:
+    repository: mirantisworkloads/
+    name: cassandra
+    tag: 3.11.0
+    pullPolicy: IfNotPresent
+
+kafka:
+  deployChart: false
+  externalAddress: ""

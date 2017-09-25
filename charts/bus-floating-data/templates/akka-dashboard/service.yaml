@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ printf "bfd-akka-dashboard-%s" .Release.Name  | trunc 55 | trimSuffix "-" }}
+  labels:
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ printf "bfd-akka-dashboard-%s" .Release.Name  | trunc 55 | trimSuffix "-" }}
+spec:
+  ports:
+    - port: 8000
+      name: http
+  selector:
+    app: {{ printf "bfd-akka-dashboard-%s" .Release.Name  | trunc 55 | trimSuffix "-" }}
+  type: "ClusterIP"
+  externalIPs: {{ .Values.dashboard.service.externalIPs }}
