@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ printf "bfd-akka-dashboard-%s" .Release.Name  | trunc 55 | trimSuffix "-" }}
+  labels:
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ printf "bfd-akka-dashboard-%s" .Release.Name  | trunc 55 | trimSuffix "-" }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        heritage: "{{ .Release.Service }}"
+        release: "{{ .Release.Name }}"
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ printf "bfd-akka-dashboard-%s" .Release.Name  | trunc 55 | trimSuffix "-" }}
+    spec:
+      containers:
+      - name: akka-dashboard
+        image: {{ .Values.dashboard.image.repository }}{{ .Values.dashboard.image.name }}:{{ .Values.dashboard.image.tag }}
+        imagePullPolicy: {{ .Values.dashboard.image.pullPolicy }}
+        env:
+        - name: CASSANDRA_CONNECT
+          value: "{{ template "bfd.cassandra-host" . }}:{{ template "bfd.cassandra-port" . }}"
+        - name: KAFKA_CONNECT
+          value: "{{ template "bfd.kafka-address" . }}"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        resources:
+{{ toYaml .Values.dashboard.resources | indent 12 }}
