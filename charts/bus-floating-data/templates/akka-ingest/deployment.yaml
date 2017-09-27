@@ -17,11 +17,6 @@ spec:
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         app: {{ printf "bfd-akka-ingest-%s" .Release.Name  | trunc 55 | trimSuffix "-" }}
     spec:
-      initContainers:
-      - name: wait-for-cassandra
-        image: {{ .Values.cassandra.image.repository }}{{ .Values.cassandra.image.name }}:{{ .Values.cassandra.image.tag }}
-        imagePullPolicy: {{ .Values.cassandra.image.pullPolicy }}
-        command: ["nodetool", "-h", "{{ template "bfd.cassandra-host" . }}", "-p", "{{ template "bfd.cassandra-port" . }}", "status"]
       containers:
       - name: akka-ingest
         image: {{ .Values.ingest.image.repository }}{{ .Values.ingest.image.name }}:{{ .Values.ingest.image.tag }}
