@@ -32,5 +32,11 @@ spec:
             port: 8000
           initialDelaySeconds: 5
           timeoutSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 20
+          timeoutSeconds: 5
         resources:
 {{ toYaml .Values.dashboard.resources | indent 12 }}
