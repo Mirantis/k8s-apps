@@ -1,0 +1,9 @@
+antiAffinity: "soft"
+
+kubernetes_domain: ${BFD_KUBERNETES_DOMAIN}
+
+prometheusExporter:
+  enabled: true
+
+config:
+  clusterSize: 1
