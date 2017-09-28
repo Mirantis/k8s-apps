@@ -1,0 +1,5 @@
+replicas: 1
+antiAffinity: soft
+
+prometheusExporter:
+  enabled: true

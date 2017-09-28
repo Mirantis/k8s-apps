@@ -1,0 +1,17 @@
+dashboard:
+  service:
+    externalIPs:
+    - "${BFD_EXTERNAL_IP}"
+
+spark:
+  deployChart: false
+  externalAddress: "spark-master-${BFD_SPARK_RELEASE}-0:7077,spark-master-${BFD_SPARK_RELEASE}-1:7077"
+
+cassandra:
+  deployChart: false
+  externalHost: "cassandra-${BFD_CASSANDRA_RELEASE}"
+  externalPort: 9042
+
+kafka:
+  deployChart: false
+  externalAddress: "kafka-${BFD_KAFKA_RELEASE}-0.kafka-${BFD_KAFKA_RELEASE}:9092,kafka-${BFD_KAFKA_RELEASE}-1.kafka-${BFD_KAFKA_RELEASE}:9092,kafka-${BFD_KAFKA_RELEASE}-2.kafka-${BFD_KAFKA_RELEASE}:9092"

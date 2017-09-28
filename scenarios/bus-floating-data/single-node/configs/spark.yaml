@@ -1,0 +1,12 @@
+spark:
+  master:
+    replicas: 1
+  worker:
+    replicas: 1
+
+prometheusExporter:
+  enabled: true
+
+zookeeper:
+  deployChart: false
+  externalAddress: zk-${BFD_ZOOKEEPER_RELEASE}-0.zk-${BFD_ZOOKEEPER_RELEASE}:2181

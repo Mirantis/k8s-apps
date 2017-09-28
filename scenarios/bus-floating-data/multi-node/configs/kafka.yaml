@@ -1,0 +1,9 @@
+replicas: 3
+antiAffinity: "soft"
+
+prometheusExporter:
+  enabled: true
+
+zookeeper:
+  deployChart: false
+  externalAddress: zk-${BFD_ZOOKEEPER_RELEASE}-0.zk-${BFD_ZOOKEEPER_RELEASE}:2181,zk-${BFD_ZOOKEEPER_RELEASE}-1.zk-${BFD_ZOOKEEPER_RELEASE}:2181,zk-${BFD_ZOOKEEPER_RELEASE}-2.zk-${BFD_ZOOKEEPER_RELEASE}:2181
