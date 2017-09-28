@@ -122,10 +122,10 @@ function main() {
     log "\tBFD_NAMESPACE - K8s namespace that will be used for deployment"
     log "\t\tcurrent: ${BFD_NAMESPACE} (default: same as BFD_NAME)"
 
-    export BFD_EXTERNAL_IP=${BFD_EXTERNAL_IP:-cluster.local}
+    export BFD_EXTERNAL_IP=${BFD_EXTERNAL_IP:-}
     log "\tBFD_EXTERNAL_IP - External IP of one of the k8s cluster nodes."
     log "\tIf not specified, attempt will be made to automatically detect it."
-    log "\t\tcurrent: $([ "${BFD_EXTERNAL_IP}" ] || echo unset) (default: unset)"
+    log "\t\tcurrent: ${BFD_EXTERNAL_IP} (default: unset)"
 
     export BFD_KUBERNETES_DOMAIN=${BFD_KUBERNETES_DOMAIN:-cluster.local}
     log "\tBFD_KUBERNETES_DOMAIN - K8s cluster domain"
@@ -251,6 +251,7 @@ function command_up() {
         log "Deploying or upgrading chart ${chart} with release ${release}"
 
         _helm upgrade --install --wait --namespace ${BFD_NAMESPACE} ${release} bfd-${BFD_NAME}/${chart} -f configs/${chart}.yaml | tee ${chart}.log
+        sleep 10
     done
 
     _helm repo list | grep -q bfd-${BFD_NAME} && _helm repo remove bfd-${BFD_NAME} 1>/dev/null
