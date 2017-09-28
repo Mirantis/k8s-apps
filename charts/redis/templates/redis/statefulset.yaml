@@ -8,7 +8,7 @@ metadata:
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     app: {{ template "redis-fullname" . }}
 spec:
-  serviceName: {{ template "sentinel-svc-fullname" . }}
+  serviceName: {{ template "redis-fullname" . }}
   replicas: {{ .Values.replicas }}
   template:
     metadata:
@@ -50,8 +50,6 @@ spec:
         env:
         - name: MASTER_DATA
           value: /var/lib/redis
-        - name: CLUSTER_SERVICE_NAME
-          value: {{ template "cluster-svc-fullname" . }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         readinessProbe:
@@ -90,29 +88,6 @@ spec:
           - "-d"
           - "\"*\""
       {{- end }}
-      - name: sentinel
-        image: {{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        env:
-        - name: SENTINEL
-          value: "true"
-        - name: CLUSTER_SERVICE_NAME
-          value: {{ template "cluster-svc-fullname" . }}
-        resources:
-{{ toYaml .Values.resources | indent 10 }}
-        readinessProbe:
-          exec:
-            command:
-            - redis-cli
-            - ping
-          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
-          timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
-        ports:
-        - name: sentinel
-          containerPort: {{ default 26379 .Values.config.sentinelPort }}
-        volumeMounts:
-        - name: sentinel-cfg
-          mountPath: /opt/redis/conf
       {{- if .Values.prometheusExporter.enabled }}
       - name: metrics
         image: {{ .Values.prometheusExporter.image.repository }}{{ .Values.prometheusExporter.image.name }}:{{ .Values.prometheusExporter.image.tag }}
@@ -124,9 +99,6 @@ spec:
       - name: redis-cfg
         configMap:
           name: {{ template "redis-fullname" . }}
-      - name: sentinel-cfg
-        configMap:
-          name: {{ template "sentinel-fullname" . }}
       {{- if eq .Values.persistence.type "emptyDir" }}
       - name: data
         emptyDir: {}
