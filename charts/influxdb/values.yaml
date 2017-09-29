@@ -6,16 +6,12 @@ ports:
   defaultUdp:
     port: 8087
     protocol: udp
-  graphite:
-    port: 2003
 
 replicas: 1
 probeInitialDelaySeconds: 15
 probeTimeoutSeconds: 5
 
 environment_variables:
-  - name: INFLUXDB_GRAPHITE_ENABLED
-    value: "true"
   - name: INFLUXDB_ADMIN_ENABLED
     value: "true"
 
@@ -33,24 +29,23 @@ testImage:
 
 # Configure additional databases and listen interfaces for them
 additionalDatabasesInterfacesConfigs:
-  #sample collectd config
-  #definition
-  collectd:
-    #standard values
-    enabled: "false"
-    port: 25826
-    database: "collectd"
-    #additional values
+  # sample graphite config
+  graphite:
+    # standard values
+    enabled: false
+    port: 2003
+    #database: ""
+    # additional values
     additionalValues: |
+      log-enabled = true
       retention-policy = ""
-      consistency-level = "one"
+      protocol = "tcp"
       batch-size = 5000
       batch-pending = 10
-      batch-timeout = "10s"
-      read-buffer = 0
-      typesdb = "/usr/share/collectd/types.db"
-      security-level = "none"
-      auth-file = "/etc/collectd/auth_file"
+      batch-timeout = "1s"
+      consistency-level = "one"
+      separator = "."
+      udp-read-buffer = 0
 
 persistence:
   type: emptyDir

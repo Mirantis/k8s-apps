@@ -26,12 +26,14 @@ spec:
       {{- end }}
     {{- end }}
     {{- range $name, $values := .Values.additionalDatabasesInterfacesConfigs }}
+    {{- if $values.enabled }}
     - name: {{ printf "%s-%s-%d-%s" $fullname ($name | lower) (int $values.port) (default "tcp" $values.protocol | lower) }}
       port: {{ $values.port }}
       protocol: {{ default "tcp" $values.protocol | upper }}
       {{- if $values.nodePort }}
       nodePort: {{ $values.nodePort }}
       {{- end }}
+    {{- end }}
     {{- end }}
   {{- if eq .Values.service.type "LoadBalancer" }}
   {{- if .Values.service.loadBalancerIP }}
