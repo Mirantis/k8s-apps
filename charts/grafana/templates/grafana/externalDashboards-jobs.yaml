@@ -23,7 +23,7 @@ spec:
           {
             "name": "get-dashboards",
             "image": "bwits/docker-git-alpine",
-            "command": ["sh", "-c", "git clone {{ $.Values.externalDashboards.gitCloneString }} /etc/dashboards"],
+            "command": ["sh", "-c", "{{ default "" $.Values.externalDashboards.gitEnvironmentVariables }} git clone {{ $.Values.externalDashboards.gitCloneString }} /etc/dashboards"],
             "volumeMounts":[{"name":"dashboards","mountPath":"/etc/dashboards"}]
           }
         ]'
