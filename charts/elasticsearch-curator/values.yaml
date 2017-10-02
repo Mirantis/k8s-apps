@@ -35,9 +35,9 @@ configurations:
             exclude:
 
 image:
-  repository: "bobrik"
+  repository: "bobrik/"
   name: "curator"
-  tag: "latest"
+  tag: "5.2.0"
   pullPolicy: "IfNotPresent"
 
 # Configure resource requests and limits.
