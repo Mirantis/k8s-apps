@@ -22,7 +22,7 @@ Get the Spinnaker UI URL to visit by running these commands in the same shell:
     {{- if .Values.ui.service.nodePort }}
     export NODE_PORT={{ .Values.ui.service.nodePort }}
     {{- else }}
-    export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "fullname" . }})-deck
+    export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "fullname" . }}-deck)
     {{- end }}
     export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
     echo http://$NODE_IP:$NODE_PORT
