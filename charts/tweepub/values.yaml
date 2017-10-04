@@ -20,6 +20,8 @@ twitter:
   tokenKey: ""
   # Twitter API Token Secret
   tokenSecret: ""
+  # HTTPS Proxy to be used when accessing api.twitter.com
+  httpsProxy: ""
 
   # At least one of the follow, track and locations should be specified
   # Detailed doc: https://dev.twitter.com/streaming/overview/request-parameters

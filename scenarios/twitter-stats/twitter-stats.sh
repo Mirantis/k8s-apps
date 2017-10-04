@@ -174,6 +174,10 @@ function main() {
     log "\tTS_CHARTS - list of Helm charts to be deployed"
     log "\t\tcurrent: ${TS_CHARTS} (default: zookeeper \${TS_STORAGE} kafka spark tweepub tweetics tweeviz)"
 
+    export TS_HTTPS_PROXY=${TS_HTTPS_PROXY:-}
+    log "\tTS_HTTPS_PROXY - HTTPS proxy to be used to access api.twitter.com"
+    log "\t\tcurrent: ${TS_HTTPS_PROXY} (empty by default)"
+
     # Check that all dependencies installed
     check_dependencies
 

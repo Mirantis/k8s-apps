@@ -1,4 +1,6 @@
 twitter:
+  httpsProxy: ${TS_HTTPS_PROXY}
+
   appKey: ${TS_APP_KEY}
   appSecret: ${TS_APP_SECRET}
   tokenKey: ${TS_TOKEN_KEY}
