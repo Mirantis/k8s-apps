@@ -54,10 +54,8 @@ spec:
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         env:
-        {{- $seed_size := default 1 .Values.config.seedSize | int -}}
-        {{- $global := . }}
-        - name: CASSANDRA_SEEDS
-          value: '{{- range $i, $e := until $seed_size }}{{ template "cassandra.fullname" $global }}-{{ $i }}.{{ template "cassandra.fullname" $global }}.{{ $global.Release.Namespace }}.svc.{{ $global.Values.kubernetes_domain }},{{- end }}'
+        - name: CASSANDRA_SEED_SIZE
+          value: "{{ .Values.config.seedSize }}"
         - name: MAX_HEAP_SIZE
           value: {{ default "8192M" .Values.config.maxHeapSize | quote }}
         - name: HEAP_NEWSIZE

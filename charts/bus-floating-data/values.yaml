@@ -67,7 +67,7 @@ cassandra:
   image:
     repository: mirantisworkloads/
     name: cassandra
-    tag: 3.11.0
+    tag: 3.11.0-r1
     pullPolicy: IfNotPresent
 
 kafka:
