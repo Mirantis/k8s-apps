@@ -1,6 +1,6 @@
 image:
-  repository: fission/
-  name: fission-bundle
+  repository: mirantisworkloads/
+  name: fission
   tag: nightly20170705
   pullPolicy: IfNotPresent
 
@@ -32,7 +32,7 @@ router:
 ui:
   enabled: false
   image:
-    repository: fission/
+    repository: mirantisworkloads/
     name: fission-ui
     tag: 0.1.0
     pullPolicy: IfNotPresent

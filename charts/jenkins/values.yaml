@@ -6,7 +6,7 @@
 Master:
   port: 8080
   image:
-    repository: jenkinsci/
+    repository: mirantisworkloads/
     name: jenkins
     tag: "2.67"
     pullPolicy: IfNotPresent
@@ -89,8 +89,8 @@ Agent:
   port: 50000
   Enabled: true
   image:
-    repository: jenkinsci/
-    name: jnlp-slave
+    repository: mirantisworkloads/
+    name: jenkins-jnlp-slave
     tag: "2.62"
 
   Component: "jenkins-slave"

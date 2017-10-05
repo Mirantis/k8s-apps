@@ -1,1 +1,5 @@
-{}
+image:
+  repository: {{ .Repository }}
+dependenciesJob:
+  image:
+    repository: {{ .Repository }}

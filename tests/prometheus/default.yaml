@@ -1,1 +1,15 @@
-{}
+alertmanager:
+  image:
+    repository: {{ .Repository }}
+configmapReload:
+  image:
+    repository: {{ .Repository }}
+kubeStateMetrics:
+  image:
+    repository: {{ .Repository }}
+nodeExporter:
+  image:
+    repository: {{ .Repository }}
+server:
+  image:
+    repository: {{ .Repository }}

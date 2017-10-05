@@ -1,5 +1,5 @@
 image:
-  repository: grafana/
+  repository: mirantisworkloads/
   name: grafana
   tag: master
   pullPolicy: Always
@@ -81,7 +81,7 @@ setDatasource:
   ## Default: appropriate/curl:latest
   ##
   image:
-    repository: appropriate/
+    repository: mirantisworkloads/
     name: curl
     tag: latest
     pullPolicy: Always

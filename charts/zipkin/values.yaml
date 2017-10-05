@@ -1,7 +1,7 @@
 image:
-  repository: openzipkin/
+  repository: mirantisworkloads/
   name: zipkin
-  tag: 1
+  tag: "1"
   pullPolicy: Always
 
 port: 9411
@@ -32,9 +32,9 @@ dependenciesJob:
   enabled: false
   schedule: "@daily"
   image:
-    repository: openzipkin/
+    repository: mirantisworkloads/
     name: zipkin-dependencies
-    tag: 1
+    tag: "1"
     pullPolicy: Always
 
 service:

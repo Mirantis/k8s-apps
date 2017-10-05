@@ -85,7 +85,7 @@ logCollector:
 prometheusExporter:
   enabled: false
   image:
-    repository: oliver006/
+    repository: mirantisworkloads/
     name: redis_exporter
     tag: v0.11.2
     pullPolicy: IfNotPresent
