@@ -1,0 +1,65 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "graphite-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "graphite-fullname" . }}
+spec:
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      name: {{ template "graphite-fullname" . }}
+      labels:
+        heritage: {{ .Release.Service | quote }}
+        release: {{ .Release.Name | quote }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "graphite-fullname" . }}
+{{- if .Values.deployment.annotations }}
+      annotations:
+{{ toYaml .Values.deployment.annotations | indent 8}}
+{{- end }}
+    spec:
+      containers:
+      - name: graphite
+        image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        env:
+{{ toYaml .Values.environment_variables | indent 10 }}
+        ports:
+        {{- range $name, $settings := .Values.ports }}
+         - containerPort: {{ $settings.port }}
+           name: '{{ $name | lower | trunc 15 | trimSuffix "-" }}'
+        {{- end }}
+        volumeMounts:
+          - name: config
+            mountPath: /opt/graphite/conf
+          - name: data
+            mountPath: /opt/graphite/storage
+      volumes:
+        - name: config
+          configMap:
+            name: {{ template "graphite-cm-fullname" . }}
+            items:
+              - key: carbon-conf
+                path: carbon.conf
+              - key: storage-schemas
+                path: storage-schemas.conf
+              - key: storage-aggregation
+                path: storage-aggregation.conf
+              - key: aggregation-rules
+                path: aggregation-rules.conf
+        - name: data
+      {{- if eq .Values.persistence.type "PersistentVolumeClaim" }}
+          persistentVolumeClaim:
+            claimName: {{ template "graphite-fullname" . }}
+      {{- else if eq .Values.persistence.type "emptyDir" }}
+          emptyDir: {}
+      {{- else if eq .Values.persistence.type "hostPath" }}
+          hostPath:
+            path: "{{ .Values.persistence.hostPath }}"
+      {{- end }}

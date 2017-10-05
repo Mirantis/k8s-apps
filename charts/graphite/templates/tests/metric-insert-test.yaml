@@ -1,0 +1,18 @@
+{{ $host := include "graphite-fullname" . }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ printf "graphite-test-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
+  annotations:
+    helm.sh/hook: test-success
+spec:
+  containers:
+  - name: graphite-test
+    image: multicloud/netcat
+    imagePullPolicy: IfNotPresent
+    command:
+      - "sh"
+      - "-c"
+      - |
+        echo -n "cdTest:1|c" | nc -v -u -w 1 {{ $host }} {{ .Values.ports.statsd.port }} && sleep 15 && curl -G -s --max-time 5 --connect-timeout 5 http://{{ $host }}/metrics/index.json | grep -c cdTest
+  restartPolicy: Never
