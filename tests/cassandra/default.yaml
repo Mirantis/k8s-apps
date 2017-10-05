@@ -1,3 +1,2 @@
 image:
   repository: {{ .Repository }}
-kubernetes_domain: {{ .KubernetesDomain }}
