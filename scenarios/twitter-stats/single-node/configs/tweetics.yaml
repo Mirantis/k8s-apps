@@ -22,6 +22,6 @@ hdfs:
 
 cassandra:
   deployChart: false
-  externalAddress: cassandra-${TS_CASSANDRA_RELEASE}:9042
+  externalAddress: cassandra-${TS_CASSANDRA_RELEASE}
   keyspace: mirantis
   table: tweetics
