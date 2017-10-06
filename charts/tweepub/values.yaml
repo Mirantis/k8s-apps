@@ -4,7 +4,7 @@
 image:
   repository: mirantisworkloads/
   name: tweepub
-  tag: 1.1.0
+  tag: 1.2.0
   pullPolicy: IfNotPresent
 
 storage: kafka # hdfs or kafka
