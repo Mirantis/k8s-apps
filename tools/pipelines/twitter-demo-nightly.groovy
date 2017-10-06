@@ -1,4 +1,4 @@
-def run(helm_home, namespace, kubernetes_domain) {
+def run(helm_home, namespace, storage) {
   stage("Run tests") {
     withCredentials([
       file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG'),
@@ -13,7 +13,7 @@ def run(helm_home, namespace, kubernetes_domain) {
         "TS_KUBECTL_CMD=" + pwd() + "/kubectl",
         "TS_NAME=${namespace}",
         "TS_USE_INTERNAL_IP=yes",
-        "TS_STORAGE=cassandra"
+        "TS_STORAGE=${storage}"
       ]) {
         ansiColor("xterm") {
           sh("./scenarios/twitter-stats/twitter-stats.sh up test down")
