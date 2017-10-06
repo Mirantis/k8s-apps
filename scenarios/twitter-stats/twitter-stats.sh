@@ -325,8 +325,10 @@ function command_test() {
                 spark_url="http://${node_ip}:$(_kubectl -n ${TS_NAMESPACE} get svc spark-master-ts-${TS_NAME}-spark-0 -o jsonpath='{ $.spec.ports[?(@.port==8080)].nodePort }')"
                 log "Spark Web UI: ${spark_url}"
 
-                hdfs_url="http://${node_ip}:$(_kubectl -n ${TS_NAMESPACE} get svc hdfs-ui-ts-${TS_NAME}-hdfs -o jsonpath='{ $.spec.ports[?(@.port==50070)].nodePort }')"
-                log "HDFS Web UI: ${hdfs_url}"
+                if [ "${TS_STORAGE}" == "hdfs" ] ; then
+                    hdfs_url="http://${node_ip}:$(_kubectl -n ${TS_NAMESPACE} get svc hdfs-ui-ts-${TS_NAME}-hdfs -o jsonpath='{ $.spec.ports[?(@.port==50070)].nodePort }')"
+                    log "HDFS Web UI: ${hdfs_url}"
+                fi
 
                 header "Twitter Stats ready and serve stats successfully"
                 log "Link: ${url}"
