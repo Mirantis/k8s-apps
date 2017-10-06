@@ -1,6 +1,6 @@
 spark:
   master:
-    replicas: 2
+    replicas: 1
   worker:
     replicas: 3
 
