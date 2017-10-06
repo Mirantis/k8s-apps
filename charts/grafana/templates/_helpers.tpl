@@ -27,3 +27,14 @@
 {{- printf `"{\"name\":\"influxdb\",\"type\":\"influxdb\",\"url\":\"%s\",\"access\":\"proxy\",\"database\":\"%s\",\"isDefault\":%s}"` $url .Values.influxdb.databaseName (default "false" .Values.influxdb.default ) -}}
 {{- end -}}
 {{- end -}}
+
+{{- define "graphite-datasource" -}}
+{{- if .Values.graphite.deployChart -}}
+{{- $address := printf "graphite-%s" .Release.Name | trunc 55 | trimSuffix "-" -}}
+{{- $url := printf "%s:%d" $address (int .Values.graphite.ports.webInterface.port) -}}
+{{- printf `"{\"name\":\"graphite\",\"type\":\"graphite\",\"url\":\"http://%s\",\"access\":\"proxy\",\"isDefault\":%s}"` $url (default "false" .Values.graphite.default) -}}
+{{- else -}}
+{{- $url := (.Values.influxdb.externalAddress) -}}
+{{- printf `"{\"name\":\"graphite\",\"type\":\"graphite\",\"url\":\"http://%s\",\"access\":\"proxy\",\"isDefault\":%s}"` $url (default "false" .Values.graphite.default) -}}
+{{- end -}}
+{{- end -}}

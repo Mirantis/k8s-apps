@@ -1,5 +1,5 @@
 {{ $root := . }}
-{{- range $source := tuple "prometheus" "influxdb" }}
+{{- range $source := tuple "prometheus" "influxdb" "graphite" }}
 {{- $ds := index $root.Values $source }}
 {{- if $ds.setDatasource }}
 apiVersion: batch/v1
@@ -31,7 +31,7 @@ spec:
           - "-H"
           - "Content-Type: application/json;charset=UTF-8"
           - "--data-binary"
-          - {{ if eq $source "prometheus" }}{{ template "prometheus-datasource" $root }}{{ else if eq $source "influxdb" }}{{ template "influxdb-datasource" $root}}{{ end }}
+          - {{ if eq $source "prometheus" }}{{ template "prometheus-datasource" $root }}{{ else if eq $source "influxdb" }}{{ template "influxdb-datasource" $root}}{{ else if eq $source "graphite" }}{{ template "graphite-datasource" $root}}{{ end }}
           - "--max-time"
           - "10"
       restartPolicy: {{ $root.Values.setDatasource.restartPolicy }}

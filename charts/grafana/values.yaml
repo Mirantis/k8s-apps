@@ -63,6 +63,14 @@ influxdb:
   setDatasource: false
   default: "false"
 
+graphite:
+  # if disabled, subchart will not be deployed
+  deployChart: false
+  # this address will be used if subchart deployment is disabled
+  externalAddress: "http://url:port"
+  setDatasource: false
+  default: "false"
+
 setDatasource:
   ## How long should it take to commit failure
   ## Default: 300
