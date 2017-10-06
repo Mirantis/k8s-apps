@@ -7,7 +7,7 @@ setup(
     install_requires=[
         'click',
         'tweepy',
-        'kafka-python',
+        'kafka-python==1.3.3',
         'pyhdfs'
     ],
     entry_points='''
