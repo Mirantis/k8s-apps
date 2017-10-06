@@ -1,0 +1,49 @@
+ports:
+  webInterface:
+    port: 80
+  recieverPlainText:
+    port: 2003
+  recieverPickle:
+    port: 2004
+  aggregatorPlainText:
+    port: 2023
+  aggregatorPickle:
+    port: 2024
+  statsd:
+    port: 8125
+    protocol: UDP
+  statsdAdmin:
+    port: 8126
+
+replicas: 1
+
+image:
+  repository: "graphiteapp/"
+  name: "graphite-statsd"
+  tag: "1.0.2-2"
+  pullPolicy: "IfNotPresent"
+
+deployment:
+  annotations: {}
+
+persistence:
+  type: emptyDir
+  #storageClass: ""
+  #volumeSize: 1Gi
+  #persistentVolumeType: "ReadWriteOnce"
+  #hostPath: ""
+
+# Configure resource requests and limits.
+resources:
+  #requests:
+  #  memory: "256Mi"
+  #  cpu: "250m"
+  #limits:
+    #cpu: "256Mi"
+    #memory: "250m"
+
+service:
+  type: "NodePort"
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  annotations: {}

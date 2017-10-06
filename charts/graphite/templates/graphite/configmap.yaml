@@ -1,0 +1,130 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "graphite-cm-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "graphite-fullname" . }}
+data:
+  carbon-conf: |
+    [cache]
+    #LOCAL_DATA_DIR = /opt/graphite/storage/whisper/
+    USER =
+    MAX_CACHE_SIZE = inf
+    MAX_UPDATES_PER_SECOND = 500
+    MAX_CREATES_PER_MINUTE = 50
+
+    LINE_RECEIVER_INTERFACE = 0.0.0.0
+    LINE_RECEIVER_PORT = {{ .Values.ports.recieverPlainText.port }}
+
+    {{- if .Values.ports.recieverUdpPlainText }}
+    ENABLE_UDP_LISTENER = True
+    UDP_RECEIVER_INTERFACE = 0.0.0.0
+    UDP_RECEIVER_PORT = {{ .Values.ports.recieverUdpPlainText.port }}
+    {{- end }}
+
+    PICKLE_RECEIVER_INTERFACE = 0.0.0.0
+    PICKLE_RECEIVER_PORT = {{ .Values.ports.recieverPickle.port }}
+
+    USE_INSECURE_UNPICKLER = False
+
+    CACHE_QUERY_INTERFACE = 0.0.0.0
+    CACHE_QUERY_PORT = 7002
+
+    USE_FLOW_CONTROL = True
+
+    LOG_UPDATES = False
+
+    WHISPER_AUTOFLUSH = False
+
+    # WHISPER_SPARSE_CREATE = False
+
+    # WHISPER_LOCK_WRITES = False
+
+    # USE_WHITELIST = False
+
+    {{- if or .Values.ports.relayPlainText .Values.ports.relayPickle }}
+    [relay]
+    {{- if .Values.ports.relayPlainTex }}
+    LINE_RECEIVER_INTERFACE = 0.0.0.0
+    LINE_RECEIVER_PORT = {{ .Values.ports.relayPlainTex.port }}
+    {{- end }}
+    {{- if .Values.ports.relayPickle }}
+    PICKLE_RECEIVER_INTERFACE = 0.0.0.0
+    PICKLE_RECEIVER_PORT = {{ .Values.ports.relayPickle.port }}
+    {{- end }}
+
+    RELAY_METHOD = rules
+
+    REPLICATION_FACTOR = {{ .Values.replicas }}
+
+    DESTINATIONS = 127.0.0.1:2004
+
+    MAX_DATAPOINTS_PER_MESSAGE = 500
+    MAX_QUEUE_SIZE = 10000
+
+    USE_FLOW_CONTROL = True
+    {{- end }}
+
+    {{- if or .Values.ports.aggregatorPlainText .Values.ports.aggregatorPickle }}
+    [aggregator]
+    {{- if .Values.ports.aggregatorPlainText }}
+    LINE_RECEIVER_INTERFACE = 0.0.0.0
+    LINE_RECEIVER_PORT = {{ .Values.ports.aggregatorPlainText.port }}
+    {{- end }}
+
+    {{- if .Values.ports.aggregatorPickle }}
+    PICKLE_RECEIVER_INTERFACE = 0.0.0.0
+    PICKLE_RECEIVER_PORT = {{ .Values.ports.aggregatorPickle.port }}
+    {{- end }}
+
+    DESTINATIONS = 127.0.0.1:2004
+
+    REPLICATION_FACTOR = {{ .Values.replicas }}
+
+    MAX_QUEUE_SIZE = 10000
+
+    USE_FLOW_CONTROL = True
+
+    MAX_DATAPOINTS_PER_MESSAGE = 500
+
+    MAX_AGGREGATION_INTERVALS = 5
+
+    # USE_WHITELIST = False
+    {{- end }}
+  storage-schemas: |
+    [carbon]
+    pattern = ^carbon\.
+    retentions = 60s:90d
+
+    [default_1min_for_1day]
+    pattern = .*
+    retentions = 60s:1d
+
+    [statsd]
+    pattern = ^stats.*
+    retentions = 10s:1d,1m:7d,10m:1y
+  storage-aggregation: |
+    [min]
+    pattern = \.min$
+    xFilesFactor = 0.1
+    aggregationMethod = min
+
+    [max]
+    pattern = \.max$
+    xFilesFactor = 0.1
+    aggregationMethod = max
+
+    [sum]
+    pattern = \.count$
+    xFilesFactor = 0
+    aggregationMethod = max
+
+    [default_average]
+    pattern = .*
+    xFilesFactor = 0.5
+    aggregationMethod = average
+  aggregation-rules: |
+    <env>.requests (10) = sum <env>.requests

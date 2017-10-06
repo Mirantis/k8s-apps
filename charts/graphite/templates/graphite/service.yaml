@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "graphite-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "graphite-fullname" . }}
+{{- if .Values.service.annotations }}
+  annotations:
+{{ toYaml .Values.service.annotations | indent 4}}
+{{- end }}
+spec:
+  type: {{ .Values.service.type | quote }}
+  selector:
+    app: {{ template "graphite-fullname" . }}
+  ports:
+    {{- $fullname := include "graphite-fullname" . -}}
+    {{ range $name, $settings := .Values.ports }}
+    - name: {{ printf "%s-%s-%d-%s" $fullname ($name | lower) (int $settings.port) (default "tcp" $settings.protocol | lower) }}
+      port: {{ $settings.port }}
+      protocol: {{ default "tcp" $settings.protocol | upper }}
+      {{- if $settings.nodePort }}
+      nodePort: {{ $settings.nodePort }}
+      {{- end }}
+    {{- end }}
+  {{- if eq .Values.service.type "LoadBalancer" }}
+  {{- if .Values.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
+  {{- end }}
+  {{- if .Values.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+  {{- range .Values.data.service.loadBalancerSourceRanges }}
+  - {{ . }}
+  {{- end }}
+  {{- end -}}
+  {{- end -}}
