@@ -34,7 +34,7 @@
 {{- $url := printf "%s:%d" $address (int .Values.graphite.ports.webInterface.port) -}}
 {{- printf `"{\"name\":\"graphite\",\"type\":\"graphite\",\"url\":\"http://%s\",\"access\":\"proxy\",\"isDefault\":%s}"` $url (default "false" .Values.graphite.default) -}}
 {{- else -}}
-{{- $url := (.Values.influxdb.externalAddress) -}}
-{{- printf `"{\"name\":\"graphite\",\"type\":\"graphite\",\"url\":\"http://%s\",\"access\":\"proxy\",\"isDefault\":%s}"` $url (default "false" .Values.graphite.default) -}}
+{{- $url := (.Values.graphite.externalAddress) -}}
+{{- printf `"{\"name\":\"graphite\",\"type\":\"graphite\",\"url\":\"%s\",\"access\":\"proxy\",\"isDefault\":%s}"` $url (default "false" .Values.graphite.default) -}}
 {{- end -}}
 {{- end -}}
