@@ -1,5 +1,5 @@
 description: A Helm chart for Zipkin - a distributed tracing system.
 name: zipkin
-version: 0.6.1
+version: 0.6.2
 appVersion: 1
 icon: http://zipkin.io/public/img/zipkin-logo-200x119.jpg

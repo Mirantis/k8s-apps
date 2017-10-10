@@ -1,5 +1,5 @@
 name: zeppelin
-version: 1.1.1
+version: 1.1.2
 description: Web-based notebook that enables data-driven, interactive data analytics and collaborative documents with SQL, Scala and more.
 appVersion: 0.7.3
 icon: https://zeppelin.apache.org/assets/themes/zeppelin/img/zeppelin_classic_logo.png
