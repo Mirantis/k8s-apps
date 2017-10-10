@@ -1,5 +1,5 @@
 replicas: 3
-antiAffinity: "soft" # or "hard" or "null"
+antiAffinity: "soft" # or "hard" or "no"
 probeInitialDelaySeconds: 15
 probeTimeoutSeconds: 5
 
@@ -24,6 +24,8 @@ persistence:
 ## Change redis configuration paramaters below.
 config:
   redisPort: 6379
+  # only 1 replica will be created if clustering is disabled
+  clusterEnabled: true
   redisParameters: |-
     pidfile /var/run/redis.pid
     tcp-backlog 511

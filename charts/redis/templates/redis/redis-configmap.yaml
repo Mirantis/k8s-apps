@@ -10,11 +10,15 @@ metadata:
 data:
   redis.conf: |-
 {{ .Values.config.redisParameters | indent 4 }}
+    {{- if .Values.config.clusterEnabled }}
     cluster-enabled yes
     cluster-require-full-coverage no
     cluster-node-timeout 1000
     cluster-migration-barrier 1
     cluster-config-file nodes.conf
+    {{- else }}
+    cluster-enabled no
+    {{- end }}
     appendonly yes
     protected-mode no
     daemonize no

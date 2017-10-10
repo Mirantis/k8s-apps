@@ -9,7 +9,9 @@ metadata:
     app: {{ template "redis-fullname" . }}
 spec:
   serviceName: {{ template "redis-fullname" . }}
+  {{- if .Values.config.clusterEnabled }}
   replicas: {{ .Values.replicas }}
+  {{- end }}
   template:
     metadata:
       labels:
