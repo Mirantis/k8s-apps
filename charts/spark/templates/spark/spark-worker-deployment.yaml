@@ -25,21 +25,11 @@ spec:
           image: {{ .Values.spark.image.repository }}{{ .Values.spark.image.name }}:{{ .Values.spark.image.tag }}
           imagePullPolicy: {{ .Values.spark.image.pullPolicy }}
           command:
-            - /usr/local/spark/sbin/start-slave.sh
-            - spark://{{ template "spark-address" . }}
+            - bash
+            - -c
+            - "chmod +x /usr/local/spark/conf/spark-env.sh && /usr/local/spark/sbin/start-slave.sh spark://{{ template "spark-address" . }}"
           resources:
 {{ toYaml .Values.spark.worker.resources | indent 12 }}
-          env:
-          - name: SPARK_DAEMON_MEMORY
-            value: {{ .Values.spark.worker.daemonMemory | quote }}
-          - name: SPARK_WORKER_MEMORY
-            value: {{ .Values.spark.worker.executorMemory | quote }}
-          - name: SPARK_NO_DAEMONIZE
-            value: "1"
-          {{- if .Values.prometheusExporter.enabled }}
-          - name: SPARK_DAEMON_JAVA_OPTS
-            value: "-javaagent:/usr/local/spark/jmx_prometheus_javaagent-0.9.jar=7072:/usr/local/spark/conf/spark-jmx.yml"
-          {{- end }}
           {{- if .Values.prometheusExporter.enabled }}
           ports:
           - name: jmx-agent
