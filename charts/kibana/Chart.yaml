@@ -3,3 +3,5 @@ version: 1.2.3
 description: |
   Kibana is an open source analytics and visualization platform
   designed to work with Elasticsearch.
+appVersion: 5.2.2
+icon: https://raw.githubusercontent.com/blacktop/docker-kibana-alpine/master/kibana-logo.png

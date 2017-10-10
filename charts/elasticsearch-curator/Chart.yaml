@@ -1,3 +1,5 @@
 name: elasticsearch-curator
 version: 0.1.2
 description: Curator engine closes elasticsearch indices
+icon: http://awsmp-logos.s3.amazonaws.com/elasticsearch-logo.png
+appVersion: 5.2.0

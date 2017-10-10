@@ -2,3 +2,5 @@ name: graphite
 version: 0.0.1
 description: |
   Graphite is an enterprise-ready monitoring tool that runs equally well on cheap hardware or Cloud infrastructure.
+appVersion: 1.0.2-2
+icon: https://raw.githubusercontent.com/graphite-project/graphite-project.github.io/master/img/apple-touch-icon-144x144.png

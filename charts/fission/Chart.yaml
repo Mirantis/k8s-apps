@@ -3,3 +3,4 @@ description: |
   Fission is a fast serverless framework for Kubernetes with a focus on developer
   productivity and high performance.
 version: 2.0.2
+icon: http://fission.io/img/fission-logo-whitebg.png
