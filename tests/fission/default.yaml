@@ -1,1 +1,8 @@
-{}
+image:
+  repository: {{ .Repository }}
+ui:
+  image:
+    repository: {{ .Repository }}
+etcd:
+  image:
+    repository: {{ .Repository }}

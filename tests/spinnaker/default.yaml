@@ -1,3 +1,13 @@
 redis:
   image:
     repository: {{ .Repository }}
+jenkins:
+  Agent:
+    image:
+      repository: {{ .Repository }}
+  Master:
+    image:
+      repository: {{ .Repository }}
+minio:
+  image:
+    repository: {{ .Repository }}

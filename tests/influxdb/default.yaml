@@ -1,2 +1,4 @@
+image:
+  repository: {{ .Repository }}
 testImage:
   repository: {{ .Repository }}

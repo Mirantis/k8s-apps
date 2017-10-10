@@ -1,1 +1,6 @@
-{}
+Master:
+  image:
+    repository: {{ .Repository }}
+Agent:
+  image:
+    repository: {{ .Repository }}

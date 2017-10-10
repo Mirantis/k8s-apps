@@ -149,6 +149,6 @@ jenkins:
     # this address will be used if subchart deployment is disabled
     externalAddress: ""
     image:
-      repository: viglesiasce/
+      repository: mirantisworkloads/
       name: spinnaker-jenkins-agent
       tag: v0.2.0

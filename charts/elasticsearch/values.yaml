@@ -20,7 +20,7 @@ master:
   prometheusExporter:
     enabled: false
     image:
-      repository: justwatch/
+      repository: mirantisworkloads/
       name: elasticsearch_exporter
       tag: 0.3.3
       pullPolicy: IfNotPresent

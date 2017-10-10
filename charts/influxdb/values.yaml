@@ -16,13 +16,13 @@ environment_variables:
     value: "true"
 
 image:
-  repository: ""
+  repository: mirantisworkloads/
   name: "influxdb"
   tag: "1.3.4"
   pullPolicy: "IfNotPresent"
 
 testImage:
-  repository: "mirantisworkloads/"
+  repository: mirantisworkloads/
   name: "test-base"
   tag: "1.0.0"
   pullPolicy: "IfNotPresent"

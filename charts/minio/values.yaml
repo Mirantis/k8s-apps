@@ -4,7 +4,7 @@ accessKey: "miniokey"
 secretKey: "miniosecret"
 
 image:
-  repository: minio/
+  repository: mirantisworkloads/
   name: minio
   tag: "RELEASE.2017-07-24T18-27-35Z"
   pullPolicy: IfNotPresent

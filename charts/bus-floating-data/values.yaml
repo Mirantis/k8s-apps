@@ -1,6 +1,6 @@
 ingest:
   image:
-    repository: anierbeck/
+    repository: mirantisworkloads/
     name: akka-ingest
     tag: 0.2.1-SNAPSHOT
     pullPolicy: IfNotPresent
@@ -15,7 +15,7 @@ ingest:
 
 digest:
   image:
-    repository: anierbeck/
+    repository: mirantisworkloads/
     name: akka-ingest
     tag: 0.2.1-SNAPSHOT
     pullPolicy: IfNotPresent
@@ -32,7 +32,7 @@ digest:
 
 dashboard:
   image:
-    repository: anierbeck/
+    repository: mirantisworkloads/
     name: akka-server
     tag: 0.2.1-SNAPSHOT
     pullPolicy: IfNotPresent

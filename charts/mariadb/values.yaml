@@ -1,7 +1,7 @@
 port: 3306
 
 image:
- repository: bitnami/
+ repository: mirantisworkloads/
  name: mariadb
  tag: 10.1.23-r2
  pullPolicy: IfNotPresent
@@ -51,7 +51,7 @@ resources:
 prometheusExporter:
   enabled: false
   image:
-    repository: prom/
+    repository: mirantisworkloads/
     name: mysqld-exporter
     tag: v0.10.0
     pullPolicy: IfNotPresent

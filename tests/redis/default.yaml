@@ -1,2 +1,5 @@
 image:
   repository: {{ .Repository }}
+prometheusExporter:
+  image:
+    repository: {{ .Repository }}

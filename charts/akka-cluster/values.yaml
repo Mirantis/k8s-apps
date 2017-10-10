@@ -2,7 +2,7 @@ port: 2551
 managementPort: 19999
 
 image:
-  repository: kshatrix/
+  repository: mirantisworkloads/
   name: akka-cluster
   tag: latest
   pullPolicy: Always

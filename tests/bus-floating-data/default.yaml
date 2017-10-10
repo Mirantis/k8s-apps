@@ -1,1 +1,9 @@
-{}
+ingest:
+  image:
+    repository: {{ .Repository }}
+digest:
+  image:
+    repository: {{ .Repository }}
+dashboard:
+  image:
+    repository: {{ .Repository }}

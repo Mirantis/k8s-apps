@@ -59,7 +59,7 @@ management:
 prometheusExporter:
     enabled: false
     image:
-      repository: kbudde/
+      repository: mirantisworkloads/
       name: rabbitmq-exporter
       tag: latest
       pullPolicy: Always

@@ -5,7 +5,7 @@ peerPort: 2380
 clientPort: 2379
 
 image:
-  repository: gcr.io/google_containers/
+  repository: mirantisworkloads/
   name: etcd-amd64
   tag: 3.0.17
   pullPolicy: IfNotPresent
