@@ -1,0 +1,4 @@
+name: monocular
+description: Monocular is a search and discovery front end for Helm Charts Repositories.
+version: 0.1.0
+appVersion: v0.4.0

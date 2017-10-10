@@ -1,0 +1,135 @@
+# Default values for monocular.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+api:
+  replicaCount: 1
+  image:
+    repository: mirantisworkloads/monocular-api
+    tag: v0.4.0
+    pullPolicy: IfNotPresent
+  service:
+    name: monocular-api
+    type: NodePort
+    externalPort: 80
+    internalPort: 8081
+    nodePort: 30080
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  livenessProbe:
+    initialDelaySeconds: 180
+  auth:
+    signingKey:
+    github:
+      clientID:
+      clientSecret:
+  config:
+    tillerNamespace: kube-system
+    repos:
+      - name: mirantisworkloads
+        url: https://mirantisworkloads.storage.googleapis.com
+        source: https://github.com/Mirantis/k8s-apps
+    cors:
+      allowed_origins:
+        - "*"
+        # e.g. UI served on a different domain
+        # - http://monocular.local
+      allowed_headers:
+        - "content-type"
+        - "x-xsrf-token"
+    # Enable Helm deployment integration
+    releasesEnabled: true
+    # Cache refresh interval in sec.
+    cacheRefreshInterval: 3600
+ui:
+  replicaCount: 1
+  image:
+    repository: mirantisworkloads/monocular-ui
+    tag: v0.4.0
+    pullPolicy: IfNotPresent
+  service:
+    name: monocular-ui
+    type: NodePort
+    externalPort: 80
+    internalPort: 8080
+    nodePort:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  # ui-config populate
+  googleAnalyticsId: UA-XXXXXX-X
+  appName: Monocular
+
+  backendHostname: http://<nodeIP>:30080
+  # If API served on same-domain at /api path using Nginx Ingress controller
+  #backendHostname: /api
+
+prerender:
+  replicaCount: 1
+  image:
+    repository: mirantisworkloads/prerender
+    tag: latest
+    pullPolicy: IfNotPresent
+  cacheEnabled: true
+  service:
+    name: prerender
+    type: NodePort
+    externalPort: 80
+    internalPort: 3000
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+ingress:
+  enabled: false
+  hosts:
+  # Wildcard
+  -
+  # - monocular.local
+
+  ## Ingress annotations
+  ##
+  annotations:
+    ## Nginx ingress controller (default)
+    ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: 'true'
+    ## Traefik ingress controller
+    # traefik.frontend.rule.type: PathPrefixStrip
+    # kubernetes.io/ingress.class: traefik
+
+  ## Ingress TLS configuration
+  ## Secrets must be manually created in the namespace
+  ##
+  # tls:
+  #   secretName: monocular.local-tls
+
+mongodb:
+  # if disabled, subchart will not be deployed
+  deployChart: true
+  # this address will be used if subchart deployment is disabled
+  externalAddress: ""
+  database: monocular
+  configServer:
+    replicas: 1
+  shard:
+    replicas: 1
+  router:
+    replicas: 1
+
+redis:
+  # if disabled, subchart will not be deployed
+  deployChart: true
+  # this address will be used if subchart deployment is disabled
+  externalAddress: ""
+  config:
+    clusterEnabled: false

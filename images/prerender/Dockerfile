@@ -1,0 +1,1 @@
+FROM migmartri/prerender:latest

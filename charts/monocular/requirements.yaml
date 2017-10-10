@@ -1,0 +1,9 @@
+dependencies:
+- name: mongodb
+  version: ^0.x
+  repository: https://mirantisworkloads.storage.googleapis.com/
+  condition: mongodb.deployChart
+- name: redis
+  version: ^2.1.x
+  repository: https://mirantisworkloads.storage.googleapis.com/
+  condition: redis.deployChart
