@@ -12,9 +12,15 @@ data:
     # spark-defaults.conf configs
     {{ .Values.configs.sparkDefaults | indent 4 | trim }}
   {{ end }}
-  {{ if .Values.configs.sparkEnv }}
   spark-env.sh: |+
     # spark-env.sh configs
+    SPARK_DAEMON_MEMORY={{ $.Values.spark.master.daemonMemory | quote }}
+    SPARK_NO_DAEMONIZE=1
+    SPARK_DAEMON_JAVA_OPTS="-Dspark.deploy.recoveryMode=ZOOKEEPER -Dspark.deploy.zookeeper.dir={{ .Values.zookeeper.path }} -Dspark.deploy.zookeeper.url={{ template "zk-address" . -}}"
+    {{ if .Values.prometheusExporter.enabled }}
+    SPARK_DAEMON_JAVA_OPTS="${SPARK_DAEMON_JAVA_OPTS} -javaagent:/usr/local/spark/jmx_prometheus_javaagent-0.9.jar=7072:/usr/local/spark/conf/spark-jmx.yml"
+    {{ end }}
+  {{ if .Values.configs.sparkEnv }}
     {{ .Values.configs.sparkEnv | indent 4 | trim }}
   {{ end }}
   log4j.properties: |-

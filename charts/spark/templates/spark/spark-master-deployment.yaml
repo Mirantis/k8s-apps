@@ -26,18 +26,11 @@ spec:
           image: {{ $.Values.spark.image.repository }}{{ $.Values.spark.image.name }}:{{ $.Values.spark.image.tag }}
           imagePullPolicy: {{ $.Values.spark.image.pullPolicy }}
           command:
-            - /usr/local/spark/sbin/start-master.sh
+            - bash
+            - -c
+            - "chmod +x /usr/local/spark/conf/spark-env.sh && /usr/local/spark/sbin/start-master.sh"
           resources:
 {{ toYaml $.Values.spark.master.resources | indent 12 }}
-          env:
-            - name: SPARK_DAEMON_MEMORY
-              value: {{ $.Values.spark.master.daemonMemory | quote }}
-            - name: SPARK_NO_DAEMONIZE
-              value: "1"
-            - name: SPARK_DAEMON_JAVA_OPTS
-              value: >
-                "-Dspark.deploy.recoveryMode=ZOOKEEPER -Dspark.deploy.zookeeper.dir={{ $.Values.zookeeper.path }} -Dspark.deploy.zookeeper.url={{ template "zk-address" $ -}}"
-                {{- if $.Values.prometheusExporter.enabled }}" -javaagent:/usr/local/spark/jmx_prometheus_javaagent-0.9.jar=7072:/usr/local/spark/conf/spark-jmx.yml"{{- end }}
           ports:
             - name: jmx-agent
               containerPort: 7072
