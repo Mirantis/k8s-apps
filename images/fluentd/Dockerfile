@@ -22,6 +22,7 @@ RUN apk update \
  && gem install json -v 2.1.0 \
  && gem install fluentd -v 0.14.20 \
  && gem install fluent-plugin-elasticsearch \
+ && gem install fluent-plugin-influxdb \
  && gem install fluent-plugin-mail \
  && apk del .build-deps \
  && rm -rf /var/cache/apk/* \
