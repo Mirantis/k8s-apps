@@ -16,7 +16,9 @@ data:
     # spark-env.sh configs
     SPARK_DAEMON_MEMORY={{ $.Values.spark.master.daemonMemory | quote }}
     SPARK_NO_DAEMONIZE=1
+    {{ if ne (int .Values.spark.master.replicas) 1 }}
     SPARK_DAEMON_JAVA_OPTS="-Dspark.deploy.recoveryMode=ZOOKEEPER -Dspark.deploy.zookeeper.dir={{ .Values.zookeeper.path }} -Dspark.deploy.zookeeper.url={{ template "zk-address" . -}}"
+    {{ end }}
     {{ if .Values.prometheusExporter.enabled }}
     SPARK_DAEMON_JAVA_OPTS="${SPARK_DAEMON_JAVA_OPTS} -javaagent:/usr/local/spark/jmx_prometheus_javaagent-0.9.jar=7072:/usr/local/spark/conf/spark-jmx.yml"
     {{ end }}
