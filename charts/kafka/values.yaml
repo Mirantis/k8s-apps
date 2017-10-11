@@ -23,7 +23,7 @@ configFiles:
 image:
   repository: mirantisworkloads/
   name: kafka
-  tag: 0.11.0.0
+  tag: 0.11.0.0-r1
   pullPolicy: IfNotPresent
 
 persistence:

@@ -100,8 +100,9 @@ spec:
         command:
         - entrypoint.sh
         readinessProbe:
-          tcpSocket:
-            port: {{ .Values.port | int }}
+          exec:
+            command:
+              - /check_status.py
           initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
           timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
         livenessProbe:

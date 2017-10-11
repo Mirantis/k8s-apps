@@ -5,6 +5,7 @@ ARG KAFKA_SCALA_VERSION=2.12
 ARG JMX_VERSION=0.9
 
 COPY entrypoint.sh waitForZK.sh /usr/bin/
+COPY check_status.py /
 
 RUN set -x && \
     curl -Lo /tmp/kafka_$KAFKA_SCALA_VERSION-$KAFKA_VERSION.tgz http://archive.apache.org/dist/kafka/$KAFKA_VERSION/kafka_$KAFKA_SCALA_VERSION-$KAFKA_VERSION.tgz && \
@@ -13,7 +14,7 @@ RUN set -x && \
     mv /opt/kafka_$KAFKA_SCALA_VERSION-$KAFKA_VERSION /opt/kafka && \
     useradd --user-group --create-home --home-dir /var/lib/kafka kafka && \
     apt-get update && \
-    apt-get install -y --no-install-recommends dnsutils && \
+    apt-get install -y --no-install-recommends dnsutils python3 python3-kazoo && \
     apt-get clean && \
     chmod +x /usr/bin/entrypoint.sh /usr/bin/waitForZK.sh && \
     chown -R kafka:kafka /opt/kafka/ && \

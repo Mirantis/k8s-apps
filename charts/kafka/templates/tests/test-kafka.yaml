@@ -13,7 +13,6 @@ spec:
         - bash
         - -c
         - >
-          sleep 20 &&
           topic="test-{{ randAlphaNum 10 }}" &&
           /opt/kafka/bin/kafka-topics.sh --create --zookeeper {{ template "zk-address" . }} --replication-factor {{ .Values.replicas }} --partitions 1 --topic $topic &&
           /opt/kafka/bin/kafka-verifiable-producer.sh --broker-list {{ template "kafka.address" . }} --topic $topic --max-messages 10 &&
