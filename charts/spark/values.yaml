@@ -7,7 +7,7 @@ spark:
   image:
     repository: mirantisworkloads/
     name: spark
-    tag: 2.2.0
+    tag: 2.2.0-r1
     pullPolicy: IfNotPresent
   master:
     replicas: 1  # 1 or 2

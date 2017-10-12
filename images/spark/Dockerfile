@@ -20,7 +20,7 @@ ENV PATH        $JAVA_HOME/bin:$SCALA_HOME/bin:$SBT_HOME/bin:$SPARK_HOME/bin:$SP
 # Download, uncompress and move all the required packages and libraries to their corresponding directories in /usr/local/ folder.
 COPY basic_test.scala .
 RUN apt-get -yqq update && \
-    apt-get install -yqq vim screen tmux && \
+    apt-get install -yqq r-base r-cran-knitr && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /tmp/* && \
