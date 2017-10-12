@@ -1,26 +1,29 @@
 {{ if .Values.dbInit }}
+{{- range $id, $database := .Values.dbInit.dbNames }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ template "influx-fullname" . }}-job"
+  name: {{ template "influx-fullname" $ }}-create-db-{{ $id }}-job
   labels:
-    heritage: {{ .Release.Service | quote }}
-    release: {{ .Release.Name | quote }}
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    app: {{ template "influx-fullname" . }}
+    heritage: {{ $.Release.Service | quote }}
+    release: {{ $.Release.Name | quote }}
+    chart: "{{ $.Chart.Name }}-{{ $.Chart.Version }}"
+    app: {{ template "influx-fullname" $ }}
 spec:
   template:
     metadata:
-      name: {{ template "influx-fullname" . }}
+      name: {{ template "influx-fullname" $ }}
       labels:
-        heritage: {{ .Release.Service | quote }}
-        release: {{ .Release.Name | quote }}
-        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-        app: {{ template "influx-fullname" . }}
+        heritage: {{ $.Release.Service | quote }}
+        release: {{ $.Release.Name | quote }}
+        chart: "{{ $.Chart.Name }}-{{ $.Chart.Version }}"
+        app: {{ template "influx-fullname" $ }}
     spec:
       containers:
       - name: influx-db-create
         image: byrnedo/alpine-curl
-        command:  ["sh", "-cx", 'until curl --connect-timeout 5 -i -f -X POST http://{{ template "influx-fullname" . }}:{{ .Values.ports.http.port  }}/query --data-urlencode "q=CREATE DATABASE {{ .Values.dbInit.dbName  }}" ; do sleep 10; done;']
+        command:  ["sh", "-cx", 'until curl --connect-timeout 5 -i -f -X POST http://{{ template "influx-fullname" $ }}:{{ $.Values.ports.http.port }}/query --data-urlencode "q=CREATE DATABASE {{ $database }}" ; do sleep 10; done;']
       restartPolicy: Never
-{{ end }}
+---
+{{- end }}
+{{- end }}
