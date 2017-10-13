@@ -41,6 +41,7 @@ spark:
     deployChart: false
     # Required
     externalAddress: ""
+  javaOpts: ""
 
 hdfs:
   # if disabled, subchart will not be deployed
