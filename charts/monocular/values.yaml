@@ -14,12 +14,12 @@ api:
     internalPort: 8081
     nodePort: 30080
   resources:
-    limits:
-      cpu: 100m
-      memory: 128Mi
-    requests:
-      cpu: 100m
-      memory: 128Mi
+    #limits:
+    #  cpu: 100m
+    #  memory: 128Mi
+    #requests:
+    #  cpu: 100m
+    #  memory: 128Mi
   livenessProbe:
     initialDelaySeconds: 180
   auth:
@@ -58,12 +58,12 @@ ui:
     internalPort: 8080
     nodePort:
   resources:
-    limits:
-      cpu: 100m
-      memory: 128Mi
-    requests:
-      cpu: 100m
-      memory: 128Mi
+    #limits:
+    #  cpu: 100m
+    #  memory: 128Mi
+    #requests:
+    #  cpu: 100m
+    #  memory: 128Mi
   # ui-config populate
   googleAnalyticsId: UA-XXXXXX-X
   appName: Monocular
@@ -85,9 +85,9 @@ prerender:
     externalPort: 80
     internalPort: 3000
   resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
+    #requests:
+    #  cpu: 100m
+    #  memory: 128Mi
 
 ingress:
   enabled: false
