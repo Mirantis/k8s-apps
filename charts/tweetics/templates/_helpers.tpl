@@ -13,7 +13,7 @@
             {{- printf ":%d" (int $.Values.kafka.port) -}}
         {{- end -}}
     {{- else -}}
-        {{- printf "%s" .Values.kafka.externalAddress -}}
+        {{- printf "%s" .Values.kafka.addresses.kafka -}}
     {{- end -}}
 {{- end -}}
 
@@ -28,7 +28,7 @@
             {{- printf ":%d" (int $.Values.zookeeper.clientPort) -}}
          {{- end -}}
     {{- else -}}
-        {{- printf "%s" .Values.zookeeper.externalAddress -}}
+        {{- printf "%s" .Values.zookeeper.addresses.zookeeper -}}
     {{- end -}}
 {{- end -}}
 
@@ -41,7 +41,7 @@
             {{- printf "-%d:%d" $i (int $ctx.Values.spark.spark.master.rpcPort) -}}
         {{- end -}}
     {{- else -}}
-        {{- printf "%s" .Values.spark.externalAddress -}}
+        {{- printf "%s" .Values.spark.addresses.spark -}}
     {{- end -}}
 {{- end -}}
 
@@ -49,7 +49,7 @@
     {{- if .Values.hdfs.deployChart -}}
         {{- template "namenode-fullname" . -}}-0.{{- template "namenode-fullname" . -}}:{{ .Values.hdfs.namenode.port }}
     {{- else -}}
-        {{- printf "%s" .Values.hdfs.externalAddress -}}
+        {{- printf "%s" .Values.hdfs.addresses.namenode -}}
     {{- end -}}
 {{- end -}}
 
@@ -57,7 +57,7 @@
     {{- if .Values.cassandra.deployChart -}}
         {{- printf "cassandra-%s" .Release.Name | trunc 55 | trimSuffix "-" -}}
     {{- else -}}
-        {{- .Values.cassandra.externalAddress -}}
+        {{- .Values.cassandra.addresses.cassandra -}}
     {{- end -}}
 {{- end -}}
 

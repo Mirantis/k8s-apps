@@ -49,12 +49,13 @@ hdfs:
   path: /
 
   # these values should be set if subchart deployment is disabled:
-  externalAddress: ""
-  externalPort: 8020
+  addresses:
+    namenode: ""
 
 cassandra:
   deployChart: false
-  externalAddress: ""
+  addresses:
+    cassandra: ""
   keyspace: mirantis
   table: tweetics
 

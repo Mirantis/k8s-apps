@@ -16,7 +16,7 @@ Expand the name of the chart.
 {{- range $i, $e := until (int .Values.spark.master.replicas) -}}
     {{- if $i }},{{- end -}}
     {{- template "master-fullname" $ctx -}}
-    {{- printf "-%d:%d" $e (int $ctx.Values.spark.master.rpcPort) -}}
+    {{- printf "-%d.%s:%d" $e $.Release.Namespace (int $ctx.Values.spark.master.rpcPort) -}}
 {{- end -}}
 {{- end -}}
 
@@ -31,6 +31,6 @@ Expand the name of the chart.
             {{- printf ":%d" (int $.Values.zookeeper.clientPort) -}}
          {{- end -}}
     {{- else -}}
-        {{- printf .Values.zookeeper.externalAddress -}}
+        {{- printf .Values.zookeeper.addresses.zookeeper -}}
     {{- end -}}
 {{- end -}}

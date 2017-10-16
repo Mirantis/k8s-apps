@@ -14,27 +14,31 @@ storage: "hdfs" # hdfs or cassandra
 zookeeper:
   # if disabled, subchart will not be deployed
   deployChart: false
-  # this address will be used if subchart deployment is disabled
+  # these addresses will be used if subchart deployment is disabled
   # Required
-  externalAddress: ""
+  addresses:
+    zookeeper: ""
 
 kafka:
   # if disabled, subchart will not be deployed
   deployChart: false
-  # this address will be used if subchart deployment is disabled
-  externalAddress: ""
+  # these addresses will be used if subchart deployment is disabled
+  addresses:
+    kafka: ""
   # Kafka topic name
   topic: twitter-stream
   zookeeper:
     deployChart: false
     # Required
-    externalAddress: ""
+    addresses:
+      zookeeper: ""
 
 spark:
   # if disabled, subchart will not be deployed
   deployChart: true
-  # this address will be used if subchart deployment is disabled
-  externalAddress: ""
+  # these addresses will be used if subchart deployment is disabled
+  addresses:
+    spark: ""
   # Spark streaming batch duration
   batchDuration: 5
   zookeeper:
@@ -46,13 +50,15 @@ spark:
 hdfs:
   # if disabled, subchart will not be deployed
   deployChart: true
-  # this address will be used if subchart deployment is disabled
-  externalAddress: ""
+  # these addresses will be used if subchart deployment is disabled
+  addresses:
+    namenode: ""
   path: /demo
 
 cassandra:
   deployChart: false
-  externalAddress: ""
+  addresses:
+    cassandra: ""
   keyspace: "mirantis"
   table: "tweetics"
 

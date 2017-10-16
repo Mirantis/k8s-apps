@@ -3,5 +3,5 @@
 {{- end -}}
 
 {{- define "cassandra.address" -}}
-{{ template "cassandra.fullname" . }}:{{ .Values.config.ports.cql }}
+{{ template "cassandra.fullname" . }}.{{ .Release.Namespace }}:{{ .Values.config.ports.cql }}
 {{- end -}}

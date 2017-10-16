@@ -66,8 +66,9 @@ logCollector:
 zookeeper:
   # if disabled, subchart will not be deployed
   deployChart: true
-  # this address will be used if subchart deployment is disabled
-  externalAddress: ""
+  # these addresses will be used if subchart deployment is disabled
+  addresses:
+    zookeeper: ""
   # this path will be used as prefix for spark deployment, useful for multiple sparks per single zookeeper
   path: "/spark"
 

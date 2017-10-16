@@ -40,16 +40,18 @@ twitter:
 kafka:
   # if disabled, subchart will not be deployed
   deployChart: true
-  # this address will be used if subchart deployment is disabled
-  externalAddress: ""
+  # these addresses will be used if subchart deployment is disabled
+  addresses:
+    kafka: ""
   # Kafka topic where the tweets will be published
   topic: twitter-stream
 
 hdfs:
   # if disabled, subchart will not be deployed
   deployChart: false
-  # this address will be used if subchart deployment is disabled
-  externalAddress: ""
+  # these addresses will be used if subchart deployment is disabled
+  addresses:
+    namenode: ""
   path: "/demo/tweepub"
 
 resources:

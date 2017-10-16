@@ -9,6 +9,6 @@
   {{- template "zk-fullname" $ctx -}}
   {{- printf "-%d." $i -}}
   {{- template "zk-fullname" $ctx -}}
-  {{- printf ":%d" (int $.Values.clientPort) -}}
+  {{- printf ".%s:%d" $.Release.Namespace (int $.Values.clientPort) -}}
 {{- end -}}
 {{- end -}}
