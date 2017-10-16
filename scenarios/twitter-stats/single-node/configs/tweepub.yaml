@@ -11,5 +11,6 @@ twitter:
 
 kafka:
   deployChart: false
-  externalAddress: kafka-${TS_KAFKA_RELEASE}-0.kafka-${TS_KAFKA_RELEASE}:9092
+  addresses:
+    kafka: kafka-${TS_KAFKA_RELEASE}-0.kafka-${TS_KAFKA_RELEASE}:9092
   topic: twitter-stream
