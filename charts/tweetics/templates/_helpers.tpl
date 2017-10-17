@@ -57,7 +57,7 @@
     {{- if .Values.cassandra.deployChart -}}
         {{- printf "cassandra-%s" .Release.Name | trunc 55 | trimSuffix "-" -}}
     {{- else -}}
-        {{- .Values.cassandra.addresses.cassandra -}}
+        {{- (split ":" .Values.cassandra.addresses.cassandra)._0 -}}
     {{- end -}}
 {{- end -}}
 
