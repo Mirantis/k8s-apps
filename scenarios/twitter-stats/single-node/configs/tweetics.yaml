@@ -2,16 +2,19 @@ minHashtagCounts: 0
 
 zookeeper:
   deployChart: false
-  externalAddress: zk-${TS_ZOOKEEPER_RELEASE}-0.zk-${TS_ZOOKEEPER_RELEASE}:2181
+  addresses:
+    zookeeper: zk-${TS_ZOOKEEPER_RELEASE}-0.zk-${TS_ZOOKEEPER_RELEASE}:2181
 
 kafka:
   deployChart: false
-  externalAddress: kafka-${TS_KAFKA_RELEASE}-0.kafka-${TS_KAFKA_RELEASE}:9092
+  addresses:
+    kafka: kafka-${TS_KAFKA_RELEASE}-0.kafka-${TS_KAFKA_RELEASE}:9092
   topic: twitter-stream
 
 spark:
   deployChart: false
-  externalAddress: spark-master-${TS_SPARK_RELEASE}-0:7077
+  addresses:
+    spark: spark-master-${TS_SPARK_RELEASE}-0:7077
 
 storage: ${TS_STORAGE}
 
