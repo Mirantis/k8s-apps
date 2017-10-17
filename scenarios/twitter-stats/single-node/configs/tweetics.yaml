@@ -17,11 +17,13 @@ storage: ${TS_STORAGE}
 
 hdfs:
   deployChart: false
-  externalAddress: hdfs-namenode-${TS_HDFS_RELEASE}-0.hdfs-namenode-${TS_HDFS_RELEASE}
+  addresses:
+    namenode: hdfs-namenode-${TS_HDFS_RELEASE}-0.hdfs-namenode-${TS_HDFS_RELEASE}:8020
   path: /twitter
 
 cassandra:
   deployChart: false
-  externalAddress: cassandra-${TS_CASSANDRA_RELEASE}
+  addresses:
+    cassandra: cassandra-${TS_CASSANDRA_RELEASE}:9042
   keyspace: mirantis
   table: tweetics

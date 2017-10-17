@@ -6,11 +6,12 @@ storage: ${TS_STORAGE}
 hdfs:
   deployChart: false
   path: /
-  externalAddress: hdfs-namenode-${TS_HDFS_RELEASE}-0.hdfs-namenode-${TS_HDFS_RELEASE}
-  externalPort: 8020
+  addresses:
+    namenode: hdfs-namenode-${TS_HDFS_RELEASE}-0.hdfs-namenode-${TS_HDFS_RELEASE}:8020
 
 cassandra:
   deployChart: false
-  externalAddress: cassandra-${TS_CASSANDRA_RELEASE}
+  addresses:
+    cassandra: cassandra-${TS_CASSANDRA_RELEASE}:9042
   keyspace: mirantis
   table: tweetics
