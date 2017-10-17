@@ -330,7 +330,7 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 
 	installTillerResult := t.Run("install_tiller", func(t *testing.T) {
 		RunCmd(t, helmCmd, "--tiller-namespace", ns, "--home", helmHome, "init")
-		for i := 0; i < 10; i++ {
+		for i := 0; i < 20; i++ {
 			cmd := exec.Command(helmCmd, "--tiller-namespace", ns, "--home", helmHome, "list")
 			output, err := cmd.CombinedOutput()
 			if err != nil {
@@ -338,7 +338,7 @@ func RunOneConfig(t *testing.T, chart string, config string) {
 			} else {
 				return
 			}
-			time.Sleep(3 * time.Second)
+			time.Sleep(6 * time.Second)
 		}
 		t.Fatalf("Tiller takes too long to start")
 	})
