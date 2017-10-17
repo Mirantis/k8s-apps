@@ -6,7 +6,7 @@ probeTimeoutSeconds: 5
 image:
   repository: mirantisworkloads/
   name: redis
-  tag: "4.0-r1"
+  tag: "4.0-r2"
   pullPolicy: IfNotPresent
 
 resources:

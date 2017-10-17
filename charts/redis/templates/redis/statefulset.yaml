@@ -61,6 +61,11 @@ spec:
             - ping
           initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
           timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
+        lifecycle:
+          preStop:
+            exec:
+              command:
+                - /kill.sh
         ports:
         - name: redis
           containerPort: {{ default 6379 .Values.config.redisPort }}
