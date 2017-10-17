@@ -17,7 +17,7 @@
             {{- printf ":%d" (int $.Values.zookeeper.clientPort) -}}
          {{- end -}}
     {{- else -}}
-        {{- printf "%s" .Values.zookeeper.externalAddress -}}
+        {{- printf "%s" .Values.zookeeper.addresses.zookeeper -}}
     {{- end -}}
 {{- end -}}
 
@@ -25,6 +25,6 @@
 {{- $ctx := . -}}
 {{- range $i, $e := until (int .Values.replicas) -}}
     {{- if $i -}},{{- end -}}
-   {{- template "kafka-fullname" $ctx -}}-{{ $i }}.{{- template "kafka-fullname" $ctx -}}:{{ $.Values.port }}
+   {{- template "kafka-fullname" $ctx -}}-{{ $i }}.{{- template "kafka-fullname" $ctx -}}.{{ $.Release.Namespace }}:{{ $.Values.port }}
 {{- end -}}
 {{- end -}}

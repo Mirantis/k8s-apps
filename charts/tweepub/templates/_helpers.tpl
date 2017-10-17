@@ -13,7 +13,7 @@
             {{- printf ":%d" (int $.Values.kafka.port) -}}
         {{- end -}}
     {{- else -}}
-        {{- printf "%s" .Values.kafka.externalAddress -}}
+        {{- printf "%s" .Values.kafka.addresses.kafka -}}
     {{- end -}}
 {{- end -}}
 
@@ -21,7 +21,7 @@
     {{- if .Values.hdfs.deployChart -}}
         {{- template "namenode-fullname" . -}}-0.{{- template "namenode-fullname" . -}}:{{ .Values.hdfs.namenode.ui.port }}
     {{- else -}}
-        {{- printf "%s" .Values.hdfs.externalAddress -}}
+        {{- printf "%s" .Values.hdfs.addresses.namenode -}}
     {{- end -}}
 {{- end -}}
 

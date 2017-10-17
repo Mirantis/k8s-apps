@@ -2,4 +2,3 @@ Kafka chart has been deployed.
 
 Internal URL:
     kafka: {{ template "kafka.address" . }}
-    zookeeper: {{ template "zk-address" . }}

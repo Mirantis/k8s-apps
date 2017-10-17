@@ -15,9 +15,9 @@
 {{- end -}}
 
 {{- define "namenode-address" -}}
-{{- template "namenode-fullname" . }}-0.{{- template "namenode-fullname" . }}:{{ .Values.namenode.port }}
+{{- template "namenode-fullname" . }}-0.{{- template "namenode-fullname" . }}.{{ .Release.Namespace }}:{{ .Values.namenode.port }}
 {{- end -}}
 
 {{- define "hdfs-ui-address" -}}
-{{ template "hdfs-ui-fullname" . }}:{{ .Values.namenode.ui.port }}
+{{ template "hdfs-ui-fullname" . }}.{{ .Release.Namespace }}:{{ .Values.namenode.ui.port }}
 {{- end -}}

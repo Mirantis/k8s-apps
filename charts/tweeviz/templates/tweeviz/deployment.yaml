@@ -81,7 +81,7 @@ spec:
           {{- if .Values.cassandra.deployChart }}
           value: {{- printf "cassandra-%s" .Release.Name | trunc 55 | trimSuffix "-" }}
           {{- else }}
-          value: "{{ .Values.cassandra.externalAddress }}"
+          value: "{{ (split ":" .Values.cassandra.addresses.cassandra)._0 }}"
           {{- end }}
         - name: TWEEVIZ_CASSANDRA_KEYSPACE
           value: "{{ .Values.cassandra.keyspace }}"
@@ -90,14 +90,14 @@ spec:
         - name: TWEEVIZ_HDFS_ADDRESS
           {{- if .Values.hdfs.deployChart }}
           value: {{ printf "hdfs-namenode-%s" .Release.Name  | trunc 55 | trimSuffix "-" }}
-          {{- else  }}
-          value: "{{ .Values.hdfs.externalAddress }}"
+          {{- else }}
+          value: "{{ (split ":" .Values.hdfs.addresses.namenode)._0 }}"
           {{- end }}
         - name: TWEEVIZ_HDFS_PORT
           {{- if .Values.hdfs.deployChart }}
           value: "{{ .Values.hdfs.namenode.port }}"
           {{- else }}
-          value: "{{ .Values.hdfs.externalPort }}"
+          value: "{{ (split ":" .Values.hdfs.addresses.namenode)._1 }}"
           {{- end }}
         - name: TWEEVIZ_HDFS_PATH
           value: "{{ .Values.hdfs.path }}"
