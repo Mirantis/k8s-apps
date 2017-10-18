@@ -45,7 +45,7 @@ resources:
 
 hdfs:
   # if disabled, subchart will not be deployed
-  deployChart: true
+  deployChart: false
   path: /
 
   # these values should be set if subchart deployment is disabled:
