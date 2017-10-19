@@ -1,1 +1,7 @@
 TweeViz UI chart has been deployed.
+
+Internal URL:
+  tweeviz_ui: {{ template "tweeviz.ui.fullname" . }}:{{ .Values.port }}
+
+External services:
+  tweeviz_ui: {{ template "tweeviz.ui.fullname" . }}:{{ .Values.port }}
