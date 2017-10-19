@@ -15,6 +15,9 @@ storage: "hdfs" # cassandra or hdfs
 # Set custom header to be displayed in viz page
 header: "Twitter Stats"
 
+probeInitialDelaySeconds: 10
+probePeriodSeconds: 5
+
 service:
   type: NodePort # or ClusterIP or LoadBalancer
 
