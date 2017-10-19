@@ -49,7 +49,7 @@ spark:
 
 hdfs:
   # if disabled, subchart will not be deployed
-  deployChart: true
+  deployChart: false
   # these addresses will be used if subchart deployment is disabled
   addresses:
     namenode: ""
