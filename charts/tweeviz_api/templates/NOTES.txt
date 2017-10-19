@@ -1,0 +1,7 @@
+TweeViz API chart has been deployed.
+
+Internal URL:
+  tweeviz_api: {{ template "tweeviz.api.fullname" . }}:{{ .Values.port }}
+
+External services:
+  tweeviz_api: {{ template "tweeviz.api.fullname" . }}:{{ .Values.port }}
