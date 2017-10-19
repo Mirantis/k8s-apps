@@ -8,13 +8,28 @@ spec:
   containers:
     - name: {{.Release.Name}}-database-test
       image: {{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}
-      command: ["/bin/bash", "/tmp/test_dir/test.sh", {{ template "cassandra.fullname" . }}]
-      volumeMounts:
-        - name: test-dir
-          mountPath: /tmp/test_dir
-  volumes:
-    - name: test-dir
-      configMap:
-        name: test-cm-{{ template "cassandra.fullname" . }}
+      command:
+        - sh
+        - -cx
+        - |
+          set -ex
+          INPUT=/tmp/test_cas.csv
+          KEYSPACE=test_{{ randAlphaNum 10 }}
+          cqlsh {{ template "cassandra.fullname" . }} -e "
+          CREATE KEYSPACE $KEYSPACE
+          WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : {{ .Values.config.clusterSize }} };"
+
+          cqlsh {{ template "cassandra.fullname" . }} -e "
+          CREATE TABLE $KEYSPACE.test_table (
+              name text,
+              age int,
+              role text,
+              PRIMARY KEY (name));"
+          cqlsh {{ template "cassandra.fullname" . }} -e "
+          INSERT INTO $KEYSPACE.test_table (name, age, role) VALUES ('john', 37, 'dev');"
+          cqlsh {{ template "cassandra.fullname" . }} -e "COPY $KEYSPACE.test_table (name, age, role) TO '$INPUT';"
+
+          grep -Fq "john,37,dev" $INPUT
+          cqlsh {{ template "cassandra.fullname" . }} -e "DROP keyspace $KEYSPACE;"
   restartPolicy: Never
 
