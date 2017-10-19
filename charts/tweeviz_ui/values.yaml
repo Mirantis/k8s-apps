@@ -1,0 +1,49 @@
+# Default values for tweeviz_ui.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+image:
+  repository: mirantisworkloads/
+  name: tweeviz-ui
+  tag: 0.1.0
+  pullPolicy: IfNotPresent
+
+port: 8589
+
+# Set custom header to be displayed in viz page
+header: "Twitter Stats"
+
+service:
+  type: NodePort # or ClusterIP or LoadBalancer
+
+  nodePort: ""
+
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+
+  annotations: {}
+
+ingress:
+  enabled: false
+  hosts: []
+    #- some.domain
+  tls:
+    enabled: false
+    secretName: ""
+  annotations: {}
+    #kubernetes.io/ingress.class: nginx
+
+resources:
+  #requests:
+  #  cpu: 100m
+  #  memory: 512Mi
+  #limits:
+  #  cpu: 100m
+  #  memory: 512Mi
+
+istio:
+  enabled: false
+
+tweeviz_api:
+  deployChart: false
+  addresses:
+    tweeviz_api: ""

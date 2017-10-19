@@ -1,0 +1,93 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "tweeviz.ui.fullname" . }}
+  labels:
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "tweeviz.ui.fullname" . }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      {{- if .Values.istio.enabled }}
+      annotations:
+        alpha.istio.io/sidecar: injected
+        alpha.istio.io/version: jenkins@ubuntu-16-04-build-12ac793f80be71-0.1.6-dab2033
+      {{- end }}
+      labels:
+        app: {{ template "tweeviz.ui.fullname" . }}
+    spec:
+      {{- if .Values.istio.enabled }}
+      initContainers:
+      - name: init
+        image: docker.io/istio/init:0.1
+        imagePullPolicy: Always
+        args:
+        - -p
+        - '15001'
+        - -u
+        - '1337'
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+      - name: enable-core-dump
+        image: alpine
+        imagePullPolicy: Always
+        command:
+        - /bin/sh
+        args:
+        - -c
+        - sysctl -w kernel.core_pattern=/tmp/core.%e.%p.%t && ulimit -c unlimited
+        securityContext:
+          privileged: true
+      {{- end }}
+      containers:
+      {{- if .Values.istio.enabled }}
+      - args:
+        - proxy
+        - sidecar
+        - -v
+        - "2"
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        image: docker.io/istio/proxy_debug:0.1
+        imagePullPolicy: Always
+        name: proxy
+        resources: {}
+        securityContext:
+          runAsUser: 1337
+      {{- end }}
+      - name: "tweeviz-ui"
+        image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: TWEEVIZ_HEADER
+          value: "{{ .Values.header }}"
+        - name: TWEEVIZ_API
+          {{- if .Values.tweeviz_api.deployChart }}
+          value: http://{{ printf "tweeviz-api-%s" .Release.Name | trunc 55 | trimSuffix "-" }}:{{ .Values.tweeviz_api.port }}
+          {{- else }}
+          value: http://{{ .Values.tweeviz_api.addresses.tweeviz_api }}
+          {{- end }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.port }}
+          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+          periodSeconds: {{ .Values.probePeriodSeconds }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
