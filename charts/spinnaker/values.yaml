@@ -115,6 +115,8 @@ redis:
   # (redis connecion string)
   externalAddress: ""
   replicas: 1
+  config:
+    clusterEnabled: false
 
 # Minio access/secret keys for the in-cluster S3 usage
 minio:
