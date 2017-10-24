@@ -48,21 +48,20 @@ Create a fully qualified Prometheus server name.
 
 {{- define "alertmanager.address" -}}
 {{- if .Values.alertmanager.deploy }}
-http://{{ template "alertmanager.fullname" . }}:{{ .Values.alertmanager.port }}
+{{ template "alertmanager.fullname" . }}.{{ .Release.Namespace }}:{{ .Values.alertmanager.port }}
 {{- else }}
 {{ .Values.alertmanager.externalAddress }}
 {{- end }}
 {{- end -}}
 
 {{- define "kubeStateMetrics.address" -}}
-{{ template "kubeStateMetrics.fullname" . }}:{{ .Values.kubeStateMetrics.port }}
+{{ template "kubeStateMetrics.fullname" . }}.{{ .Release.Namespace }}:{{ .Values.kubeStateMetrics.port }}
 {{- end -}}
 
 {{- define "nodeExporter.address" -}}
-{{ template "nodeExporter.fullname" . }}:{{ .Values.nodeExporter.port }}
+{{ template "nodeExporter.fullname" . }}.{{ .Release.Namespace }}:{{ .Values.nodeExporter.port }}
 {{- end -}}
 
 {{- define "server.address" -}}
-{{ template "server.fullname" . }}:{{ .Values.server.port }}
+{{ template "server.fullname" . }}.{{ .Release.Namespace }}:{{ .Values.server.port }}
 {{- end -}}
-

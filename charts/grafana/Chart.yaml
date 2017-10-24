@@ -1,4 +1,4 @@
 description: The leading tool for querying and visualizing time series and metrics.
 name: grafana
-version: 1.0.4
+version: 2.0.0
 icon: https://raw.githubusercontent.com/grafana/grafana/master/public/img/logo_transparent_400x.png

@@ -1,5 +1,5 @@
 dependencies:
 - name: prometheus
-  version: ^0.x
+  version: ^1.x
   repository: https://mirantisworkloads.storage.googleapis.com/
   condition: prometheus.deployChart

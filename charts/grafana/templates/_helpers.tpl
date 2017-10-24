@@ -12,7 +12,7 @@
 {{- $url := printf "%s:%d" $address (int .Values.prometheus.server.port) -}}
 {{- printf `"{\"name\":\"prometheus\",\"type\":\"prometheus\",\"url\":\"http://%s\",\"access\":\"proxy\",\"isDefault\":%s}"` $url (default "false" .Values.prometheus.default) -}}
 {{- else -}}
-{{- $url := (.Values.prometheus.externalAddress) -}}
+{{- $url := printf "http://%s" .Values.prometheus.addresses.server -}}
 {{- printf `"{\"name\":\"prometheus\",\"type\":\"prometheus\",\"url\":\"%s\",\"access\":\"proxy\",\"isDefault\":%s}"` $url (default "false" .Values.prometheus.default) -}}
 {{- end -}}
 {{- end -}}

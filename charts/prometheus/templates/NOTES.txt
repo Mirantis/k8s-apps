@@ -1,10 +1,20 @@
 Prometheus chart has been deployed.
 
 Internal URL:
+    {{- if .Values.alertmanager.enabled }}
     alertmanager: {{ template "alertmanager.address" . }}
+    {{- end }}
     kube-state-metrics: {{ template "kubeStateMetrics.address" . }}
     node-exporter: {{ template "nodeExporter.address" . }}
     server: {{ template "server.address" . }}
+
+External services:
+    {{- if and .Values.alertmanager.enabled .Values.alertmanager.deploy }}
+    alertmanager: {{ template "alertmanager.fullname" . }}:{{ .Values.alertmanager.port }}
+    {{- end }}
+    kube-state-metrics: {{ template "kubeStateMetrics.fullname" . }}:{{ .Values.kubeStateMetrics.port }}
+    node-exporter: {{ template "nodeExporter.fullname" . }}:{{ .Values.nodeExporter.port }}
+    server: {{ template "server.fullname" . }}:{{ .Values.server.port }}
 
 External URL:
 {{- if .Values.alertmanager.ingress.enabled }}

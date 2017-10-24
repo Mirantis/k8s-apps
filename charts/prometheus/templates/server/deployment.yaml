@@ -41,7 +41,7 @@ spec:
           command:
             - "sh"
             - "-c"
-            - "prometheus --config.file=/etc/config/prometheus.yml {{ if .Values.alertmanager.enabled }} --alertmanager.url={{ template "alertmanager.address" . }}{{ end }} --storage.local.path=/data --web.console.libraries=/etc/prometheus/console_libraries --web.console.templates=/etc/prometheus/consoles {{ range $key, $value := .Values.server.extraArgs }} --{{ $key }}={{ $value }} {{ end }} | tee /prometheus/prom.log"
+            - "prometheus --config.file=/etc/config/prometheus.yml {{ if .Values.alertmanager.enabled }} --alertmanager.url=http://{{ template "alertmanager.address" . }}{{ end }} --storage.local.path=/data --web.console.libraries=/etc/prometheus/console_libraries --web.console.templates=/etc/prometheus/consoles {{ range $key, $value := .Values.server.extraArgs }} --{{ $key }}={{ $value }} {{ end }} | tee /prometheus/prom.log"
           ports:
             - containerPort: 9090
           readinessProbe:
