@@ -1,8 +1,8 @@
 image:
   repository: mirantisworkloads/
   name: grafana
-  tag: master
-  pullPolicy: Always
+  tag: 4.5.2
+  pullPolicy: IfNotPresent
 
 probeInitialDelaySeconds: 15
 probeTimeoutSeconds: 5

@@ -1,1 +1,1 @@
-FROM grafana/grafana:master
+FROM grafana/grafana:4.5.2
