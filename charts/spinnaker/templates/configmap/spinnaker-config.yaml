@@ -467,7 +467,7 @@ data:
         enabled: true
         defaultMaster:
           name: default
-          baseUrl: {{ template "spinnaker.jenkins-master-address" . }}/
+          baseUrl: http://{{ template "spinnaker.jenkins-master-address" . }}/
           username: {{ .Values.jenkins.Master.AdminUser }}
           password: {{ .Values.jenkins.Master.AdminPassword }}
 
