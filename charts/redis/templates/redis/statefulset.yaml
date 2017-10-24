@@ -66,6 +66,9 @@ spec:
             exec:
               command:
                 - /kill.sh
+        command:
+          - /run.sh
+          - {{ if .Values.config.clusterEnabled -}}cluster{{- else -}}single{{- end }}
         ports:
         - name: redis
           containerPort: {{ default 6379 .Values.config.redisPort }}
