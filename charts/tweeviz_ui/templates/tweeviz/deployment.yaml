@@ -9,6 +9,9 @@ metadata:
     app: {{ template "tweeviz.ui.fullname" . }}
 spec:
   replicas: 1
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
   template:
     metadata:
       {{- if .Values.istio.enabled }}
