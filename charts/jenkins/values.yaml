@@ -20,6 +20,8 @@ Master:
 
     hostPath: ""
 
+  initContainerEnvironmentVariables: {}
+
   service:
     type: NodePort # or ClusterIP or LoadBalancer
 

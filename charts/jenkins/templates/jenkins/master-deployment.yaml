@@ -32,6 +32,10 @@ spec:
         command:
         - sh
         - /var/jenkins_config/apply_config.sh
+{{- if .Values.Master.initContainerEnvironmentVariables }}
+        env:
+{{ toYaml .Values.Master.initContainerEnvironmentVariables | indent 8 }}
+{{- end }}
         volumeMounts:
         - mountPath: /var/jenkins_config
           name: jenkins-config
