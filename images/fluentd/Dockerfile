@@ -24,6 +24,8 @@ RUN apk update \
  && gem install fluent-plugin-elasticsearch \
  && gem install fluent-plugin-influxdb -v 1.0.0.rc1 \
  && gem install fluent-plugin-mail \
+ && gem install fluent-plugin-multiprocess \
+ && gem install fluent-plugin-record-modifier -v '>= 1.0.0.rc1' \
  && apk del .build-deps \
  && rm -rf /var/cache/apk/* \
  && rm -rf /tmp/* /var/tmp/* /usr/lib/ruby/gems/*/cache/*.gem
