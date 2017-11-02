@@ -33,3 +33,11 @@
         {{- printf "%s" .Values.redis.externalAddress -}}
     {{- end -}}
 {{- end -}}
+
+{{- define "spinnaker.deck-address" -}}
+{{ template "fullname" . }}-deck:{{ .Values.ui.port }}
+{{- end -}}
+
+{{- define "spinnaker.gate-address" -}}
+{{ template "fullname" . }}-gate:8084
+{{- end -}}

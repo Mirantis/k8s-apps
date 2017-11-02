@@ -1,9 +1,9 @@
 {{- $serviceName := include "fullname" . -}}
-{{- range $name, $content := .Values.jenkins.upload.jobs }}
+{{- range $name, $content := .Values.upload.jenkinsJobs }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ $serviceName }}-upload-{{ (split "." $name)._0 }}
+  name: {{ $serviceName }}-jj-{{ (split "." $name)._0 }}
   labels:
     app: {{ $serviceName }}
     component: jenkins
@@ -18,11 +18,11 @@ spec:
       volumes:
       - name: jenkins-job
         configMap:
-          name: {{ $serviceName }}-upload-{{ (split "." $name)._0 }}
+          name: {{ $serviceName }}-jj-{{ (split "." $name)._0 }}
       containers:
       - name: upload
-        image: "{{ $.Values.jenkins.upload.image.repository }}{{ $.Values.jenkins.upload.image.name }}:{{ $.Values.jenkins.upload.image.tag }}"
-        imagePullPolicy: "{{ $.Values.jenkins.upload.image.pullPolicy }}"
+        image: "{{ $.Values.upload.image.repository }}{{ $.Values.upload.image.name }}:{{ $.Values.upload.image.tag }}"
+        imagePullPolicy: "{{ $.Values.upload.image.pullPolicy }}"
         command:
         - curl
         - -X
@@ -42,7 +42,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ $serviceName }}-upload-{{ (split "." $name)._0 }}
+  name: {{ $serviceName }}-jj-{{ (split "." $name)._0 }}
   labels:
     app: {{ $serviceName }}
     component: jenkins

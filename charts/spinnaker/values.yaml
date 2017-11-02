@@ -134,6 +134,24 @@ gcs:
   project: my-project-name
   jsonKey: '<INSERT CLOUD STORAGE JSON HERE>'
 
+upload:
+  # Image that will be used to upload applications/pipelines
+  image:
+    repository: mirantisworkloads/
+    name: test-base
+    tag: 1.0.0
+    pullPolicy: IfNotPresent
+
+  # Jenkins jobs that will be uploaded (in xml format)
+  jenkinsJobs:
+    # example.xml: |
+  # Spinnaker applications that will be created (in json format)
+  applications:
+    # example.json: |
+  # Spinnaker pipelines that will be created (in json format)
+  pipelines:
+    # example.json: |
+
 # Configuration for the Jenkins instance that is attached to the
 # igor component of Spinnaker. For more info about the Jenkins integration
 # with Spinnaker, visit:
@@ -154,14 +172,3 @@ jenkins:
       repository: mirantisworkloads/
       name: spinnaker-jenkins-agent
       tag: v0.2.0
-
-  upload:
-    # Image that will be used to upload jobs
-    image:
-      repository: mirantisworkloads/
-      name: test-base
-      tag: 1.0.0
-      pullPolicy: IfNotPresent
-    # Jobs that will be uploaded (in xml format)
-    jobs:
-      # example.xml: |
