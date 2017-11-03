@@ -8,7 +8,7 @@ Master:
   image:
     repository: mirantisworkloads/
     name: jenkins
-    tag: "2.67"
+    tag: "2.87"
     pullPolicy: IfNotPresent
 
   persistence:

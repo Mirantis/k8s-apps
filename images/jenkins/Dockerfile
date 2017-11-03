@@ -1,1 +1,1 @@
-FROM jenkinsci/jenkins:2.67
+FROM jenkins/jenkins:2.87
