@@ -8,14 +8,20 @@ data:
     <?xml version='1.0' encoding='UTF-8'?>
     <hudson>
       <disabledAdministrativeMonitors/>
-      <version>{{ .Values.Master.ImageTag }}</version>
+      <version>2.7.3</version>
       <numExecutors>0</numExecutors>
       <mode>NORMAL</mode>
       <useSecurity>{{ .Values.Master.UseSecurity }}</useSecurity>
       <authorizationStrategy class="hudson.security.FullControlOnceLoggedInAuthorizationStrategy">
+        {{- if .Values.Master.UseSecurity  }}
         <denyAnonymousReadAccess>true</denyAnonymousReadAccess>
+        {{- else }}
+        <denyAnonymousReadAccess>false</denyAnonymousReadAccess>
+        {{- end }}
       </authorizationStrategy>
+      {{- if .Values.Master.UseSecurity  }}
       <securityRealm class="hudson.security.LegacySecurityRealm"/>
+      {{- end }}
       <disableRememberMe>false</disableRememberMe>
       <projectNamingStrategy class="jenkins.model.ProjectNamingStrategy$DefaultProjectNamingStrategy"/>
       <workspaceDir>${JENKINS_HOME}/workspace/${ITEM_FULLNAME}</workspaceDir>
