@@ -31,7 +31,16 @@ spec:
         imagePullPolicy: '{{ .Values.Master.image.pullPolicy }}'
         command:
         - sh
-        - /var/jenkins_config/apply_config.sh
+        - -cxe
+        - |
+          mkdir -p /usr/share/jenkins/ref/secrets/
+          echo "false" > /usr/share/jenkins/ref/secrets/slave-to-master-security-kill-switch
+          cp -n /var/jenkins_config/config.xml /var/jenkins_home
+          cp /var/jenkins_config/plugins.txt /var/jenkins_home
+          {{- if .Values.Jobs }}
+          cp -r /var/configmap/jobs /var/jenkins_home/
+          {{- end }}
+          /usr/local/bin/install-plugins.sh `echo $(cat /var/jenkins_home/plugins.txt)`
 {{- if .Values.Master.initContainerEnvironmentVariables }}
         env:
 {{ toYaml .Values.Master.initContainerEnvironmentVariables | indent 8 }}
@@ -45,6 +54,11 @@ spec:
           name: plugin-dir
         - mountPath: /usr/share/jenkins/ref/secrets/
           name: secrets-dir
+        {{- range $name, $content := .Values.Jobs }}
+        - mountPath: /var/configmap/jobs/{{ (split "." $name)._0 }}/config.xml
+          name: job-{{ (split "." $name)._0 }}
+          subPath: config.xml
+        {{- end }}
       {{- if .Values.Master.NodeSelector }}
       nodeSelector:
 {{ toYaml .Values.Master.NodeSelector | indent 8 }}
@@ -123,3 +137,8 @@ spec:
         persistentVolumeClaim:
           claimName: {{ template "jenkins.master-fullname" . }}
         {{- end }}
+      {{- range $name, $content := .Values.Jobs }}
+      - name: job-{{ (split "." $name)._0 }}
+        configMap:
+          name: {{ template "jenkins.master-fullname" $ }}-job-{{ (split "." $name)._0 }}
+      {{- end }}

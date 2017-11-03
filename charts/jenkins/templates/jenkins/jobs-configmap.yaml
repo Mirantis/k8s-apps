@@ -1,0 +1,16 @@
+{{- $serviceName := include "jenkins.master-fullname" . -}}
+{{- range $name, $content := .Values.Jobs }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $serviceName }}-job-{{ (split "." $name)._0 }}
+  labels:
+    heritage: {{ $.Release.Service | quote }}
+    release: {{ $.Release.Name | quote }}
+    chart: "{{ $.Chart.Name }}-{{ $.Chart.Version }}"
+    component: "{{ $.Release.Name }}-{{ $.Values.Master.Component }}"
+data:
+  config.xml: |
+{{ $content | indent 4}}
+---
+{{- end }}

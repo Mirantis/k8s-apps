@@ -110,15 +110,6 @@ Agent:
   #   secretName: mysecret
   #   mountPath: /var/myapp/mysecret
 
-upload:
-  # Image that will be used to upload jobs
-  image:
-    repository: mirantisworkloads/
-    name: test-base
-    tag: 1.0.0
-    pullPolicy: IfNotPresent
-
-  # Jenkins jobs that will be uploaded (in xml format)
-  # NOTE: it will work only when `Master.UseSecurity: false`
-  jobs:
-    # example.xml: |
+# Initial set of jobs (in xml format)
+Jobs:
+  # example: |
