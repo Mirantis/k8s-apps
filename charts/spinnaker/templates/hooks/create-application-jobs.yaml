@@ -21,8 +21,8 @@ spec:
           name: {{ $serviceName }}-app-{{ (split "." $name)._0 }}
       containers:
       - name: upload
-        image: "{{ $.Values.jenkins.upload.image.repository }}{{ $.Values.jenkins.upload.image.name }}:{{ $.Values.jenkins.upload.image.tag }}"
-        imagePullPolicy: "{{ $.Values.jenkins.upload.image.pullPolicy }}"
+        image: "{{ $.Values.upload.image.repository }}{{ $.Values.upload.image.name }}:{{ $.Values.upload.image.tag }}"
+        imagePullPolicy: "{{ $.Values.upload.image.pullPolicy }}"
         command:
         - curl
         - -f
