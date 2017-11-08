@@ -9,7 +9,7 @@ data:
     <?xml version='1.0' encoding='UTF-8'?>
     <hudson>
       <disabledAdministrativeMonitors/>
-      <version>2.7.3</version>
+      <version>{{ .Values.jenkins.Master.image.tag }}</version>
       <numExecutors>0</numExecutors>
       <mode>NORMAL</mode>
       <useSecurity>false</useSecurity>
@@ -61,7 +61,7 @@ data:
           <serverUrl>https://kubernetes.default</serverUrl>
           <skipTlsVerify>false</skipTlsVerify>
           <namespace>{{ .Release.Namespace }}</namespace>
-          <jenkinsUrl>{{ template "spinnaker.jenkins-master-address" . }}</jenkinsUrl>
+          <jenkinsUrl>http://{{ template "spinnaker.jenkins-master-address" . }}</jenkinsUrl>
           <jenkinsTunnel>{{ template "spinnaker.jenkins-agent-address" . }}</jenkinsTunnel>
           <containerCap>0</containerCap>
           <retentionTimeout>5</retentionTimeout>
