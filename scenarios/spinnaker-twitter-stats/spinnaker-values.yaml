@@ -1,0 +1,292 @@
+upload:
+  image:
+    repository: mirantisworkloads/
+    name: test-base
+    tag: 1.0.0
+    pullPolicy: IfNotPresent
+
+  applications:
+    demo.json: |
+      {
+        "job": [
+          {
+            "type": "createApplication",
+            "application": {
+              "cloudProviders": "kubernetes",
+              "instancePort": null,
+              "name": "twitter-analytics",
+              "email": "demo@mirantis.com"
+            },
+            "user": "[anonymous]"
+          }
+        ],
+        "application": "twitter-analytics",
+        "description": "Create Application: twitter-analytics"
+      }
+
+  pipelines:
+    deploy.json: |
+      {
+        "application": "twitter-analytics",
+        "name": "Twitter Analytics: deploy",
+        "keepWaitingPipelines": true,
+        "lastModifiedBy": "anonymous",
+        "limitConcurrent": true,
+        "parallel": true,
+        "parameterConfig": [
+          {
+            "default": "demo",
+            "name": "Name"
+          }
+        ],
+        "stages": [
+          {
+            "continuePipeline": false,
+            "failPipeline": true,
+            "job": "twitter",
+            "master": "default",
+            "name": "Deploy ZooKeeper",
+            "parameters": {
+              "TS_CHARTS": "zookeeper",
+              "TS_CMD": "up",
+              "TS_NAME": "${parameters.Name}"
+            },
+            "refId": "1",
+            "requisiteStageRefIds": [],
+            "type": "jenkins"
+          },
+          {
+            "continuePipeline": false,
+            "failPipeline": true,
+            "job": "twitter",
+            "master": "default",
+            "name": "Deploy Kafka",
+            "parameters": {
+              "TS_CHARTS": "kafka",
+              "TS_CMD": "up",
+              "TS_NAME": "${parameters.Name}"
+            },
+            "refId": "2",
+            "requisiteStageRefIds": [
+              "1"
+            ],
+            "type": "jenkins"
+          },
+          {
+            "continuePipeline": false,
+            "failPipeline": true,
+            "job": "twitter",
+            "master": "default",
+            "name": "Deploy Spark",
+            "parameters": {
+              "TS_CHARTS": "spark",
+              "TS_CMD": "up",
+              "TS_NAME": "${parameters.Name}"
+            },
+            "refId": "3",
+            "requisiteStageRefIds": [
+              "1"
+            ],
+            "type": "jenkins"
+          },
+          {
+            "continuePipeline": false,
+            "failPipeline": true,
+            "job": "twitter",
+            "master": "default",
+            "name": "Deploy HDFS",
+            "parameters": {
+              "TS_CHARTS": "hdfs",
+              "TS_CMD": "up",
+              "TS_NAME": "${parameters.Name}"
+            },
+            "refId": "4",
+            "requisiteStageRefIds": [],
+            "type": "jenkins"
+          },
+          {
+            "continuePipeline": false,
+            "failPipeline": true,
+            "job": "twitter",
+            "master": "default",
+            "name": "Deploy Twitter to Kafka",
+            "parameters": {
+              "TS_CHARTS": "tweepub",
+              "TS_CMD": "up",
+              "TS_NAME": "${parameters.Name}"
+            },
+            "refId": "5",
+            "requisiteStageRefIds": [
+              "2"
+            ],
+            "type": "jenkins"
+          },
+          {
+            "continuePipeline": false,
+            "failPipeline": true,
+            "job": "twitter",
+            "master": "default",
+            "name": "Deploy Analytics Job",
+            "parameters": {
+              "TS_CHARTS": "tweetics",
+              "TS_CMD": "up",
+              "TS_NAME": "${parameters.Name}"
+            },
+            "refId": "6",
+            "requisiteStageRefIds": [
+              "3",
+              "2"
+            ],
+            "type": "jenkins"
+          },
+          {
+            "continuePipeline": false,
+            "failPipeline": true,
+            "job": "twitter",
+            "master": "default",
+            "name": "Deploy Analytics Visualization",
+            "parameters": {
+              "TS_CHARTS": "tweeviz",
+              "TS_CMD": "up",
+              "TS_NAME": "${parameters.Name}"
+            },
+            "refId": "7",
+            "requisiteStageRefIds": [
+              "4"
+            ],
+            "type": "jenkins"
+          },
+          {
+            "continuePipeline": false,
+            "failPipeline": true,
+            "job": "twitter",
+            "master": "default",
+            "name": "Verify all services",
+            "parameters": {
+              "TS_CHARTS": "",
+              "TS_CMD": "test",
+              "TS_NAME": "${parameters.Name}"
+            },
+            "refId": "8",
+            "requisiteStageRefIds": [
+              "6",
+              "5",
+              "7"
+            ],
+            "type": "jenkins"
+          }
+        ],
+        "triggers": []
+      }
+    destroy.json: |
+      {
+        "application": "twitter-analytics",
+        "name": "Twitter Analytics: destroy",
+        "keepWaitingPipelines": true,
+        "lastModifiedBy": "anonymous",
+        "limitConcurrent": true,
+        "parallel": true,
+        "parameterConfig": [
+          {
+            "default": "demo",
+            "name": "Name"
+          }
+        ],
+        "stages": [
+          {
+            "continuePipeline": false,
+            "failPipeline": true,
+            "job": "twitter",
+            "master": "default",
+            "name": "Deploy ZooKeeper",
+            "parameters": {
+              "TS_CHARTS": "",
+              "TS_CMD": "down",
+              "TS_NAME": "${parameters.Name}"
+            },
+            "refId": "1",
+            "requisiteStageRefIds": [],
+            "type": "jenkins"
+          }
+        ],
+        "triggers": []
+      }
+
+jenkins:
+  Agent:
+    image:
+      repository: mirantisworkloads/
+      name: jenkins-demo-slave
+      tag: 1.0.0
+
+  Jobs:
+    twitter: |
+      <?xml version='1.0' encoding='UTF-8'?>
+      <project>
+        <actions/>
+        <description></description>
+        <keepDependencies>false</keepDependencies>
+        <properties>
+          <hudson.model.ParametersDefinitionProperty>
+            <parameterDefinitions>
+              <hudson.model.StringParameterDefinition>
+                <name>TS_NAME</name>
+                <description></description>
+                <defaultValue>demo</defaultValue>
+              </hudson.model.StringParameterDefinition>
+              <hudson.model.StringParameterDefinition>
+                <name>TS_CMD</name>
+                <description></description>
+                <defaultValue>up</defaultValue>
+              </hudson.model.StringParameterDefinition>
+              <hudson.model.StringParameterDefinition>
+                <name>TS_CHARTS</name>
+                <description></description>
+                <defaultValue></defaultValue>
+              </hudson.model.StringParameterDefinition>
+            </parameterDefinitions>
+          </hudson.model.ParametersDefinitionProperty>
+        </properties>
+        <scm class="hudson.plugins.git.GitSCM" plugin="git@3.4.0">
+          <configVersion>2</configVersion>
+          <userRemoteConfigs>
+            <hudson.plugins.git.UserRemoteConfig>
+              <url>https://github.com/Mirantis/k8s-apps</url>
+            </hudson.plugins.git.UserRemoteConfig>
+          </userRemoteConfigs>
+          <branches>
+            <hudson.plugins.git.BranchSpec>
+              <name>*/master</name>
+            </hudson.plugins.git.BranchSpec>
+          </branches>
+          <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+          <submoduleCfg class="list"/>
+          <extensions/>
+        </scm>
+        <canRoam>true</canRoam>
+        <disabled>false</disabled>
+        <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+        <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+        <triggers/>
+        <concurrentBuild>true</concurrentBuild>
+        <builders>
+          <hudson.tasks.Shell>
+            <command>#!/bin/bash
+      set -ex
+
+      export TS_USE_INTERNAL_IP=yes
+      export TS_APP_KEY=CHANGEME
+      export TS_APP_SECRET=CHANGEME
+      export TS_TOKEN_KEY=CHANGEME
+      export TS_TOKEN_SECRET=CHANGEME
+
+      helm init --client-only
+
+      cd scenarios/twitter-stats
+
+      timeout 120 ./twitter-stats.sh $TS_CMD</command>
+          </hudson.tasks.Shell>
+        </builders>
+        <publishers/>
+        <buildWrappers/>
+      </project>

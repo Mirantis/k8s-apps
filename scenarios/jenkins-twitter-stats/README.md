@@ -10,6 +10,15 @@
   ```shell
   helm repo add mirantisworkloads https://mirantisworkloads.storage.googleapis.com
   ```
+* Set twitter credentials in `jenkins-values.yaml`:
+
+  Replace CHANGEME with proper values.
+
+    export TS_APP_KEY=CHANGEME
+    export TS_APP_SECRET=CHANGEME
+    export TS_TOKEN_KEY=CHANGEME
+    export TS_TOKEN_SECRET=CHANGEME
+
 * Install jenkins chart with pre-defined job:
   ```shell
   helm install mirantisworkloads/jenkins -f jenkins-values.yaml
