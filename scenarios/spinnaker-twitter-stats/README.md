@@ -14,10 +14,12 @@
 
   Replace CHANGEME with proper values.
 
+  ```shell
     export TS_APP_KEY=CHANGEME
     export TS_APP_SECRET=CHANGEME
     export TS_TOKEN_KEY=CHANGEME
     export TS_TOKEN_SECRET=CHANGEME
+  ```
 
 * Install spinnaker chart with pre-uploaded pipelines:
   ```shell
