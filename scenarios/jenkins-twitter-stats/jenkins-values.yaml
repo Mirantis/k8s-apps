@@ -1,0 +1,77 @@
+Agent:
+  image:
+    repository: mirantisworkloads/
+    name: jenkins-demo-slave
+    tag: 1.0.0
+
+Jobs:
+  twitter: |
+    <?xml version='1.0' encoding='UTF-8'?>
+    <project>
+      <actions/>
+      <description></description>
+      <keepDependencies>false</keepDependencies>
+      <properties>
+        <hudson.model.ParametersDefinitionProperty>
+          <parameterDefinitions>
+            <hudson.model.StringParameterDefinition>
+              <name>TS_NAME</name>
+              <description></description>
+              <defaultValue>demo</defaultValue>
+            </hudson.model.StringParameterDefinition>
+            <hudson.model.StringParameterDefinition>
+              <name>TS_CMD</name>
+              <description></description>
+              <defaultValue>up</defaultValue>
+            </hudson.model.StringParameterDefinition>
+            <hudson.model.StringParameterDefinition>
+              <name>TS_CHARTS</name>
+              <description></description>
+              <defaultValue></defaultValue>
+            </hudson.model.StringParameterDefinition>
+          </parameterDefinitions>
+        </hudson.model.ParametersDefinitionProperty>
+      </properties>
+      <scm class="hudson.plugins.git.GitSCM" plugin="git@3.4.0">
+        <configVersion>2</configVersion>
+        <userRemoteConfigs>
+          <hudson.plugins.git.UserRemoteConfig>
+            <url>https://github.com/Mirantis/k8s-apps</url>
+          </hudson.plugins.git.UserRemoteConfig>
+        </userRemoteConfigs>
+        <branches>
+          <hudson.plugins.git.BranchSpec>
+            <name>*/master</name>
+          </hudson.plugins.git.BranchSpec>
+        </branches>
+        <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+        <submoduleCfg class="list"/>
+        <extensions/>
+      </scm>
+      <canRoam>true</canRoam>
+      <disabled>false</disabled>
+      <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+      <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+      <triggers/>
+      <concurrentBuild>true</concurrentBuild>
+      <builders>
+        <hudson.tasks.Shell>
+          <command>#!/bin/bash
+    set -ex
+
+    export TS_USE_INTERNAL_IP=yes
+    export TS_APP_KEY=CHANGEME
+    export TS_APP_SECRET=CHANGEME
+    export TS_TOKEN_KEY=CHANGEME
+    export TS_TOKEN_SECRET=CHANGEME
+
+    helm init --client-only
+
+    cd scenarios/twitter-stats
+
+    timeout 120 ./twitter-stats.sh $TS_CMD</command>
+        </hudson.tasks.Shell>
+      </builders>
+      <publishers/>
+      <buildWrappers/>
+    </project>
