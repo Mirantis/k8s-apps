@@ -1,3 +1,4 @@
+requirements.lock
 *.tgz
 dist
 .idea
