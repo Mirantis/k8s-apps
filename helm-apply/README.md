@@ -27,6 +27,10 @@ releases:
       <some-param>: <some-value>
 ```
 
+## Asciinema demo
+
+[![asciicast](https://asciinema.org/a/pU78GbUmjJQKJ1jqnumAmBbmC.png)](https://asciinema.org/a/pU78GbUmjJQKJ1jqnumAmBbmC)
+
 ## Chart requirements
 
 There are no any specific requirements for charts in general. But if you want
