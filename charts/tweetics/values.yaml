@@ -10,6 +10,7 @@ image:
 # Filter out hashtags with less then specified count
 minHashtagCounts: 0
 storage: "hdfs" # hdfs or cassandra
+submitArgs: "--total-executor-cores 2 --executor-memory 512M"
 
 zookeeper:
   # if disabled, subchart will not be deployed
