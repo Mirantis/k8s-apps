@@ -1,4 +1,4 @@
-FROM python:2.7-alpine
+FROM python:2.7-jessie
 
 COPY setup.py tweepub.py /tweepub/
 RUN pip install /tweepub
