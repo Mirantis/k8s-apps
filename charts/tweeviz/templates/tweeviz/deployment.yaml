@@ -2,6 +2,8 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: {{ template "fullname" . }}
+  annotations:
+    sidecar.istio.io/status: injected-version-releng@0d29a2c0d15f-0.2.12-998e0e00d375688bcb2af042fc81a60ce5264009
   labels:
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
@@ -16,36 +18,49 @@ spec:
     metadata:
       {{ if .Values.istio.enabled }}
       annotations:
-        alpha.istio.io/sidecar: injected
-        alpha.istio.io/version: jenkins@ubuntu-16-04-build-12ac793f80be71-0.1.6-dab2033
+        sidecar.istio.io/status: injected-version-releng@0d29a2c0d15f-0.2.12-998e0e00d375688bcb2af042fc81a60ce5264009
       {{ end }}
       labels:
         app: {{ template "fullname" . }}
+        chartName: {{ .Chart.Name }}
     spec:
       {{ if .Values.istio.enabled }}
       initContainers:
-      - name: init
-        image: docker.io/istio/init:0.1
-        imagePullPolicy: Always
-        args:
+      - args:
         - -p
-        - '15001'
+        - "15001"
         - -u
-        - '1337'
+        - "1337"
+        image: docker.io/istio/proxy_init:0.2.12
+        imagePullPolicy: IfNotPresent
+        name: istio-init
+        resources: {}
         securityContext:
           capabilities:
             add:
             - NET_ADMIN
-      - name: enable-core-dump
-        image: alpine
-        imagePullPolicy: Always
+          privileged: true
+      - args:
+        - -c
+        - sysctl -w kernel.core_pattern=/etc/istio/proxy/core.%e.%p.%t && ulimit -c
+          unlimited
         command:
         - /bin/sh
-        args:
-        - -c
-        - sysctl -w kernel.core_pattern=/tmp/core.%e.%p.%t && ulimit -c unlimited
+        image: alpine
+        imagePullPolicy: IfNotPresent
+        name: enable-core-dump
+        resources: {}
         securityContext:
           privileged: true
+      volumes:
+      - emptyDir:
+          medium: Memory
+          sizeLimit: "0"
+        name: istio-envoy
+      - name: istio-certs
+        secret:
+          optional: true
+          secretName: istio.default
       {{ end }}
       containers:
       {{ if .Values.istio.enabled }}
@@ -54,6 +69,28 @@ spec:
         - sidecar
         - -v
         - "2"
+        - --configPath
+        - /etc/istio/proxy
+        - --binaryPath
+        - /usr/local/bin/envoy
+        - --serviceCluster
+        - sleep
+        - --drainDuration
+        - 45s
+        - --parentShutdownDuration
+        - 1m0s
+        - --discoveryAddress
+        - istio-pilot.ap:8080
+        - --discoveryRefreshDelay
+        - 1s
+        - --zipkinAddress
+        - istio-zipkin.ap:9411
+        - --connectTimeout
+        - 10s
+        - --statsdUdpAddress
+        - istio-mixer.ap:9125
+        - --proxyAdminPort
+        - "15000"
         env:
         - name: POD_NAME
           valueFrom:
@@ -63,16 +100,24 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        - name: POD_IP
+        - name: INSTANCE_IP
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
-        image: docker.io/istio/proxy_debug:0.1
-        imagePullPolicy: Always
-        name: proxy
+        image: docker.io/istio/proxy_debug:0.2.12
+        imagePullPolicy: IfNotPresent
+        name: istio-proxy
         resources: {}
         securityContext:
+          privileged: true
+          readOnlyRootFilesystem: false
           runAsUser: 1337
+        volumeMounts:
+        - mountPath: /etc/istio/proxy
+          name: istio-envoy
+        - mountPath: /etc/certs/
+          name: istio-certs
+          readOnly: true
       {{ end }}
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"

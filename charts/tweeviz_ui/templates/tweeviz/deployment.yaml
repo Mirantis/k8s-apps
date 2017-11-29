@@ -21,6 +21,7 @@ spec:
       {{- end }}
       labels:
         app: {{ template "tweeviz.ui.fullname" . }}
+        chartName: {{ .Release.Name }}
     spec:
       {{- if .Values.istio.enabled }}
       initContainers:

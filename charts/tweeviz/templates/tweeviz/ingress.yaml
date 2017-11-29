@@ -1,4 +1,4 @@
-{{- if and .Values.ingress.enabled (not .Values.istio.enabled) -}}
+{{- if .Values.ingress.enabled -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -9,7 +9,9 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     app: {{ template "fullname" . }}
   annotations:
-{{ toYaml .Values.ingress.annotations | indent 4 }}
+  {{- if .Values.istio.enabled }}
+    kubernetes.io/ingress.class: istio
+  {{- end }}
 spec:
   {{- if .Values.ingress.tls.enabled }}
   tls:
