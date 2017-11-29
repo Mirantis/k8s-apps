@@ -20,6 +20,8 @@ type Applier struct {
 	Repositories map[string]string   `yaml:"repos"`
 	Clusters     map[string]*Cluster `yaml:"clusters"`
 	Releases     map[string]*Release `yaml:"releases"`
+	Routes       map[string]*Route   `yaml:"routes"`
+	AB           map[string]*AB      `yaml:"ab-testing"`
 }
 
 func NewApplier(configFilePath string, providers getter.Providers) (*Applier, error) {
@@ -56,16 +58,29 @@ func (applier *Applier) Run(verbose, diff, dryRun bool) error {
 		}
 	}
 
-	fmt.Printf("\n")
 	for _, release := range installOrder {
 		err := applier.Releases[release].Wait()
 		if err != nil {
 			return err
 		}
 	}
-	fmt.Printf("\n")
+
 	for _, release := range installOrder {
 		applier.Releases[release].PrintAddresses()
+	}
+
+	for _, route := range applier.Routes {
+		err := route.Create()
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, ab := range applier.AB {
+		err := ab.Create()
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -97,6 +112,19 @@ func (applier *Applier) prepareApplier() error {
 		}
 		release.Chart = NewChart(applier.Repositories[repository], name, version)
 		release.Cluster = applier.Clusters[release.ClusterName]
+	}
+
+	for name, route := range applier.Routes {
+		route.Name = name
+		route.Cluster = applier.Clusters[route.ClusterName]
+	}
+
+	for name, ab := range applier.AB {
+		ab.Name = name
+		ab.Cluster = applier.Clusters[ab.ClusterName]
+		for _, route := range ab.Route {
+			route.Release = applier.Releases[route.ReleaseName]
+		}
 	}
 
 	return nil

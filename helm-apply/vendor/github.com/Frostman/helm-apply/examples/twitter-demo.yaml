@@ -1,0 +1,70 @@
+repos:
+  mirantis: https://mirantisworkloads.storage.googleapis.com
+  local: http://127.0.0.1:8879
+
+clusters:
+  aws:
+    context: aws
+    externalIP: X.X.X.X
+  gke:
+    context: gke
+    externalIP: X.X.X.X
+
+releases:
+  tweeviz-ui-demo:
+    chart: mirantis/tweeviz_ui
+    cluster: aws
+    wait: true
+    dependencies:
+      tweeviz_api: tweeviz-api-demo
+
+  tweeviz-api-demo:
+    chart: mirantis/tweeviz_api
+    cluster: gke
+    wait: true
+    dependencies:
+      hdfs: hdfs-demo
+
+  tweepub-demo:
+    chart: mirantis/tweepub
+    cluster: gke
+    dependencies:
+      kafka: kafka-demo
+    parameters:
+      twitter:
+        # Should be replaced with proper values
+        appKey: XXXX
+        appSecret: XXXX
+        tokenKey: XXXX
+        tokenSecret: XXXX
+
+        locations: -71.4415,41.9860,-70.4747,42.9041,-122.75,36.8,-121.75,37.8,-74,40,-73,41
+
+  tweetics-demo:
+    chart: mirantis/tweetics
+    cluster: gke
+    dependencies:
+      zookeeper: zookeeper-demo
+      kafka: kafka-demo
+      spark: spark-demo
+      hdfs: hdfs-demo
+
+  spark-demo:
+    chart: mirantis/spark
+    cluster: gke
+    dependencies:
+      zookeeper: zookeeper-demo
+
+  kafka-demo:
+    chart: mirantis/kafka
+    cluster: gke
+    dependencies:
+      zookeeper: zookeeper-demo
+
+  zookeeper-demo:
+    chart: mirantis/zookeeper
+    cluster: gke
+
+  hdfs-demo:
+    chart: mirantis/hdfs
+    cluster: gke

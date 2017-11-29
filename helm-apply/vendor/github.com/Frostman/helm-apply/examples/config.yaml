@@ -1,0 +1,22 @@
+repos:
+  mirantis: https://mirantisworkloads.storage.googleapis.com
+  local: http://127.0.0.1:8879
+
+clusters:
+  cluster-1:
+    context: k8s17
+
+releases:
+  kafka-demo:
+    chart: mirantis/kafka
+    cluster: cluster-1
+    dependencies:
+      zookeeper: zookeeper-demo
+    parameters:
+      replicas: 2
+
+  zookeeper-demo:
+    chart: mirantis/zookeeper
+    cluster: cluster-1
+    parameters:
+      replicas: 2

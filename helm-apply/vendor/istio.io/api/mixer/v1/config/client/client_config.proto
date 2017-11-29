@@ -1,0 +1,112 @@
+// Copyright 2017 Istio Authors
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+
+syntax = "proto3";
+
+import "gogoproto/gogo.proto";
+
+import "mixer/v1/attributes.proto";
+import "mixer/v1/config/client/api_spec.proto";
+import "mixer/v1/config/client/quota.proto";
+
+package istio.mixer.v1.config.client;
+
+option (gogoproto.goproto_getters_all) = false;
+option (gogoproto.equal_all) = false;
+option (gogoproto.gostring_all) = false;
+
+// Defines the per-service client configuration.
+message ServiceConfig {
+  // If true, call Mixer Check.
+  bool enable_mixer_check = 1;
+
+  // If true, call Mixer Report.
+  bool enable_mixer_Report = 2;
+
+  // Send these attributes to Mixer in both Check and Report. This
+  // typically includes the "destination.service" attribute.
+  Attributes mixer_attributes = 3;
+
+  // HTTP API specifications to generate API attributes.
+  repeated HTTPAPISpec http_api_spec = 4;
+
+  // Quota specifications to generate quota requirements.
+  repeated QuotaSpec quota_spec = 5;
+}
+
+// Defines the transport config on how to call Mixer.
+message TransportConfig {
+  // The flag to disable check cache.
+  bool disable_check_cache = 1;
+
+  // The flag to disable quota cache.
+  bool disable_quota_cache = 2;
+
+  // The flag to disable report batch.
+  bool disable_report_batch = 3;
+
+  enum NetworkFailPolicy {
+    // If network fails, request is passed to the backend.
+    FAIL_OPEN = 0;
+    // If network fails, request is rejected.
+    FAIL_CLOSE = 1;
+  }
+  // Specifies the policy when failed to connect to Mixer server.
+  NetworkFailPolicy network_fail_policy = 4;
+}
+
+// Defines the client config for HTTP.
+message HttpClientConfig {
+  // The transport config.
+  TransportConfig transport = 1;
+
+  // Map of control configuration indexed by destination.service. This
+  // is used to support per-service configuration for cases where a
+  // mixerclient serves multiple services.
+  map<string, ServiceConfig> service_configs = 2;
+
+  // Default destination service name if none was specified in the
+  // client request.
+  string default_destination_service = 3;
+
+  // Default attributes to send to Mixer in both Check and
+  // Report. This typically includes "destination.ip" and
+  // "destination.uid" attributes.
+  Attributes mixer_attributes = 4;
+
+  // Default attributes to forward to upstream. This typically
+  // includes the "source.ip" and "source.uid" attributes.
+  Attributes forward_attributes = 5;
+}
+
+// Defines the client config for TCP.
+message TcpClientConfig {
+  // The transport config.
+  TransportConfig transport = 1;
+
+  // Default attributes to send to Mixer in both Check and
+  // Report. This typically includes "destination.ip" and
+  // "destination.uid" attributes.
+  Attributes mixer_attributes = 2;
+
+  // If set to true, disables mixer check calls.
+  bool disable_check_calls = 3;
+
+  // If set to true, disables mixer check calls.
+  bool disable_report_calls = 4;
+
+  // Quota specifications to generate quota requirements.
+  // It applies on the new TCP connections.
+  QuotaSpec connection_quota_spec = 5;
+}

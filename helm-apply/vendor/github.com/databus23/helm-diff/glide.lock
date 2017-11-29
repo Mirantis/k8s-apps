@@ -1,0 +1,111 @@
+hash: 89acf9fc60dc1afd09a19f388147d5127fd9f25a4f0d6fffd2c026e795b212e2
+updated: 2017-07-13T13:51:36.7181269+02:00
+imports:
+- name: github.com/aryann/difflib
+  version: a1a4dd44eb11820695fbe83e00fb2301ee6eb54c
+- name: github.com/BurntSushi/toml
+  version: b26d9c308763d68093482582cea63d69be07a0f0
+- name: github.com/facebookgo/atomicfile
+  version: 2de1f203e7d5e386a6833233882782932729f27e
+- name: github.com/facebookgo/symwalk
+  version: 42004b9f322246749dd73ad71008b1f3160c0052
+- name: github.com/ghodss/yaml
+  version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
+- name: github.com/gobwas/glob
+  version: bea32b9cd2d6f55753d94a28e959b13f0244797a
+  subpackages:
+  - compiler
+  - match
+  - syntax
+  - syntax/ast
+  - syntax/lexer
+  - util/runes
+  - util/strings
+- name: github.com/golang/protobuf
+  version: 2bba0603135d7d7f5cb73b2125beeda19c09f4ef
+  subpackages:
+  - proto
+  - ptypes/any
+  - ptypes/timestamp
+- name: github.com/inconshreveable/mousetrap
+  version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
+- name: github.com/Masterminds/semver
+  version: 3f0ab6d4ab4bed1c61caf056b63a6e62190c7801
+- name: github.com/mattn/go-colorable
+  version: ded68f7a9561c023e790de24279db7ebf473ea80
+- name: github.com/mattn/go-isatty
+  version: fc9e8d8ef48496124e79ae0df75490096eccf6fe
+- name: github.com/mgutz/ansi
+  version: 9520e82c474b0a04dd04f8a40959027271bab992
+- name: github.com/spf13/cobra
+  version: f62e98d28ab7ad31d707ba837a966378465c7b57
+- name: github.com/spf13/pflag
+  version: 9ff6c6923cfffbcd502984b8e0c80539a94968b7
+- name: golang.org/x/crypto
+  version: d172538b2cfce0c13cee31e647d0367aa8cd2486
+  subpackages:
+  - cast5
+  - openpgp
+  - openpgp/armor
+  - openpgp/clearsign
+  - openpgp/elgamal
+  - openpgp/errors
+  - openpgp/packet
+  - openpgp/s2k
+- name: golang.org/x/net
+  version: e90d6d0afc4c315a0d87a568ae68577cc15149a0
+  subpackages:
+  - context
+  - http2
+  - http2/hpack
+  - internal/timeseries
+  - lex/httplex
+  - trace
+- name: golang.org/x/sys
+  version: 8f0908ab3b2457e2e15403d3697c9ef5cb4b57a9
+  subpackages:
+  - unix
+- name: google.golang.org/grpc
+  version: 8050b9cbc271307e5a716a9d782803d09b0d6f2d
+  subpackages:
+  - codes
+  - credentials
+  - grpclog
+  - internal
+  - keepalive
+  - metadata
+  - naming
+  - peer
+  - stats
+  - tap
+  - transport
+- name: gopkg.in/yaml.v2
+  version: a83829b6f1293c91addabc89d0571c246397bbf4
+- name: k8s.io/apimachinery
+  version: fbd6803372f831e58b86c78d07421637a64ad768
+  subpackages:
+  - pkg/version
+- name: k8s.io/helm
+  version: 1f8caeaed5b9728b20adef53dcb9f1af6f7a9ee4
+  repo: https://github.com/databus23/helm.git
+  subpackages:
+  - pkg/chartutil
+  - pkg/downloader
+  - pkg/getter
+  - pkg/helm
+  - pkg/helm/environment
+  - pkg/helm/helmpath
+  - pkg/ignore
+  - pkg/plugin
+  - pkg/proto/hapi/chart
+  - pkg/proto/hapi/release
+  - pkg/proto/hapi/services
+  - pkg/proto/hapi/version
+  - pkg/provenance
+  - pkg/repo
+  - pkg/resolver
+  - pkg/strvals
+  - pkg/tlsutil
+  - pkg/urlutil
+  - pkg/version
+testImports: []

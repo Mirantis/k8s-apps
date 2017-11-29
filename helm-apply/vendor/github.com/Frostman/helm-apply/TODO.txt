@@ -1,0 +1,7 @@
+* move API configs to secrets
+* make default kubeconfig location automatic
+* try to initialize only used clusters (we can skip clusters section in this case)
+* hide helm output
+* make progress bar
+* helm plugin install script
+* publish binaries

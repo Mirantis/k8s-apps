@@ -1,0 +1,10 @@
+name: "apply"
+version: "0.1.0"
+usage: "apply helm charts configuration"
+description: |-
+  Define helm charts in declarative way.
+  Deploy on different Kubernetes clusters.
+  Manage dependencies.
+ignoreFlags: false
+useTunnel: false
+command: "$HELM_PLUGIN_DIR/helm-apply"
