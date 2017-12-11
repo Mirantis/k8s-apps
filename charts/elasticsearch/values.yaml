@@ -15,8 +15,15 @@ image:
   tag: 5.2.2
   pullPolicy: IfNotPresent
 
+testImage:
+  repository: mirantisworkloads/
+  name: "test-base"
+  tag: "1.0.0"
+  pullPolicy: "IfNotPresent"
+
 master:
   replicas: 1
+  quorum: 1 # quorum should be replicas - 1, at least 1
   prometheusExporter:
     enabled: false
     image:
@@ -25,7 +32,7 @@ master:
       tag: 0.3.3
       pullPolicy: IfNotPresent
   heapSize: 1G
-  resources:
+  #resources:
     #requests:
     #  cpu: 256m
     #  memory: 512Mi
@@ -36,10 +43,22 @@ master:
 client:
   replicas: 1
   heapSize: 1G
-  resources:
+  config:
+    processors: 1
+    thread_pool:
+      search:
+        size: 1 # has to be equal to processors [max. processors + 1]
+        queue_size: 500
+      bulk:
+        size: 1 # has to be equal to processors [max. processors + 1]
+        queue_size: 500
+      index:
+        size: 1 # has to be equal to processors [max. processors + 1]
+        queue_size: 500
+  #resources:
     #requests:
-    #  cpu: 256m
-    #  memory: 512Mi
+    #  cpu: 1
+    #  memory: 1Gi
     #limits:
     #  cpu: 512m
     #  memory: 1Gi
@@ -60,15 +79,27 @@ client:
     #  kubernetes.io/ingress.class: nginx
 
 data:
-  replicas: 3
+  replicas: 1
   heapSize: 1536m
-  resources:
+  #resources:
     #requests:
     #  cpu: 256m
     #  memory: 2Gi
     #limits:
     #  cpu: 1
     #  memory: 4Gi
+  config:
+    processors: 1
+    thread_pool:
+      search:
+        size: 1 # has to be equal to processors [max. processors + 1]
+        queue_size: 500
+      bulk:
+        size: 1 # has to be equal to processors [max. processors + 1]
+        queue_size: 500
+      index:
+        size: 1 # has to be equal to processors [max. processors + 1]
+        queue_size: 500
   persistence:
     type: emptyDir # or hostPath or PersistentVolumeClaim
     #storageClass: ""
