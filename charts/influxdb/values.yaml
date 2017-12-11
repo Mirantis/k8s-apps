@@ -73,7 +73,76 @@ service:
   loadBalancerSourceRanges: []
   annotations: {}
 
-#create initial database in influxdb
-dbInit: # or dbInit: {} to leve empty influx
-  dbNames:
-    - default_init_db
+# Invoking external configuration management
+# Blog url as example and reasoning: http://apealive.net/post/helm-charts-wheelhouse
+wheelhouse:
+  enabled: false
+#  engine: salt
+#  image:
+#    repository: epcim/
+#    name: salt-formulas
+#    tag: wheelhouse-debian-stretch-salt-stable-formula-stable
+#    pullPolicy: IfNotPresent
+#  #  repository: mirantisworkloads/
+#  #  name: wheelhouse
+#  #  tag: 1.3.4
+#  #  pullPolicy: IfNotPresent
+#  #
+#  # Individual task specification
+#  job:
+#    initdb:
+#      wheel:
+#        - client
+#      logging:
+#        severity: debug
+#    cronjob:
+#      wheel: []
+#  # Shared, consolidated, metadata structure
+#  pillar:
+#    influxdb:
+#      client:
+#        enabled: true
+#        server:
+#          protocol: http
+#          host: $INFLUXDB_HOST
+#          port: 8086
+#          user: admin
+#          password: password
+#        user:
+#          fluentd:
+#            name: fluentd
+#            password: password
+#            enabled: true
+#        database:
+#            initialdb:
+#              enabled: true
+#              name: initialdb
+#              retention_policy:
+#                - name: a_year
+#                  duration: 52w
+#                  replication: 1
+#                  is_default: true
+#    # This section is only needed if I want to use influx module/state directly
+#    salt:
+#      minion:
+#          config:
+#            influxdb:
+#              host: $INFLUXDB_HOST
+#              port: 8086
+#  # Free structure to compose execution logic that fit the engine
+#  wheel:
+#    client:
+#      state.apply:
+#        - influxdb.client
+#    prune_openstack_metrics:
+#      state.sls_id:
+#        - prune_measurement
+#        - influxdb.query
+#    minion_influxdb_config:
+#      state.apply:
+#        /etc/salt/minion:
+#          file.serialize:
+#          - dataset_pillar:  salt:minion:config
+#          - formatter:       yaml
+#          - merge_if_exists: True
+#          - makedirs: True
