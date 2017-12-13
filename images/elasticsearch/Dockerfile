@@ -1,12 +1,14 @@
 FROM openjdk:8
 
+# set basic Java configuration
 ENV NODE_DATA=true NODE_MASTER=true BOOTSTRAP_MLOCKALL=false ES_JAVA_OPTS=-Djava.net.preferIPv4Stack=true
 
+# install elasticsearch and add user
 RUN set -x \
-    && curl -o /tmp/esc.tgz https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.2.tar.gz \
+    && curl -o /tmp/esc.tgz https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.5.2.tar.gz \
     && tar -zvxf /tmp/esc.tgz -C /usr/share/ \
     && rm /tmp/esc.tgz \
-    && mv /usr/share/elasticsearch-5.2.2 /usr/share/elasticsearch \
+    && mv /usr/share/elasticsearch-5.5.2 /usr/share/elasticsearch \
     && useradd --user-group --home-dir /usr/share/elasticsearch elasticsearch \
     && ln -s /usr/share/elasticsearch/bin/elasticsearch /usr/bin/elasticsearch \
     && chown -R elasticsearch:elasticsearch /usr/share/elasticsearch /usr/bin/elasticsearch
@@ -16,12 +18,17 @@ RUN set -x \
 # https://discuss.elastic.co/t/running-as-non-root-user-service-wrapper-has-changed/7863
 RUN usermod -s /bin/bash -d /usr/share/elasticsearch elasticsearch
 
-RUN /usr/share/elasticsearch/bin/elasticsearch-plugin install io.fabric8:elasticsearch-cloud-kubernetes:5.2.2 \
+# install elasticsearch-cloud-kubernetes plugin
+RUN /usr/share/elasticsearch/bin/elasticsearch-plugin install io.fabric8:elasticsearch-cloud-kubernetes:5.5.2 \
     && rm /usr/share/elasticsearch/plugins/discovery-kubernetes/slf4j-* \
     && curl -o /usr/share/elasticsearch/plugins/discovery-kubernetes/slf4j-log4j12-1.7.13.jar http://central.maven.org/maven2/org/slf4j/slf4j-log4j12/1.7.13/slf4j-log4j12-1.7.13.jar \
     && curl -o /usr/share/elasticsearch/plugins/discovery-kubernetes/slf4j-api-1.7.13.jar http://central.maven.org/maven2/org/slf4j/slf4j-api/1.7.13/slf4j-api-1.7.13.jar
 
 
+# copy config - switch to configmap in case of any changes in this file
 ADD elasticsearch.yml /usr/share/elasticsearch/config/elasticsearch.yml
+
+# add pre stop hook - used in kubernetes
+ADD pre-stop-hook.sh /
 
 USER elasticsearch
