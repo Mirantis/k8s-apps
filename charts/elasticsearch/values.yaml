@@ -12,7 +12,7 @@ probeTimeoutSeconds: 5
 image:
   repository: mirantisworkloads/
   name: elasticsearch
-  tag: 5.2.2
+  tag: 5.5.2
   pullPolicy: IfNotPresent
 
 master:
