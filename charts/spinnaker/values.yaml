@@ -169,3 +169,6 @@ jenkins:
       repository: mirantisworkloads/
       name: spinnaker-jenkins-agent
       tag: v0.2.0
+
+rbac:
+  enabled: false

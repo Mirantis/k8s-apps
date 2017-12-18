@@ -18,6 +18,7 @@ spec:
         app: {{ template "fullname" . }}
         component: clouddriver
     spec:
+      serviceAccountName: {{ template "fullname" . }}-clouddriver
       containers:
         - image: {{ .Values.images.clouddriver }}
           name: clouddriver
