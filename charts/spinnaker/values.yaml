@@ -61,14 +61,14 @@ mail:
 
 # Images for each component
 images:
-  clouddriver: gcr.io/spinnaker-marketplace/clouddriver:0.5.0-72
-  echo: gcr.io/spinnaker-marketplace/echo:0.4.0-72
-  deck: gcr.io/spinnaker-marketplace/deck:1.3.0-72
-  igor: gcr.io/spinnaker-marketplace/igor:0.4.0-72
-  orca: gcr.io/spinnaker-marketplace/orca:0.5.0-72
-  gate: gcr.io/spinnaker-marketplace/gate:0.5.0-72
-  front50: gcr.io/spinnaker-marketplace/front50:0.4.1-72
-  rosco: gcr.io/spinnaker-marketplace/rosco:0.4.0-72
+  clouddriver: quay.io/spinnaker/clouddriver:v1.734.0
+  echo: quay.io/spinnaker/echo:release-1.5.x
+  deck: quay.io/spinnaker/deck:v2.1158.0
+  igor: quay.io/spinnaker/igor:release-1.5.x
+  orca: quay.io/spinnaker/orca:release-1.5.x
+  gate: quay.io/spinnaker/gate:release-1.5.x
+  front50: quay.io/spinnaker/front50:release-1.5.x
+  rosco: quay.io/spinnaker/rosco:release-1.5.x
 
 gate:
   allowedOriginsPattern: '^https?://(?:localhost|127.0.0.1|[^/]+\.example\.com)(?::[1-9]\d*)?/?$'
