@@ -58,7 +58,7 @@ spec:
             {{ end }}
           readinessProbe:
             httpGet:
-              path: /credentials
+              path: /health
               port: 7002
             initialDelaySeconds: 20
             timeoutSeconds: 1
