@@ -386,12 +386,6 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "master"
-  name = "google.golang.org/genproto"
-  packages = ["googleapis/rpc/status"]
-  revision = "14790a1795ea4c3387aaf24aed670ddb51f18292"
-
-[[projects]]
   name = "google.golang.org/grpc"
   packages = [".","codes","credentials","grpclog","internal","keepalive","metadata","naming","peer","stats","tap","transport"]
   revision = "8050b9cbc271307e5a716a9d782803d09b0d6f2d"
@@ -478,6 +472,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7d57cdc3327e07713ebaddcdf32bc49234c9482087d6dc0af07b7dd07df6516f"
+  inputs-digest = "d0dd1b37ee752178c27315439b1549c1966fbe6b162752f4f1686af4ce010bf2"
   solver-name = "gps-cdcl"
   solver-version = 1

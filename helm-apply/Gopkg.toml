@@ -1,8 +1,3 @@
-ignored = [
-  "k8s.io/client-go/pkg/api/v1",
-  "k8s.io/client-go/pkg/apis/rbac/v1beta1"
-]
-
 [[constraint]]
   name = "github.com/BurntSushi/toml"
   version = "~0.3.0"
