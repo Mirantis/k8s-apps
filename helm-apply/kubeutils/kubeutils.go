@@ -4,8 +4,8 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/pkg/api/v1"
-	"k8s.io/client-go/pkg/apis/rbac/v1beta1"
+	rbacv1 "k8s.io/api/rbac/v1"
+	"k8s.io/api/core/v1"
 )
 
 func EnsureNamespace(client kubernetes.Interface, namespace string) error {
@@ -38,21 +38,21 @@ func CreateServiceAccount(client kubernetes.Interface, namespace string) error {
 }
 
 func CreateClusterRoleBinding(client kubernetes.Interface, namespace string) error {
-	crb := v1beta1.ClusterRoleBinding{
+	crb := rbacv1.ClusterRoleBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "tiller-" + namespace,
 		},
-		RoleRef: v1beta1.RoleRef{
+		RoleRef: rbacv1.RoleRef{
 			Kind: "ClusterRole",
 			Name: "cluster-admin",
 		},
-		Subjects: []v1beta1.Subject{{
+		Subjects: []rbacv1.Subject{{
 			Kind:      "ServiceAccount",
 			Name:      "tiller",
 			Namespace: namespace,
 		}},
 	}
-	_, err := client.RbacV1beta1().ClusterRoleBindings().Create(&crb)
+	_, err := client.RbacV1().ClusterRoleBindings().Create(&crb)
 	if err != nil {
 		return err
 	}

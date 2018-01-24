@@ -66,7 +66,7 @@ func (cluster *Cluster) initTiller() error {
 	}
 
 	err = installer.Install(client, &installer.Options{
-		Namespace: namespace, ImageSpec: "gcr.io/kubernetes-helm/tiller:v2.6.2",
+		Namespace: namespace, ImageSpec: "gcr.io/kubernetes-helm/tiller:v2.7.2",
 		ServiceAccount: "tiller-" + namespace})
 	if err != nil {
 		return err
