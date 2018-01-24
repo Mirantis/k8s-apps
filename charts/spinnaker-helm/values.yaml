@@ -1,0 +1,174 @@
+# Define which registries and repositories you want available in your
+# Spinnaker pipeline definitions
+# For more info visit:
+#   http://www.spinnaker.io/v1.0/docs/target-deployment-configuration#section-docker-registry
+
+
+providers:
+  docker:
+    # Configure your Docker registries here
+    accounts:
+    - name: dockerhub
+      address: https://index.docker.io
+      repositories:
+        - library/alpine
+        - library/ubuntu
+        - library/centos
+        - library/nginx
+    # - name: gcr
+    #   address: https://gcr.io
+    #   username: _json_key
+    #   password: '<INSERT YOUR SERVICE ACCOUNT JSON HERE>'
+    #   email: 1234@5678.com
+
+  google:
+    enabled: false
+    defaultRegion: us-central1
+    defaultZone: us-central1-f
+
+    accounts:
+      - name: example
+        # The project is the Google Project ID for the project to manage with
+        # Spinnaker. The jsonKey is the JSON service credentials
+        # downloaded from the Google Developer's Console.
+        project: example
+        jsonKey: '<JSON_CREDENTIALS>'
+        consul:
+          enabled: false
+
+  aws:
+    enabled: false
+    defaultRegions:
+      - us-west-2
+    defaultIAMRole: BaseIAMRole
+    # {{name}} will be interpolated with the aws account name (e.g. "example-keypair").
+    defaultKeyPairTemplate: "{{name}}-keypair"
+
+    account:
+      accessKey: example
+      secretKey: example
+
+# Settings for notifications via email
+# For more info visit:
+#   http://www.spinnaker.io/docs/notifications-and-events-guide#section-email
+mail:
+  enabled: false
+  host: smtp.example.org
+  username: admin
+  password: admin
+  fromAddress: spinnaker@example.org
+  port: 25
+
+# Images for each component
+images:
+  echo: quay.io/spinnaker/echo:release-1.5.x
+  igor: quay.io/spinnaker/igor:release-1.5.x
+  front50: quay.io/spinnaker/front50:release-1.5.x
+  rosco: quay.io/spinnaker/rosco:release-1.5.x
+  clouddriver: posox/clouddriver:0.8.1-r102
+  deck: posox/deck:1.6.2-r3
+  orca: posox/orca:0.8.1-r5
+  gate: posox/gate:latest
+
+gate:
+  allowedOriginsPattern: '^https?://(?:localhost|127.0.0.1|[^/]+\.example\.com)(?::[1-9]\d*)?/?$'
+
+# Bucket to use when storing config data in S3 compatible storage
+storageBucket: spinnaker
+
+ui:
+  port: 9000
+  service:
+    type: NodePort # or ClusterIP or LoadBalancer
+
+    nodePort: ""
+
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+
+    annotations: {}
+
+  ingress:
+    enabled: false
+    hosts: []
+      #   - some.domain
+    tls:
+      enabled: false
+      secretName: ""
+    annotations: {}
+      #   kubernetes.io/ingress.class: nginx
+
+# Resources to provide to each of
+# the Spinnaker components
+resources:
+#  limits:
+#    cpu: 1000m
+#    memory: 1280Mi
+#  requests:
+#    cpu: 1000m
+#    memory: 1280Mi
+
+redis:
+  # if disabled, subchart will not be deployed
+  deployChart: true
+  # this address will be used if subchart deployment is disabled
+  # (redis connecion string)
+  externalAddress: ""
+  replicas: 1
+  config:
+    clusterEnabled: false
+
+# Minio access/secret keys for the in-cluster S3 usage
+minio:
+  enabled: true
+  # if disabled, subchart will not be deployed
+  deployChart: true
+  # this address will be used if subchart deployment is disabled
+  externalAddress: ""
+
+  accessKey: spinnakeradmin
+  secretKey: spinnakeradmin
+
+gcs:
+  enabled: false
+  project: my-project-name
+  jsonKey: '<INSERT CLOUD STORAGE JSON HERE>'
+
+upload:
+  # Image that will be used to upload applications/pipelines
+  image:
+    repository: mirantisworkloads/
+    name: test-base
+    tag: 1.0.0
+    pullPolicy: IfNotPresent
+
+  # Spinnaker applications that will be created (in json format)
+  applications:
+    # example.json: |
+  # Spinnaker pipelines that will be created (in json format)
+  pipelines:
+    # example.json: |
+
+# Configuration for the Jenkins instance that is attached to the
+# igor component of Spinnaker. For more info about the Jenkins integration
+# with Spinnaker, visit:
+#   http://www.spinnaker.io/docs/jenkins-script-execution-stage
+jenkins:
+  # if disabled, subchart will not be deployed
+  deployChart: true
+
+  Master:
+    # this address will be used if subchart deployment is disabled
+    externalAddress: ""
+    CustomConfigMap: true
+
+  Agent:
+    # this address will be used if subchart deployment is disabled
+    externalAddress: ""
+    image:
+      repository: mirantisworkloads/
+      name: spinnaker-jenkins-agent
+      tag: v0.2.0
+
+rbac:
+  enabled: false

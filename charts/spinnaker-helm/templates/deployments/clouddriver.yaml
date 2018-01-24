@@ -1,0 +1,83 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}-clouddriver
+  labels:
+    app: {{ template "fullname" . }}
+    component: clouddriver
+spec:
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap/spinnaker-config.yaml") . | sha256sum }}
+      labels:
+        app: {{ template "fullname" . }}
+        component: clouddriver
+    spec:
+      serviceAccountName: {{ template "fullname" . }}-clouddriver
+      initContainers:
+        - name: kubeconfig
+          image: {{ .Values.images.clouddriver }}
+          command:
+          - sh
+          - -ce
+          - |
+            kubectl config set-cluster default --server=https://kubernetes.default --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            kubectl config set-context default --cluster=default
+            token=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+            kubectl config set-credentials user --token=$token
+            kubectl config set-context default --user=user
+            kubectl config use-context default
+          volumeMounts:
+            - mountPath: /root/.kube/
+              name: kubeconfig
+      containers:
+        - image: {{ .Values.images.clouddriver }}
+          name: clouddriver
+          ports:
+            - containerPort: 7002
+              name: clouddriver
+          volumeMounts:
+            - mountPath: /root/.kube/
+              name: kubeconfig
+            - mountPath: /opt/spinnaker/config
+              name: {{ template "fullname" . }}-spinnaker-config
+            - mountPath: /tmp/registry
+              name: {{ template "fullname" . }}-registry
+            {{ if .Values.providers.google.enabled }}
+            - mountPath: /root/.google
+              name: google
+            {{ end }}
+            {{ if .Values.providers.aws.enabled }}
+            - mountPath: /root/.aws
+              name: {{ template "fullname" . }}-aws
+            {{ end }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 7002
+            initialDelaySeconds: 20
+            timeoutSeconds: 1
+      volumes:
+        - name: kubeconfig
+          emptyDir: {}
+        - name: {{ template "fullname" . }}-spinnaker-config
+          configMap:
+            name: {{ template "fullname" . }}-spinnaker-config
+        - name: {{ template "fullname" . }}-registry
+          secret:
+            secretName: {{ template "fullname" . }}-registry
+        {{ if .Values.providers.google.enabled }}
+        - name: google
+          secret:
+            secretName: {{ template "fullname" . }}-google
+        {{ end }}
+        {{ if .Values.providers.aws.enabled }}
+        - name: {{ template "fullname" . }}-aws
+          configMap:
+            name: {{ template "fullname" . }}-aws
+        {{ end }}

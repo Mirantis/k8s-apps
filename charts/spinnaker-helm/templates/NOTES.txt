@@ -1,0 +1,35 @@
+Spinnaker chart has been deployed.
+
+Internal URL:
+    spinnaker-ui: {{ template "fullname" . }}-deck:{{ .Values.ui.port }}
+
+External URL:
+{{- if .Values.ui.ingress.enabled }}
+From outside the cluster, the cluster URL(s) are:
+{{ if .Values.ui.ingress.tls.enabled }}
+{{- range .Values.ui.ingress.hosts }}
+    ui: https://{{ . }}
+{{- end -}}
+{{- else }}
+{{- range .Values.ui.ingress.hosts }}
+    ui: http://{{ . }}
+{{- end -}}
+{{- end }}
+{{ else }}
+{{ if contains "NodePort" .Values.ui.service.type -}}
+Get the Spinnaker UI URL to visit by running these commands in the same shell:
+
+    {{- if .Values.ui.service.nodePort }}
+    export NODE_PORT={{ .Values.ui.service.nodePort }}
+    {{- else }}
+    export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "fullname" . }}-deck)
+    {{- end }}
+    export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+    echo http://$NODE_IP:$NODE_PORT
+{{ else if contains "LoadBalancer" .Values.ui.service.type -}}
+NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+You can watch the status of it by running in the same shell 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "fullname" . }}-deck'
+    export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "fullname" . }}-deck -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+    echo http://$SERVICE_IP:{{ .Values.ui.port }}
+{{- end }}
+{{- end }}

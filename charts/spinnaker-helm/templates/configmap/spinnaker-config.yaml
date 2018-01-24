@@ -1,0 +1,587 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "fullname" . }}-spinnaker-config
+  labels:
+    app: {{ template "fullname" . }}
+data:
+  clouddriver.yml: |
+    server:
+      port: ${services.clouddriver.port:7002}
+      address: ${services.clouddriver.host:localhost}
+
+    redis:
+      connection: ${services.redis.connection:redis://localhost:6379}
+
+    udf:
+      # Controls whether UserDataProviders are used to populate user data of new
+      # server groups. If false, user data is copied over from ancestor server
+      # groups on both CopyLastAsgAtomicOperation and
+      # ModifyAsgLaunchConfigurationOperation (only if no user data is provided
+      # on the given request).
+      enabled: ${services.clouddriver.aws.udf.enabled:true}
+
+    default:
+      account:
+        env: ${providers.aws.primaryCredentials.name}
+
+    aws:
+      # AWS Credentials are passed either as environment variables or through
+      # a standard AWS file $HOME/.aws/credentials
+      # See providers.aws.primaryCredentials in spinnaker.yml for more
+      # info on setting environment variables.
+      enabled: ${providers.aws.enabled:false}
+      defaults:
+        iamRole: ${provider.aws.defaultIAMRole:BaseIAMRole}
+      defaultRegions:
+        - name: ${providers.aws.defaultRegion:us-east-1}
+      defaultFront50Template: ${services.front50.baseUrl}
+      defaultKeyPairTemplate: ${providers.aws.defaultKeyPairTemplate}
+
+    azure:
+      enabled: ${providers.azure.enabled:false}
+
+      accounts:
+        - name: ${providers.azure.primaryCredentials.name}
+          clientId: ${providers.azure.primaryCredentials.clientId}
+          appKey: ${providers.azure.primaryCredentials.appKey}
+          tenantId: ${providers.azure.primaryCredentials.tenantId}
+          subscriptionId: ${providers.azure.primaryCredentials.subscriptionId}
+
+    google:
+      enabled: ${providers.google.enabled:false}
+
+      accounts:
+        - name: ${providers.google.primaryCredentials.name}
+          project: ${providers.google.primaryCredentials.project}
+          jsonPath: ${providers.google.primaryCredentials.jsonPath}
+
+    cf:
+      enabled: ${providers.cf.enabled:false}
+
+      accounts:
+        - name: ${providers.cf.primaryCredentials.name}
+          api: ${providers.cf.primaryCredentials.api}
+          console: ${providers.cf.primaryCredentials.console}
+          org: ${providers.cf.defaultOrg}
+          space: ${providers.cf.defaultSpace}
+          username: ${providers.cf.account.name:}
+          password: ${providers.cf.account.password:}
+
+    kubernetes:
+      enabled: ${providers.kubernetes.enabled:false}
+      accounts:
+        - name: ${providers.kubernetes.primaryCredentials.name}
+          serviceAccount: true
+          kubeconfigFile: /root/.kube/kubeconfig
+          dockerRegistries:
+          {{- range $index, $account := .Values.providers.docker.accounts }}
+          - accountName: {{ $account.name }}
+          {{ end }}
+    helm:
+      enabled: true
+      accounts:
+        - name: helm-account
+          kubeconfigFile: /root/.kube/kubeconfig
+          tillerNamespace: {{ .Release.Namespace }}
+          helmRepos:
+            - name: mirantisworkloads
+              address: https://mirantisworkloads.storage.googleapis.com
+
+    dockerRegistry:
+      {{ if .Values.providers.docker.accounts }}
+      enabled: true
+      accounts:
+        {{- range $index, $account := .Values.providers.docker.accounts }}
+        - name: {{ $account.name }}
+          address: {{ $account.address }}
+          {{- if $account.username }}
+          username: {{ $account.username }}
+          email: {{ $account.email }}
+          {{- end }}
+          {{- if $account.password }}
+          passwordFile: /tmp/registry/password-{{ $account.name }}
+          {{- end }}
+          {{- if $account.trackDigests }}
+          trackDigests: {{ $account.trackDigests }}
+          {{- end }}
+          {{- if $account.repositories }}
+          repositories:
+            {{- range $index, $repo := $account.repositories }}
+            - {{ $repo }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+      {{ else }}
+      enabled: false
+      {{ end }}
+
+    credentials:
+      primaryAccountTypes: ${providers.aws.primaryCredentials.name}, ${providers.google.primaryCredentials.name}, ${providers.cf.primaryCredentials.name}, ${providers.azure.primaryCredentials.name}, ${providers.helm.primaryCredentials.name}
+      challengeDestructiveActionsEnvironments: ${providers.aws.primaryCredentials.name}, ${providers.google.primaryCredentials.name}, ${providers.cf.primaryCredentials.name}, ${providers.azure.primaryCredentials.name}, ${providers.helm.primaryCredentials.name}
+
+  echo.yml: |
+{{ .Files.Get "config/echo.yml" | indent 4 }}
+  echo-local.yml: |
+{{ .Files.Get "config/echo-local.yml" | indent 4 }}
+  fiat.yml: |
+{{ .Files.Get "config/fiat.yml" | indent 4 }}
+  fiat.yml-local: |
+{{ .Files.Get "config/fiat-local.yml" | indent 4 }}
+  front50.yml: |
+{{ .Files.Get "config/front50.yml" | indent 4 }}
+  front50-local.yml: |
+{{ .Files.Get "config/front50-local.yml" | indent 4 }}
+  gate.yml: |
+    server:
+      port: ${services.gate.port:8084}
+      address: 0.0.0.0
+      # ssl:
+      #   enabled: false
+      #   keyStore: /opt/spinnaker/gate-tls/keystore.jks
+      #   keyStorePassword: password
+      #   keyAlias: server
+
+    # Circular references since we're already using 'services'
+    # services:
+    #   clouddriver:
+    #     baseUrl: ${services.clouddriver.baseUrl:localhost:7002}
+    #   orca:
+    #     baseUrl: ${services.orca.baseUrl:localhost:8083}
+    #   front50:
+    #     baseUrl: ${services.front50.baseUrl:localhost:8080}
+    # #optional services:
+    #   echo:
+    #     enabled: ${services.echo.enabled:true}
+    #     baseUrl: ${services.echo.baseUrl:8089}
+    #   flapjack:
+    #     enabled: ${services.flapjack.enabled:false}
+    #   igor:
+    #     enabled: ${services.igor.enabled:false}
+    #     baseUrl: ${services.igor.baseUrl:8088}
+
+    cors:
+      allowedOriginsPattern: {{ .Values.gate.allowedOriginsPattern }}
+
+    redis:
+      connection: ${services.redis.connection}
+  igor.yml: |
+{{ .Files.Get "config/igor.yml" | indent 4 }}
+  igor-local.yml: |
+{{ .Files.Get "config/igor-local.yml" | indent 4 }}
+  orca.yml: |
+{{ .Files.Get "config/orca.yml" | indent 4 }}
+  orca-local.yml: |
+{{ .Files.Get "config/orca-local.yml" | indent 4 }}
+  rosco.yml: |
+{{ .Files.Get "config/rosco.yml" | indent 4 }}
+  rosco-local.yml: |
+{{ .Files.Get "config/rosco-local.yml" | indent 4 }}
+  settings.js: |
+    'use strict';
+
+    // Add any env variables used here to the webpack config variable: HAPPY_PACK_ENV_INVALIDATE
+    var feedbackUrl = 'http://localhost';
+    var gateHost = '/gate';
+    var bakeryDetailUrl = gateHost + '/bakery/logs/{{ "{{" }}context.region{{ "}}" }}/{{ "{{" }}context.status.resourceId{{ "}}" }}';
+    var authEndpoint = gateHost + '/auth/user';
+    var authEnabled = true;
+    var netflixMode = false;
+    var chaosEnabled = false;
+    var fiatEnabled = false;
+    var entityTagsEnabled = false;
+    var debugEnabled = true;
+    var canaryEnabled = false;
+
+    window.spinnakerSettings = {
+      checkForUpdates: true,
+      debugEnabled: debugEnabled,
+      defaultProviders: ['aws', 'gce', 'azure', 'cf', 'kubernetes', 'dcos', 'openstack', 'oraclebmcs', 'ecs', 'helm'],
+      feedbackUrl: feedbackUrl,
+      gateUrl: gateHost,
+      bakeryDetailUrl: bakeryDetailUrl,
+      authEndpoint: authEndpoint,
+      pollSchedule: 30000,
+      defaultTimeZone: 'America/Los_Angeles', // see http://momentjs.com/timezone/docs/#/data-utilities/
+      defaultCategory: 'serverGroup',
+      defaultInstancePort: 80,
+      providers: {
+        azure: {
+          defaults: {
+            account: 'azure-test',
+            region: 'westus'
+          },
+        },
+        aws: {
+          defaults: {
+            account: 'test',
+            region: 'us-east-1',
+            iamRole: 'BaseIAMRole',
+          },
+          defaultSecurityGroups: [],
+          loadBalancers: {
+            // if true, VPC load balancers will be created as internal load balancers if the selected subnet has a purpose
+            // tag that starts with "internal"
+            inferInternalFlagFromSubnet: false,
+          },
+          useAmiBlockDeviceMappings: false,
+        },
+        ecs: {
+          defaults: {
+            account: 'test',
+            region: 'us-east-1',
+            iamRole: 'BaseIAMRole',
+          },
+          defaultSecurityGroups: [],
+        },
+        gce: {
+          defaults: {
+            account: 'my-google-account',
+            region: 'us-central1',
+            zone: 'us-central1-f',
+          },
+          associatePublicIpAddress: true,
+        },
+        titus: {
+          defaults: {
+            account: 'titustestvpc',
+            region: 'us-east-1',
+            iamProfile: '{{ "{{" }}application{{ "}}" }}InstanceProfile',
+          },
+        },
+        oraclebmcs: {
+          defaults: {
+            account: 'DEFAULT',
+            region: 'us-phoenix-1',
+            bakeryRegions: ['us-phoenix-1']
+          }
+        },
+        openstack: {
+          defaults: {
+            account: 'test',
+            region: 'us-west-1'
+          },
+        },
+        kubernetes: {
+          defaults: {
+            account: 'my-kubernetes-account',
+            namespace: 'default',
+            proxy: 'localhost:8001',
+          },
+        },
+        helm: {
+            defaults: {
+                account: 'helm-account'
+            }
+        },
+        dcos: {
+          defaults: {
+            account: 'my-dcos-account'
+          },
+        },
+        appengine: {
+          defaults: {
+            account: 'my-appengine-account',
+            editLoadBalancerStageEnabled: false,
+          }
+        }
+      },
+      whatsNew: {
+        gistId: '32526cd608db3d811b38',
+        fileName: 'news.md',
+      },
+      notifications: {
+        email: {
+          enabled: true,
+        },
+        hipchat: {
+          enabled: true,
+          botName: 'Skynet T-800'
+        },
+        sms: {
+          enabled: true,
+        },
+        slack: {
+          enabled: true,
+          botName: 'spinnakerbot'
+        }
+      },
+      authEnabled: authEnabled,
+      authTtl: 600000,
+      gitSources: ['stash', 'github', 'bitbucket'],
+      triggerTypes: ['git', 'pipeline', 'docker', 'cron', 'jenkins', 'travis', 'pubsub'],
+      feature: {
+        canary: canaryEnabled,
+        entityTags: entityTagsEnabled,
+        fiatEnabled: fiatEnabled,
+        pipelines: true,
+        notifications: false,
+        fastProperty: true,
+        vpcMigrator: true,
+        clusterDiff: false,
+        roscoMode: false,
+        netflixMode: netflixMode,
+        chaosMonkey: chaosEnabled,
+        // whether stages affecting infrastructure (like "Create Load Balancer") should be enabled or not
+        infrastructureStages: false,
+        jobs: false,
+        snapshots: false,
+        travis: false,
+        pipelineTemplates: false,
+        artifacts: false,
+      },
+    };
+  spinnaker.yml: |
+{{ .Files.Get "config/spinnaker.yml" | indent 4 }}
+  clouddriver-local.yml: |
+    server:
+      port: ${services.clouddriver.port:7002}
+      address: 0.0.0.0
+
+    default:
+      account:
+        env: ${providers.kubernetes.primaryCredentials.name}
+
+    {{- if .Values.providers.google.enabled }}
+    google:
+      enabled: true
+
+      accounts:
+      {{- range $index, $account := .Values.providers.google.accounts }}
+        - name: {{ $account.name }}
+          project: {{ $account.project }}
+          jsonPath: "/root/.google/{{ $account.name }}.json"
+          consul:
+            enabled: {{ $account.consul.enabled }}
+      {{- end }}
+    {{- end }}
+    {{- if .Values.providers.aws.enabled }}
+    aws:
+      enabled: true
+      defaults:
+        iamRole: {{ .Values.providers.aws.defaultIAMRole }}
+      defaultRegions:
+        {{- range $index, $region := .Values.providers.aws.defaultRegions }}
+        - name: {{ $region }}
+        {{- end }}
+      defaultKeyPairTemplate: {{ .Values.providers.aws.defaultKeyPairTemplate }}
+    {{- end }}
+    credentials:
+      primaryAccountTypes: ${providers.kubernetes.primaryCredentials.name}, ${providers.google.primaryCredentials.name}, ${providers.aws.primaryCredentials.name}
+      challengeDestructiveActionsEnvironments: ${providers.kubernetes.primaryCredentials.name}, ${providers.google.primaryCredentials.name}, ${providers.aws.primaryCredentials.name}
+  spinnaker-local.yml: |
+    global:
+      spinnaker:
+        environment: test
+
+    services:
+      default:
+        # These defaults can be modified to change all the spinnaker subsystems
+        # (clouddriver, gate, etc) at once, but not external systems (jenkins, etc).
+        # Individual systems can still be overridden using their own section entry
+        # directly under 'services'.
+        host: localhost
+        protocol: http
+
+      clouddriver:
+        host: {{ template "fullname" . }}-clouddriver
+        port: 7002
+        baseUrl: ${services.default.protocol}://${services.clouddriver.host}:${services.clouddriver.port}
+        # Controls whether UserDataProviders are used to populate user data of new server groups.
+        # If false, user data is copied over from ancestor server groups on both CopyLastAsgAtomicOperation and
+        # ModifyAsgLaunchConfigurationOperation (only if no user data is provided on the given request).
+        aws:
+          udf:
+            enabled: false
+
+      echo:
+        enabled: true
+        host: {{ template "fullname" . }}-echo
+        port: 8089
+        baseUrl: ${services.default.protocol}://${services.echo.host}:${services.echo.port}
+        cron:
+          enabled: true
+        notifications:
+          # allow pipeline triggers to run periodically via cron expressions
+          # If you wish for spinnaker to send notifications, configure the following blocks
+          mail:
+            enabled: {{ .Values.mail.enabled }}
+            host: {{ .Values.mail.host }}
+            username: {{ .Values.mail.username }}
+            password: {{ .Values.mail.password }}
+            fromAddress: {{ .Values.mail.fromAddress }}
+            port: {{ .Values.mail.port }}
+          hipchat:
+            enabled: false
+            url: # the hipchat server to connect to
+            token: #the hipchat auth token
+          sms:
+            enabled: false
+            account: # twilio account id
+            token: # twilio auth token
+            from: # phone number by which sms messages are sent
+          slack:
+            enabled: false
+            token: # the part after http://hooks.slack.com/services/
+
+      deck:
+        host: {{ template "fullname" . }}-deck
+        port: {{ .Values.ui.port }}
+        baseUrl: ${services.default.protocol}://${services.deck.host}:${services.deck.port}
+        gateUrl: ${services.gate.baseUrl}
+        bakeryUrl: ${services.bakery.baseUrl}
+        timezone: 'America/New_York'
+        auth:
+          enabled: false
+
+      front50:
+        host: {{ template "fullname" . }}-front50
+        port: 8080
+        baseUrl: ${services.default.protocol}://${services.front50.host}:${services.front50.port}
+
+        # If using storage bucket persistence (gcs or s3), specify the bucket here
+        # disable cassandra and enable the storage service below.
+        storage_bucket: {{ .Values.storageBucket }}
+        bucket_root: front50
+
+        cassandra:
+          enabled: false
+        redis:
+          enabled: false
+        {{ if .Values.gcs.enabled }}
+        gcs:
+          enabled: true
+          project: {{ .Values.gcs.project }}
+        s3:
+          enabled: false
+        {{ else }}
+        gcs:
+          enabled: false
+        s3:
+          enabled: true
+          endpoint: {{ template "spinnaker.minio-address" . }}
+        {{ end }}
+      gate:
+        host: {{ template "fullname" . }}-gate
+        port: 8084
+        baseUrl: ${services.default.protocol}://${services.gate.host}:${services.gate.port}/gate
+
+      igor:
+        # If you are integrating Jenkins then you must also enable Spinnaker's
+        # "igor" subsystem.
+        enabled: true
+        host: {{ template "fullname" . }}-igor
+        port: 8088
+        baseUrl: ${services.default.protocol}://${services.igor.host}:${services.igor.port}
+
+      kato:
+        host: ${services.clouddriver.host}
+        port: ${services.clouddriver.port}
+        baseUrl: ${services.clouddriver.baseUrl}
+
+      mort:
+        host: ${services.clouddriver.host}
+        port: ${services.clouddriver.port}
+        baseUrl: ${services.clouddriver.baseUrl}
+
+      orca:
+        host: {{ template "fullname" . }}-orca
+        port: 8083
+        baseUrl: ${services.default.protocol}://${services.orca.host}:${services.orca.port}
+        enabled: true
+
+      oort:
+        host: ${services.clouddriver.host}
+        port: ${services.clouddriver.port}
+        baseUrl: ${services.clouddriver.baseUrl}
+
+      rosco:
+        host: {{ template "fullname" . }}-rosco
+        port: 8087
+        baseUrl: ${services.default.protocol}://${services.rosco.host}:${services.rosco.port}
+        # You need to provide the fully-qualified path to the directory containing the packer templates.
+        # They typically live in rosco's config/packer directory.
+        configDir: /opt/rosco/config/packer
+
+      bakery:
+        host: ${services.rosco.host}
+        port: ${services.rosco.port}
+        baseUrl: ${services.rosco.baseUrl}
+        extractBuildDetails: true
+
+      docker:
+        # This target repository is used by the bakery to publish baked docker images.
+        # Do not include http://.
+        enabled: true
+        targetRepository: viglesiasce/sample-app
+
+      jenkins:
+        # The "name" entry is used for the display name when selecting
+        # this server. You must set `enabled` to true when enabling igor.
+        #
+        # If you have multiple jenkins servers, you will need to list
+        # them in an igor-local.yml. See jenkins.masters in config/igor.yml.
+        #
+        # Note that jenkins is not installed with Spinnaker so you must obtain this
+        # on your own if you are interested.
+        enabled: true
+        defaultMaster:
+          name: default
+          baseUrl: http://{{ template "spinnaker.jenkins-master-address" . }}/
+          username: {{ .Values.jenkins.Master.AdminUser }}
+          password: {{ .Values.jenkins.Master.AdminPassword }}
+
+      redis:
+        connection: {{ template "spinnaker.redis-address" . }}
+
+    providers:
+    {{ with $account := first .Values.providers.docker.accounts }}
+      kubernetes:
+        enabled: true
+        primaryCredentials:
+          name: local
+          namespace: default
+          dockerRegistryAccount: {{ $account.name }}
+      helm:
+        enabled: true
+        primaryCredentials:
+          name: helm-account
+
+      dockerRegistry:
+        enabled: true
+        primaryCredentials:
+          name: {{ $account.name }}
+          address: {{ $account.address }}
+          repository: vic-goog/gceme
+          {{- if $account.username }}
+          username: {{ $account.username }}
+          email: {{ $account.email }}
+          {{- end }}
+          {{- if $account.password }}
+          passwordFile: /tmp/registry/password-{{ $account.name }}
+          {{- end }}
+    {{ end }}
+    {{- if .Values.providers.google.enabled }}
+      google:
+        enabled: true
+        defaultRegion: "{{ .Values.providers.google.defaultRegion }}"
+        defaultZone: "{{ .Values.providers.google.defaultZone }}"
+        {{- with $account := first .Values.providers.google.accounts }}
+        primaryCredentials:
+          name: {{ $account.name }}
+          project: {{ $account.project }}
+          jsonPath: "/root/.google/{{ $account.name }}.json"
+          consul:
+            enabled: {{ $account.consul.enabled }}
+        {{- end }}
+    {{- end }}
+    {{- if .Values.providers.aws.enabled }}
+    aws:
+      enabled: true
+      defaultRegion: {{ first .Values.providers.aws.defaultRegions }}
+      defaultIAMRole: {{ .Values.providers.aws.defaultIAMRole }}
+      primaryCredentials:
+        name: default
+
+      defaultKeyPairTemplate: {{ .Values.providers.aws.defaultKeyPairTemplate }}
+    {{- end }}

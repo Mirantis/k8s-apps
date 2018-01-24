@@ -1,0 +1,13 @@
+dependencies:
+- name: redis
+  version: ^2.x
+  repository: https://mirantisworkloads.storage.googleapis.com/
+  condition: redis.deployChart
+- name: minio
+  version: ^1.x
+  repository: https://mirantisworkloads.storage.googleapis.com/
+  condition: minio.deployChart
+- name: jenkins
+  version: ^2.x
+  repository: https://mirantisworkloads.storage.googleapis.com/
+  condition: jenkins.deployChart

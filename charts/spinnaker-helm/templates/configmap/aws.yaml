@@ -1,0 +1,13 @@
+{{- if .Values.providers.aws.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "fullname" . }}-aws
+  labels:
+    app: {{ template "fullname" . }}
+data:
+  credentials: |
+    [default]
+    aws_access_key_id={{ .Values.providers.aws.account.accessKey }}
+    aws_secret_access_key={{ .Values.providers.aws.account.secretKey }}
+{{- end  }}

@@ -1,0 +1,54 @@
+{{- $serviceName := include "fullname" . -}}
+{{- range $name, $content := .Values.upload.applications }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $serviceName }}-app-{{ (split "." $name)._0 }}
+  labels:
+    app: {{ $serviceName }}
+    component: app-upload
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ $serviceName }}
+        component: app-upload
+    spec:
+      restartPolicy: OnFailure
+      volumes:
+      - name: application
+        configMap:
+          name: {{ $serviceName }}-app-{{ (split "." $name)._0 }}
+      containers:
+      - name: upload
+        image: "{{ $.Values.upload.image.repository }}{{ $.Values.upload.image.name }}:{{ $.Values.upload.image.tag }}"
+        imagePullPolicy: "{{ $.Values.upload.image.pullPolicy }}"
+        command:
+        - curl
+        - -f
+        - -m
+        - "10"
+        - -d@/application/application.json
+        - -X
+        - POST
+        - -H
+        - "Content-Type: application/json"
+        - -H
+        - "Accept: application/json"
+        - http://{{ template "spinnaker.deck-address" $ }}/gate/applications/app/tasks
+        volumeMounts:
+        - name: application
+          mountPath: /application
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $serviceName }}-app-{{ (split "." $name)._0 }}
+  labels:
+    app: {{ $serviceName }}
+    component: app-upload
+data:
+  application.json: |
+{{ $content | indent 4}}
+---
+{{- end }}
