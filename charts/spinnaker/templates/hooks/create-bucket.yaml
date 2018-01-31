@@ -17,7 +17,7 @@ spec:
       restartPolicy: OnFailure
       containers:
       - name: post-install-job
-        image: "minio/mc:RELEASE.2017-06-15T03-38-43Z"
+        image: "{{ .Values.images.mc }}"
         command:
         - sh
         - -c
