@@ -97,8 +97,8 @@ Agent:
 
   Component: "jenkins-slave"
   Privileged: false
-  Cpu: "200m"
-  Memory: "256Mi"
+  Cpu: "400m"
+  Memory: "512Mi"
   # You may want to change this to true while testing a new image
   AlwaysPullImage: false
   # You can define the volumes that you want to mount for this container
