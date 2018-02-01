@@ -1,0 +1,19 @@
+images:
+  echo: {{ .Repository }}spinnaker-echo:release-1.5.x
+  igor: {{ .Repository }}spinnaker-igor:release-1.5.x
+  front50: {{ .Repository }}spinnaker-front50:release-1.5.x
+  rosco: {{ .Repository }}spinnaker-rosco:release-1.5.x
+  mc: {{ .Repository }}minio-mc:RELEASE.2017-06-15T03-38-43Z
+redis:
+  image:
+    repository: {{ .Repository }}
+jenkins:
+  Agent:
+    image:
+      repository: {{ .Repository }}
+  Master:
+    image:
+      repository: {{ .Repository }}
+minio:
+  image:
+    repository: {{ .Repository }}

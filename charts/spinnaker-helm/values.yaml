@@ -61,14 +61,15 @@ mail:
 
 # Images for each component
 images:
-  echo: quay.io/spinnaker/echo:release-1.5.x
-  igor: quay.io/spinnaker/igor:release-1.5.x
-  front50: quay.io/spinnaker/front50:release-1.5.x
-  rosco: quay.io/spinnaker/rosco:release-1.5.x
+  echo: mirantisworkloads/spinnaker-echo:release-1.5.x
+  igor: mirantisworkloads/spinnaker-igor:release-1.5.x
+  front50: mirantisworkloads/spinnaker-front50:release-1.5.x
+  rosco: mirantisworkloads/spinnaker-rosco:release-1.5.x
   clouddriver: posox/clouddriver:0.8.1-r102
   deck: posox/deck:1.6.2-r3
   orca: posox/orca:0.8.1-r5
   gate: posox/gate:latest
+  mc: mirantisworkloads/minio-mc:RELEASE.2017-06-15T03-38-43Z
 
 gate:
   allowedOriginsPattern: '^https?://(?:localhost|127.0.0.1|[^/]+\.example\.com)(?::[1-9]\d*)?/?$'
