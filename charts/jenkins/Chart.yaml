@@ -1,5 +1,5 @@
 name: jenkins
-version: 2.5.2
+version: 2.6.0
 description: Open source continuous integration server.
-appVersion: 2.87
+appVersion: 2.88
 icon: https://wiki.jenkins-ci.org/download/attachments/2916393/logo.png

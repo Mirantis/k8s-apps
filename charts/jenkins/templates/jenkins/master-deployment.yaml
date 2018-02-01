@@ -40,7 +40,7 @@ spec:
           {{- if .Values.Jobs }}
           cp -r /var/configmap/jobs /var/jenkins_home/
           {{- end }}
-          /usr/local/bin/install-plugins.sh `echo $(cat /var/jenkins_home/plugins.txt)`
+          /usr/local/bin/install-plugins.sh {{ if .Values.Master.NeverDownloadPlugins }}--never-download {{ end }}< /var/jenkins_home/plugins.txt
 {{- if .Values.Master.initContainerEnvironmentVariables }}
         env:
 {{ toYaml .Values.Master.initContainerEnvironmentVariables | indent 8 }}

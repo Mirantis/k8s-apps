@@ -8,7 +8,7 @@ Master:
   image:
     repository: mirantisworkloads/
     name: jenkins
-    tag: "2.88"
+    tag: "2.88-r1"
     pullPolicy: IfNotPresent
 
   persistence:
@@ -72,6 +72,7 @@ Master:
       - workflow-job:2.13
       - credentials-binding:1.12
       - git:3.4.0
+  NeverDownloadPlugins: false
 # Used to approve a list of groovy functions in pipelines used the script-security plugin. Can be viewed under /scriptApproval
   # ScriptApproval:
   #   - "method groovy.json.JsonSlurperClassic parseText java.lang.String"
