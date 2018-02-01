@@ -30,7 +30,7 @@ def process_comma_separated_option(option):
               help="Limit filter to the comma-separated list of BCP 47"
                    " language identifiers")
 @click.option('--kafka', default=None,
-              help="A comma-separated list of Kafka bootstap servers")
+              help="A comma-separated list of Kafka bootstrap servers")
 @click.option('--topic', default="twitter-stream",
               help="Kafka topic where the tweets will be published")
 @click.option('--hdfs', default=None,
