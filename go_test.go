@@ -151,13 +151,17 @@ func VerifyIngress(t *testing.T) {
 	})
 }
 
-func DiscoverArtifacts(t *testing.T, path string) []string {
-	matches, err := filepath.Glob(path + "/*")
+func DiscoverArtifacts(t *testing.T, dir string) []string {
+	matches, err := filepath.Glob(dir + "/*")
 	if err != nil {
-		t.Fatalf("Failed to list directory %s: %s", path, err)
+		t.Fatalf("Failed to list directory %s: %s", dir, err)
 	}
 	var allArtifacts []string
 	for _, match := range matches {
+		_, err := os.Stat(path.Join(match, ".nobuild"))
+		if !os.IsNotExist(err) {
+			continue
+		}
 		allArtifacts = append(allArtifacts, filepath.Base(match))
 	}
 	t.Logf("Found artifacts: %+v", allArtifacts)
@@ -385,9 +389,9 @@ func RunHelmInstall(t *testing.T, helmHome string, ns string, rel string, chartD
 	}
 	var buf bytes.Buffer
 	obj := struct {
-		Repository string;
-		KubernetesDomain string;
-	} { *imageRepoPtr + "/", *kubernetesDomainPtr }
+		Repository       string
+		KubernetesDomain string
+	}{*imageRepoPtr + "/", *kubernetesDomainPtr}
 	err = tmpl.Execute(&buf, obj)
 	if err != nil {
 		t.Fatalf("Failed to execute template %s: %s", config, err)
