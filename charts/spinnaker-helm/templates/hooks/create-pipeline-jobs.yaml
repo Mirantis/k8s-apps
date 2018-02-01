@@ -1,0 +1,54 @@
+{{- $serviceName := include "fullname" . -}}
+{{- range $name, $content := .Values.upload.pipelines }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $serviceName }}-pipeline-{{ (split "." $name)._0 }}
+  labels:
+    app: {{ $serviceName }}
+    component: pipeline-upload
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ $serviceName }}
+        component: pipeline-upload
+    spec:
+      restartPolicy: OnFailure
+      volumes:
+      - name: pipeline
+        configMap:
+          name: {{ $serviceName }}-pipeline-{{ (split "." $name)._0 }}
+      containers:
+      - name: upload
+        image: "{{ $.Values.upload.image.repository }}{{ $.Values.upload.image.name }}:{{ $.Values.upload.image.tag }}"
+        imagePullPolicy: "{{ $.Values.upload.image.pullPolicy }}"
+        command:
+        - curl
+        - -f
+        - -m
+        - "10"
+        - -d@/pipeline/pipeline.json
+        - -X
+        - POST
+        - -H
+        - "Content-Type: application/json"
+        - -H
+        - "Accept: application/json"
+        - http://{{ template "spinnaker.gate-address" $ }}/pipelines
+        volumeMounts:
+        - name: pipeline
+          mountPath: /pipeline
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $serviceName }}-pipeline-{{ (split "." $name)._0 }}
+  labels:
+    app: {{ $serviceName }}
+    component: pipeline-upload
+data:
+  pipeline.json: |
+{{ $content | indent 4}}
+---
+{{- end }}
