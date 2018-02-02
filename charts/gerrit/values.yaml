@@ -7,12 +7,16 @@ image:
   tag: "2.14.4"
   pullPolicy: IfNotPresent
 
-port: 8080
-
 service:
   type: NodePort # or ClusterIP or LoadBalancer
 
-  nodePort: ""
+  rest:
+    port: 8080
+    nodePort: ""
+
+  ssh:
+    port: 29418
+    nodePort: ""
 
   loadBalancerIP: ""
   loadBalancerSourceRanges: []

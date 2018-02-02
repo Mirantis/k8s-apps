@@ -13,11 +13,20 @@ metadata:
 {{- end }}
 spec:
   ports:
-    - port: {{ .Values.port }}
+    - port: {{ .Values.service.rest.port }}
+      targetPort: 8080
       name: http
       {{- if eq .Values.service.type "NodePort" }}
-      {{- if .Values.service.nodePort }}
-      nodePort: {{ .Values.service.nodePort }}
+      {{- if .Values.service.rest.nodePort }}
+      nodePort: {{ .Values.service.rest.nodePort }}
+      {{- end -}}
+      {{- end }}
+    - port: {{ .Values.service.ssh.port }}
+      targetPort: 29418
+      name: ssh
+      {{- if eq .Values.service.type "NodePort" }}
+      {{- if .Values.service.ssh.nodePort }}
+      nodePort: {{ .Values.service.ssh.nodePort }}
       {{- end -}}
       {{- end }}
   selector:
