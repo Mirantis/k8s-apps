@@ -1,0 +1,31 @@
+# Default values for tweepub.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+image:
+  repository: mirantisworkloads/
+  name: tweepub-fake
+  tag: 1.0.0
+  pullPolicy: IfNotPresent
+
+storage: kafka
+
+twitter:
+  # Base word used to generate fake tweets with base_word-N hashtags
+  #baseWord: hashtag
+
+kafka:
+  # if disabled, subchart will not be deployed
+  deployChart: true
+  # these addresses will be used if subchart deployment is disabled
+  addresses:
+    kafka: ""
+  # Kafka topic where the tweets will be published
+  topic: twitter-stream
+
+resources:
+  #requests:
+  #  cpu: 100m
+  #  memory: 512Mi
+  #limits:
+  #  cpu: 100m
+  #  memory: 512Mi
