@@ -11,7 +11,7 @@ storage: kafka
 
 twitter:
   # Base word used to generate fake tweets with base_word-N hashtags
-  #baseWord: hashtag
+  baseWord: hashtag
 
 kafka:
   # if disabled, subchart will not be deployed
