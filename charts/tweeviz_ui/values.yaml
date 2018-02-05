@@ -9,6 +9,9 @@ image:
 
 port: 8589
 
+probeInitialDelaySeconds: 10
+probePeriodSeconds: 5
+
 # Set custom header to be displayed in viz page
 header: "Twitter Stats"
 
