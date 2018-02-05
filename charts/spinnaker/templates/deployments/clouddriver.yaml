@@ -62,6 +62,13 @@ spec:
               port: 7002
             initialDelaySeconds: 20
             timeoutSeconds: 1
+          {{ if (or .Values.clouddriver.proxy.http.enabled .Values.clouddriver.proxy.https.enabled) -}}
+          env:
+            - name: JAVA_OPTS
+              value:
+                {{- if .Values.clouddriver.proxy.http.enabled }} -Dhttp.proxyHost={{ .Values.clouddriver.proxy.http.host }} -Dhttp.proxyPort={{ .Values.clouddriver.proxy.http.port }} -Dhttp.nonProxyHosts=kubernetes.default {{ end }}
+                {{- if .Values.clouddriver.proxy.https.enabled }} -Dhttps.proxyHost={{ .Values.clouddriver.proxy.https.host }} -Dhttps.proxyPort={{ .Values.clouddriver.proxy.https.port }} -Dhttps.nonProxyHosts=kubernetes.default {{ end }}
+          {{- end }}
       volumes:
         - name: kubeconfig
           emptyDir: {}
