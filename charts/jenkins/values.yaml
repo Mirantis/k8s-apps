@@ -42,6 +42,9 @@ Master:
     annotations: {}
       #   kubernetes.io/ingress.class: nginx
 
+  rbac:
+    enabled: false
+
   resources:
   #  requests:
   #    memory: 256Mi

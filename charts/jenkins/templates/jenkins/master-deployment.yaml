@@ -25,6 +25,7 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/jenkins/config.yaml") . | sha256sum }}
     spec:
+      serviceAccountName: {{ template "jenkins.master-fullname" . }}-master
       initContainers:
       - name: copy-default-config
         image: '{{ .Values.Master.image.repository }}{{ .Values.Master.image.name }}:{{ .Values.Master.image.tag }}'
