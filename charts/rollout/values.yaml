@@ -49,11 +49,11 @@ helmApplyConfig:
     aws:
       context: aws
       namespace: ${ENV}
-      externalIP: 172.16.180.69
+      externalIP: CHANGEME
     gke:
       context: gke
       namespace: ${ENV}
-      externalIP: 172.16.180.65
+      externalIP: CHANGEME
 
   releases:
     tweeviz-ui-${ENV}:
@@ -64,7 +64,7 @@ helmApplyConfig:
         tweeviz_api: tweeviz-api-${ENV}
       parameters:
         image:
-          repository: mirademo/
+          repository: CHANGEME/
           tag: v${VERSION}
 
     tweeviz-api-${ENV}:
@@ -122,8 +122,9 @@ helmApplyConfig:
 
 # Docker account credentials that will be used during docker login
 docker:
-  user: mirademo
+  user: CHANGEME
   password: CHANGEME
+  repository: CHANGEME
 
 spinnaker:
   providers:
