@@ -1,0 +1,216 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "rollout.fullname" . }}-jenkins
+data:
+  tweeviz-ui-unit-tests: |
+    <?xml version='1.0' encoding='UTF-8'?>
+    <project>
+      <actions/>
+      <description></description>
+      <keepDependencies>false</keepDependencies>
+      <properties>
+        <hudson.model.ParametersDefinitionProperty>
+          <parameterDefinitions>
+            <hudson.model.StringParameterDefinition>
+              <name>VERSION</name>
+              <description></description>
+              <defaultValue></defaultValue>
+            </hudson.model.StringParameterDefinition>
+          </parameterDefinitions>
+        </hudson.model.ParametersDefinitionProperty>
+      </properties>
+      <scm class="hudson.scm.NullSCM"/>
+      <canRoam>true</canRoam>
+      <disabled>false</disabled>
+      <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+      <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+      <triggers/>
+      <concurrentBuild>false</concurrentBuild>
+      <builders>
+        <hudson.tasks.Shell>
+          <command>#!/bin/bash
+
+    set -ex
+
+    sleep 10
+    </command>
+        </hudson.tasks.Shell>
+      </builders>
+      <publishers/>
+      <buildWrappers/>
+    </project>
+
+  tweeviz-ui-integration-tests: |
+    <?xml version='1.0' encoding='UTF-8'?>
+    <project>
+      <description></description>
+      <keepDependencies>false</keepDependencies>
+      <properties>
+        <hudson.model.ParametersDefinitionProperty>
+          <parameterDefinitions>
+            <hudson.model.StringParameterDefinition>
+              <name>ENV</name>
+              <description></description>
+              <defaultValue></defaultValue>
+            </hudson.model.StringParameterDefinition>
+          </parameterDefinitions>
+        </hudson.model.ParametersDefinitionProperty>
+      </properties>
+      <scm class="hudson.scm.NullSCM"/>
+      <canRoam>true</canRoam>
+      <disabled>false</disabled>
+      <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+      <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+      <triggers/>
+      <concurrentBuild>false</concurrentBuild>
+      <builders>
+        <hudson.tasks.Shell>
+          <command>#!/bin/bash
+
+    set -ex
+
+    sleep 37</command>
+        </hudson.tasks.Shell>
+      </builders>
+      <publishers/>
+      <buildWrappers/>
+    </project>
+
+  tweeviz-ui-trigger: |
+    <?xml version='1.0' encoding='UTF-8'?>
+    <project>
+      <actions/>
+      <description></description>
+      <keepDependencies>false</keepDependencies>
+      <properties/>
+      <scm class="hudson.scm.NullSCM"/>
+      <canRoam>true</canRoam>
+      <disabled>false</disabled>
+      <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+      <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+      <triggers>
+        <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger plugin="gerrit-trigger@2.27.3">
+          <spec></spec>
+          <gerritProjects>
+            <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
+              <compareType>PLAIN</compareType>
+              <pattern>tweeviz-ui</pattern>
+              <branches>
+                <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
+                  <compareType>PLAIN</compareType>
+                  <pattern>master</pattern>
+                </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
+              </branches>
+              <disableStrictForbiddenFileVerification>false</disableStrictForbiddenFileVerification>
+            </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
+          </gerritProjects>
+          <dynamicGerritProjects class="empty-list"/>
+          <skipVote>
+            <onSuccessful>false</onSuccessful>
+            <onFailed>false</onFailed>
+            <onUnstable>false</onUnstable>
+            <onNotBuilt>false</onNotBuilt>
+          </skipVote>
+          <silentMode>false</silentMode>
+          <notificationLevel></notificationLevel>
+          <silentStartMode>false</silentStartMode>
+          <escapeQuotes>true</escapeQuotes>
+          <nameAndEmailParameterMode>PLAIN</nameAndEmailParameterMode>
+          <dependencyJobsNames></dependencyJobsNames>
+          <commitMessageParameterMode>BASE64</commitMessageParameterMode>
+          <changeSubjectParameterMode>PLAIN</changeSubjectParameterMode>
+          <commentTextParameterMode>BASE64</commentTextParameterMode>
+          <buildStartMessage></buildStartMessage>
+          <buildFailureMessage></buildFailureMessage>
+          <buildSuccessfulMessage></buildSuccessfulMessage>
+          <buildUnstableMessage></buildUnstableMessage>
+          <buildNotBuiltMessage></buildNotBuiltMessage>
+          <buildUnsuccessfulFilepath></buildUnsuccessfulFilepath>
+          <customUrl></customUrl>
+          <serverName>admin</serverName>
+          <triggerOnEvents>
+            <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.events.PluginChangeMergedEvent/>
+          </triggerOnEvents>
+          <dynamicTriggerConfiguration>false</dynamicTriggerConfiguration>
+          <triggerConfigURL></triggerConfigURL>
+          <triggerInformationAction/>
+        </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
+      </triggers>
+      <concurrentBuild>false</concurrentBuild>
+      <builders>
+        <hudson.tasks.Shell>
+          <command>#/bin/bash
+
+    set -ex
+
+    echo &quot;VERSION=$GERRIT_CHANGE_NUMBER&quot; &gt; props</command>
+        </hudson.tasks.Shell>
+      </builders>
+      <publishers>
+        <hudson.tasks.ArtifactArchiver>
+          <artifacts>props</artifacts>
+          <allowEmptyArchive>false</allowEmptyArchive>
+          <onlyIfSuccessful>false</onlyIfSuccessful>
+          <fingerprint>false</fingerprint>
+          <defaultExcludes>true</defaultExcludes>
+          <caseSensitive>true</caseSensitive>
+        </hudson.tasks.ArtifactArchiver>
+      </publishers>
+      <buildWrappers/>
+    </project>
+
+  tweeviz-ui-build-image: |
+    <?xml version='1.0' encoding='UTF-8'?>
+    <project>
+      <actions/>
+      <description></description>
+      <keepDependencies>false</keepDependencies>
+      <properties>
+        <hudson.model.ParametersDefinitionProperty>
+          <parameterDefinitions>
+            <hudson.model.StringParameterDefinition>
+              <name>VERSION</name>
+              <description></description>
+              <defaultValue></defaultValue>
+            </hudson.model.StringParameterDefinition>
+          </parameterDefinitions>
+        </hudson.model.ParametersDefinitionProperty>
+      </properties>
+      <scm class="hudson.plugins.git.GitSCM" plugin="git@3.4.0">
+        <configVersion>2</configVersion>
+        <userRemoteConfigs>
+          <hudson.plugins.git.UserRemoteConfig>
+            <url>http://{{ template "gerrit.fullname" . }}:{{ .Values.gerrit.service.rest.port }}/tweeviz-ui</url>
+          </hudson.plugins.git.UserRemoteConfig>
+        </userRemoteConfigs>
+        <branches>
+          <hudson.plugins.git.BranchSpec>
+            <name>*/master</name>
+          </hudson.plugins.git.BranchSpec>
+        </branches>
+        <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+        <submoduleCfg class="list"/>
+        <extensions/>
+      </scm>
+      <canRoam>true</canRoam>
+      <disabled>false</disabled>
+      <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+      <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+      <triggers/>
+      <concurrentBuild>false</concurrentBuild>
+      <builders>
+        <hudson.tasks.Shell>
+          <command>#!/bin/bash
+
+    set -ex
+    docker login -u {{ .Values.docker.user }} -p {{ .Values.docker.password }}
+    docker build --network host -t mirademo/tweeviz-ui:v${VERSION} .
+    docker push mirademo/tweeviz-ui:v${VERSION}
+    docker logout
+    echo &quot;success&quot;</command>
+        </hudson.tasks.Shell>
+      </builders>
+      <publishers/>
+      <buildWrappers/>
+    </project>

@@ -1,0 +1,579 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "rollout.fullname" . }}-rollout
+data:
+  rollout.json: |
+    {
+      "application": "cddemo",
+      "name": "Twitter Analytics UI: Rollout",
+      "appConfig": {},
+      "keepWaitingPipelines": false,
+      "lastModifiedBy": "anonymous",
+      "limitConcurrent": true,
+      "parallel": true,
+      "stages": [
+        {
+          "continuePipeline": false,
+          "failPipeline": true,
+          "job": "tweeviz-ui-build-image",
+          "master": "default",
+          "name": "Bake image",
+          "parameters": {
+            "VERSION": "${ trigger.properties['VERSION']}"
+          },
+          "refId": "1",
+          "requisiteStageRefIds": [],
+          "type": "jenkins"
+        },
+        {
+          "continuePipeline": false,
+          "failPipeline": true,
+          "job": "tweeviz-ui-unit-tests",
+          "master": "default",
+          "name": "Unit tests",
+          "parameters": {
+            "VERSION": "${ trigger.properties['VERSION']}"
+          },
+          "refId": "2",
+          "requisiteStageRefIds": [
+            "1"
+          ],
+          "type": "jenkins"
+        },
+        {
+          "account": "local",
+          "annotations": {},
+          "application": "cddemo",
+          "cloudProvider": "kubernetes",
+          "cloudProviderType": "kubernetes",
+          "containers": [
+            {
+              "args": [],
+              "command": [
+                "sh",
+                "-cex",
+                "envsubst < /etc/apply/apply  > twitter-stats.yaml && helm-apply -v twitter-stats.yaml"
+              ],
+              "envVars": [
+                {
+                  "name": "KUBECONFIG",
+                  "value": "/etc/kube/aws:/etc/kube/gke"
+                },
+                {
+                  "name": "ENV",
+                  "value": "stage"
+                },
+                {
+                  "name": "VERSION",
+                  "value": "${ trigger.properties['VERSION']}"
+                }
+              ],
+              "imageDescription": {
+                "account": "dockerhub",
+                "imageId": "index.docker.io/kshatrix/rollout-jenkins-slave:latest",
+                "registry": "index.docker.io",
+                "repository": "kshatrix/rollout-jenkins-slave",
+                "tag": "latest"
+              },
+              "imagePullPolicy": "ALWAYS",
+              "limits": {},
+              "name": "deploy",
+              "ports": [
+                {
+                  "containerPort": 80,
+                  "name": "http",
+                  "protocol": "TCP"
+                }
+              ],
+              "requests": {},
+              "volumeMounts": [
+                {
+                  "mountPath": "/etc/apply",
+                  "name": "1517411063053",
+                  "readOnly": false
+                },
+                {
+                  "mountPath": "/etc/kube",
+                  "name": "1517411152286",
+                  "readOnly": false
+                }
+              ]
+            }
+          ],
+          "dnsPolicy": "ClusterFirst",
+          "labels": {},
+          "name": "Deploy STAGE",
+          "namespace": "{{ .Release.Namespace }}",
+          "refId": "4",
+          "requisiteStageRefIds": [
+            "2"
+          ],
+          "type": "runJob",
+          "volumeSources": [
+            {
+              "configMap": {
+                "configMapName": "{{ template "rollout.fullname" . }}-apply",
+                "items": []
+              },
+              "defaultPersistentVolumeClaim": {
+                "claimName": "",
+                "readOnly": true
+              },
+              "emptyDir": {
+                "medium": "DEFAULT"
+              },
+              "hostPath": {
+                "path": "/"
+              },
+              "name": "1517411063053",
+              "persistentVolumeClaim": {
+                "claimName": "",
+                "readOnly": true
+              },
+              "secret": {
+                "secretName": ""
+              },
+              "type": "CONFIGMAP"
+            },
+            {
+              "configMap": {
+                "configMapName": "{{ template "rollout.fullname" . }}-kube",
+                "items": []
+              },
+              "defaultPersistentVolumeClaim": {
+                "claimName": "",
+                "readOnly": true
+              },
+              "emptyDir": {
+                "medium": "DEFAULT"
+              },
+              "hostPath": {
+                "path": "/"
+              },
+              "name": "1517411152286",
+              "persistentVolumeClaim": {
+                "claimName": "",
+                "readOnly": true
+              },
+              "secret": {
+                "secretName": ""
+              },
+              "type": "CONFIGMAP"
+            }
+          ]
+        },
+        {
+          "continuePipeline": false,
+          "failPipeline": true,
+          "job": "tweeviz-ui-integration-tests",
+          "master": "default",
+          "name": "STAGE: integration tests",
+          "parameters": {
+            "ENV": "stage",
+            "VERSION": "${ trigger.properties['VERSION']}"
+          },
+          "refId": "5",
+          "requisiteStageRefIds": [
+            "4"
+          ],
+          "type": "jenkins"
+        },
+        {
+          "failPipeline": true,
+          "judgmentInputs": [],
+          "name": "Deploy to PROD?",
+          "notifications": [],
+          "refId": "8",
+          "requisiteStageRefIds": [
+            "5",
+            "4"
+          ],
+          "type": "manualJudgment"
+        },
+        {
+          "account": "local",
+          "annotations": {},
+          "application": "cddemo",
+          "cloudProvider": "kubernetes",
+          "cloudProviderType": "kubernetes",
+          "containers": [
+            {
+              "args": [],
+              "command": [
+                "sh",
+                "-cex",
+                "envsubst < /etc/apply/apply  > twitter-stats.yaml && helm-apply -v twitter-stats.yaml"
+              ],
+              "envVars": [
+                {
+                  "name": "KUBECONFIG",
+                  "value": "/etc/kube/aws:/etc/kube/gke"
+                },
+                {
+                  "name": "ENV",
+                  "value": "prod"
+                },
+                {
+                  "name": "VERSION",
+                  "value": "${ trigger.properties['VERSION']}"
+                }
+              ],
+              "imageDescription": {
+                "account": "dockerhub",
+                "imageId": "index.docker.io/kshatrix/rollout-jenkins-slave:latest",
+                "registry": "index.docker.io",
+                "repository": "kshatrix/rollout-jenkins-slave",
+                "tag": "latest"
+              },
+              "imagePullPolicy": "ALWAYS",
+              "limits": {},
+              "name": "deploy",
+              "ports": [
+                {
+                  "containerPort": 80,
+                  "name": "http",
+                  "protocol": "TCP"
+                }
+              ],
+              "requests": {},
+              "volumeMounts": [
+                {
+                  "mountPath": "/etc/apply",
+                  "name": "1517411063053",
+                  "readOnly": false
+                },
+                {
+                  "mountPath": "/etc/kube",
+                  "name": "1517411152286",
+                  "readOnly": false
+                }
+              ]
+            }
+          ],
+          "dnsPolicy": "ClusterFirst",
+          "labels": {},
+          "name": "Rollout NEW PROD",
+          "namespace": "{{ .Release.Namespace }}",
+          "refId": "10",
+          "requisiteStageRefIds": [
+            "8"
+          ],
+          "type": "runJob",
+          "volumeSources": [
+            {
+              "configMap": {
+                "configMapName": "{{ template "rollout.fullname" . }}-apply",
+                "items": []
+              },
+              "defaultPersistentVolumeClaim": {
+                "claimName": "",
+                "readOnly": true
+              },
+              "emptyDir": {
+                "medium": "DEFAULT"
+              },
+              "hostPath": {
+                "path": "/"
+              },
+              "name": "1517411063053",
+              "persistentVolumeClaim": {
+                "claimName": "",
+                "readOnly": true
+              },
+              "secret": {
+                "secretName": ""
+              },
+              "type": "CONFIGMAP"
+            },
+            {
+              "configMap": {
+                "configMapName": "{{ template "rollout.fullname" . }}-kube",
+                "items": []
+              },
+              "defaultPersistentVolumeClaim": {
+                "claimName": "",
+                "readOnly": true
+              },
+              "emptyDir": {
+                "medium": "DEFAULT"
+              },
+              "hostPath": {
+                "path": "/"
+              },
+              "name": "1517411152286",
+              "persistentVolumeClaim": {
+                "claimName": "",
+                "readOnly": true
+              },
+              "secret": {
+                "secretName": ""
+              },
+              "type": "CONFIGMAP"
+            }
+          ]
+        },
+        {
+          "account": "local",
+          "annotations": {},
+          "application": "cddemo",
+          "cloudProvider": "kubernetes",
+          "cloudProviderType": "kubernetes",
+          "containers": [
+            {
+              "args": [],
+              "command": [
+                "sh",
+                "-cex",
+                "export KUBECONFIG=/etc/kube/aws && helm --kube-context aws list -q | grep stage | xargs helm --kube-context aws delete --purge  && export KUBECONFIG=/etc/kube/gke && helm --kube-context gke list -q | grep stage | xargs helm --kube-context gke delete --purge"
+              ],
+              "envVars": [],
+              "imageDescription": {
+                "account": "dockerhub",
+                "imageId": "index.docker.io/kshatrix/rollout-jenkins-slave:latest",
+                "registry": "index.docker.io",
+                "repository": "kshatrix/rollout-jenkins-slave",
+                "tag": "latest"
+              },
+              "imagePullPolicy": "ALWAYS",
+              "limits": {},
+              "name": "deploy",
+              "ports": [
+                {
+                  "containerPort": 80,
+                  "name": "http",
+                  "protocol": "TCP"
+                }
+              ],
+              "requests": {},
+              "volumeMounts": [
+                {
+                  "mountPath": "/etc/kube",
+                  "name": "1517411152286",
+                  "readOnly": false
+                }
+              ]
+            }
+          ],
+          "dnsPolicy": "ClusterFirst",
+          "labels": {},
+          "name": "Tear down STAGE",
+          "namespace": "{{ .Release.Namespace }}",
+          "refId": "12",
+          "requisiteStageRefIds": [
+            "8"
+          ],
+          "type": "runJob",
+          "volumeSources": [
+            {
+              "configMap": {
+                "configMapName": "{{ template "rollout.fullname" . }}-kube",
+                "items": []
+              },
+              "defaultPersistentVolumeClaim": {
+                "claimName": "",
+                "readOnly": true
+              },
+              "emptyDir": {
+                "medium": "DEFAULT"
+              },
+              "hostPath": {
+                "path": "/"
+              },
+              "name": "1517411152286",
+              "persistentVolumeClaim": {
+                "claimName": "",
+                "readOnly": true
+              },
+              "secret": {
+                "secretName": ""
+              },
+              "type": "CONFIGMAP"
+            }
+          ]
+        },
+        {
+          "account": "local",
+          "annotations": {},
+          "application": "cddemo",
+          "cloudProvider": "kubernetes",
+          "cloudProviderType": "kubernetes",
+          "containers": [
+            {
+              "args": [],
+              "command": [
+                "sh",
+                "-cex",
+                "sleep 10"
+              ],
+              "envVars": [],
+              "imageDescription": {
+                "account": "dockerhub",
+                "imageId": "index.docker.io/kshatrix/rollout-jenkins-slave:latest",
+                "registry": "index.docker.io",
+                "repository": "kshatrix/rollout-jenkins-slave",
+                "tag": "latest"
+              },
+              "imagePullPolicy": "ALWAYS",
+              "limits": {},
+              "name": "deploy",
+              "ports": [
+                {
+                  "containerPort": 80,
+                  "name": "http",
+                  "protocol": "TCP"
+                }
+              ],
+              "requests": {},
+              "volumeMounts": []
+            }
+          ],
+          "dnsPolicy": "ClusterFirst",
+          "labels": {},
+          "name": "Tear down OLD PROD",
+          "namespace": "{{ .Release.Namespace }}",
+          "refId": "13",
+          "requisiteStageRefIds": [
+            "15"
+          ],
+          "type": "runJob",
+          "volumeSources": []
+        },
+        {
+          "account": "local",
+          "annotations": {},
+          "application": "cddemo",
+          "cloudProvider": "kubernetes",
+          "cloudProviderType": "kubernetes",
+          "containers": [
+            {
+              "args": [],
+              "command": [
+                "sh",
+                "-cex",
+                "sleep 10"
+              ],
+              "envVars": [],
+              "imageDescription": {
+                "account": "dockerhub",
+                "imageId": "index.docker.io/kshatrix/rollout-jenkins-slave:latest",
+                "registry": "index.docker.io",
+                "repository": "kshatrix/rollout-jenkins-slave",
+                "tag": "latest"
+              },
+              "imagePullPolicy": "ALWAYS",
+              "limits": {},
+              "name": "deploy",
+              "ports": [
+                {
+                  "containerPort": 80,
+                  "name": "http",
+                  "protocol": "TCP"
+                }
+              ],
+              "requests": {},
+              "volumeMounts": []
+            }
+          ],
+          "dnsPolicy": "ClusterFirst",
+          "labels": {},
+          "name": "Switch to NEW PROD",
+          "namespace": "{{ .Release.Namespace }}",
+          "refId": "14",
+          "requisiteStageRefIds": [
+            "10"
+          ],
+          "type": "runJob",
+          "volumeSources": []
+        },
+        {
+          "account": "local",
+          "annotations": {},
+          "application": "cddemo",
+          "cloudProvider": "kubernetes",
+          "cloudProviderType": "kubernetes",
+          "containers": [
+            {
+              "args": [],
+              "command": [
+                "sh",
+                "-cex",
+                "export KUBECONFIG=/etc/kube/aws && NODEPORT=$(kubectl --context aws get svc tweeviz-ui-tweeviz-ui-prod -n prod -o jsonpath=\"{.spec.ports[0].nodePort}\") && while true; do [ \"200\" -eq $(curl --write-out \"%{http_code}\" --silent --output /dev/null http://{{ .Values.helmApplyConfig.clusters.aws.externalIP }}:$NODEPORT) ] || exit 1; sleep 10; done"
+              ],
+              "envVars": [],
+              "imageDescription": {
+                "account": "dockerhub",
+                "imageId": "index.docker.io/kshatrix/rollout-jenkins-slave:latest",
+                "registry": "index.docker.io",
+                "repository": "kshatrix/rollout-jenkins-slave",
+                "tag": "latest"
+              },
+              "imagePullPolicy": "ALWAYS",
+              "limits": {},
+              "name": "deploy",
+              "ports": [
+                {
+                  "containerPort": 80,
+                  "name": "http",
+                  "protocol": "TCP"
+                }
+              ],
+              "requests": {},
+              "volumeMounts": [
+                {
+                  "mountPath": "/etc/kube",
+                  "name": "1517411152286",
+                  "readOnly": false
+                }
+              ]
+            }
+          ],
+          "dnsPolicy": "ClusterFirst",
+          "labels": {},
+          "name": "Verify for 3 days",
+          "namespace": "{{ .Release.Namespace }}",
+          "refId": "15",
+          "requisiteStageRefIds": [
+            "14"
+          ],
+          "type": "runJob",
+          "volumeSources": [
+            {
+              "configMap": {
+                "configMapName": "{{ template "rollout.fullname" . }}-kube",
+                "items": []
+              },
+              "defaultPersistentVolumeClaim": {
+                "claimName": "",
+                "readOnly": true
+              },
+              "emptyDir": {
+                "medium": "DEFAULT"
+              },
+              "hostPath": {
+                "path": "/"
+              },
+              "name": "1517411152286",
+              "persistentVolumeClaim": {
+                "claimName": "",
+                "readOnly": true
+              },
+              "secret": {
+                "secretName": ""
+              },
+              "type": "CONFIGMAP"
+            }
+          ]
+        }
+      ],
+      "triggers": [
+        {
+          "enabled": true,
+          "fromTrigger": true,
+          "job": "tweeviz-ui-trigger",
+          "master": "default",
+          "propertyFile": "props",
+          "type": "jenkins"
+        }
+      ]
+    }

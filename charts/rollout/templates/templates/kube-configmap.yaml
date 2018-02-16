@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "rollout.fullname" . }}-kube
+  labels:
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    app: {{ template "rollout.fullname" . }}
+data:
+{{ toYaml .Values.kubeConfigs | indent 2 }}

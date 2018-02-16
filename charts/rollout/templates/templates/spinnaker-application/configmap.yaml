@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "rollout.fullname" . }}-app
+data:
+  application.json: |
+    {
+      "job": [
+        {
+          "type": "createApplication",
+          "application": {
+            "cloudProviders": "kubernetes",
+            "instancePort": null,
+            "name": "cddemo",
+            "email": "demo@mirantis.com"
+          },
+          "user": "[anonymous]"
+        }
+      ],
+      "application": "cddemo",
+      "description": "Create Application: cddemo"
+    }

@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "rollout.fullname" . }}-gerrit-trigger
+  labels:
+    app: {{ template "rollout.fullname" . }}-gerrit-trigger
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-weight": "2"
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ template "rollout.fullname" . }}-gerrit-trigger
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: app
+        image: "kshatrix/rollout-jenkins-slave"
+        command:
+        - "sh"
+        - "-cxe"
+        - |
+          GERRIT_POD=$(kubectl get pods -l app={{ template "gerrit.fullname" .}} | grep gerrit | awk '{print $1}')
+          kubectl cp ~/.ssh/id_rsa.pub $GERRIT_POD:/var/gerrit/id_rsa.pub
+          kubectl exec $GERRIT_POD -- bash -cex 'cat /var/gerrit/id_rsa.pub | ssh -o "StrictHostKeyChecking no" -p 29418 -i /var/gerrit/etc/ssh_host_rsa_key "Gerrit Code Review@localhost" suexec --as admin@example.com -- gerrit set-account --add-ssh-key - admin'
+          ssh -i ~/.ssh/id_rsa -o "StrictHostKeyChecking no" -p {{ .Values.gerrit.service.ssh.port }} admin@{{ template "gerrit.fullname" .}} -- gerrit create-project --empty-commit tweeviz-ui
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa -o \"StrictHostKeyChecking no\""
+          git clone ssh://admin@{{ template "gerrit.fullname" .}}:{{ .Values.gerrit.service.ssh.port }}/tweeviz-ui && cd tweeviz-ui && cp -r /tweeviz-ui/* .
+          git add -A && git config --global user.email admin@example.com && git config --global user.name admin
+          git commit -m "Tweeviz UI: Initial commit" && git push

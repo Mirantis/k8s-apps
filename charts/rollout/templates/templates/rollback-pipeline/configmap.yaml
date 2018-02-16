@@ -1,0 +1,195 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "rollout.fullname" . }}-rollback
+data:
+  rollback.json: |
+    {
+      "application": "cddemo",
+      "name": "Twitter Analytics UI: Rollback",
+      "appConfig": {},
+      "keepWaitingPipelines": false,
+      "lastModifiedBy": "anonymous",
+      "limitConcurrent": true,
+      "stages": [
+        {
+          "account": "local",
+          "annotations": {},
+          "application": "cddemo",
+          "cloudProvider": "kubernetes",
+          "cloudProviderType": "kubernetes",
+          "containers": [
+            {
+              "args": [],
+              "command": [
+                "sh",
+                "-cex",
+                "envsubst < /etc/apply/apply  > twitter-stats.yaml && helm-apply -v twitter-stats.yaml"
+              ],
+              "envVars": [
+                {
+                  "name": "KUBECONFIG",
+                  "value": "/etc/kube/aws:/etc/kube/gke"
+                },
+                {
+                  "name": "ENV",
+                  "value": "prod"
+                },
+                {
+                  "name": "VERSION",
+                  "value": "1.0"
+                }
+              ],
+              "imageDescription": {
+                "account": "dockerhub",
+                "imageId": "index.docker.io/kshatrix/rollout-jenkins-slave:latest",
+                "registry": "index.docker.io",
+                "repository": "kshatrix/rollout-jenkins-slave",
+                "tag": "latest"
+              },
+              "imagePullPolicy": "ALWAYS",
+              "limits": {},
+              "name": "deploy",
+              "ports": [
+                {
+                  "containerPort": 80,
+                  "name": "http",
+                  "protocol": "TCP"
+                }
+              ],
+              "requests": {},
+              "volumeMounts": [
+                {
+                  "mountPath": "/etc/apply",
+                  "name": "1517411063053",
+                  "readOnly": false
+                },
+                {
+                  "mountPath": "/etc/kube",
+                  "name": "1517411152286",
+                  "readOnly": false
+                }
+              ]
+            }
+          ],
+          "dnsPolicy": "ClusterFirst",
+          "labels": {},
+          "name": "Switch back to current PROD",
+          "namespace": "{{ .Release.Namespace }}",
+          "refId": "1",
+          "requisiteStageRefIds": [],
+          "type": "runJob",
+          "volumeSources": [
+            {
+              "configMap": {
+                "configMapName": "{{ template "rollout.fullname" . }}-apply",
+                "items": []
+              },
+              "defaultPersistentVolumeClaim": {
+                "claimName": "",
+                "readOnly": true
+              },
+              "emptyDir": {
+                "medium": "DEFAULT"
+              },
+              "hostPath": {
+                "path": "/"
+              },
+              "name": "1517411063053",
+              "persistentVolumeClaim": {
+                "claimName": "",
+                "readOnly": true
+              },
+              "secret": {
+                "secretName": ""
+              },
+              "type": "CONFIGMAP"
+            },
+            {
+              "configMap": {
+                "configMapName": "{{ template "rollout.fullname" . }}-kube",
+                "items": []
+              },
+              "defaultPersistentVolumeClaim": {
+                "claimName": "",
+                "readOnly": true
+              },
+              "emptyDir": {
+                "medium": "DEFAULT"
+              },
+              "hostPath": {
+                "path": "/"
+              },
+              "name": "1517411152286",
+              "persistentVolumeClaim": {
+                "claimName": "",
+                "readOnly": true
+              },
+              "secret": {
+                "secretName": ""
+              },
+              "type": "CONFIGMAP"
+            }
+          ]
+        },
+        {
+          "account": "local",
+          "annotations": {},
+          "application": "cddemo",
+          "cloudProvider": "kubernetes",
+          "cloudProviderType": "kubernetes",
+          "containers": [
+            {
+              "args": [],
+              "command": [
+                "sh",
+                "-cex",
+                "sleep 10"
+              ],
+              "envVars": [],
+              "imageDescription": {
+                "account": "dockerhub",
+                "imageId": "index.docker.io/kshatrix/rollout-jenkins-slave:latest",
+                "registry": "index.docker.io",
+                "repository": "kshatrix/rollout-jenkins-slave",
+                "tag": "latest"
+              },
+              "imagePullPolicy": "ALWAYS",
+              "limits": {},
+              "name": "deploy",
+              "ports": [
+                {
+                  "containerPort": 80,
+                  "name": "http",
+                  "protocol": "TCP"
+                }
+              ],
+              "requests": {},
+              "volumeMounts": []
+            }
+          ],
+          "dnsPolicy": "ClusterFirst",
+          "labels": {},
+          "name": "Tear down NEW PROD",
+          "namespace": "{{ .Release.Namespace }}",
+          "refId": "2",
+          "requisiteStageRefIds": [
+            "1"
+          ],
+          "type": "runJob",
+          "volumeSources": []
+        }
+      ],
+      "triggers": [
+        {
+          "application": "cddemo",
+          "enabled": true,
+          "fromTrigger": true,
+          "pipeline": "${ROLLOUT_PIPELINE_ID}",
+          "status": [
+            "failed"
+          ],
+          "type": "pipeline"
+        }
+      ]
+    }

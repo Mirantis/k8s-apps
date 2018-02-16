@@ -1,0 +1,152 @@
+kubeConfigs:
+  aws: |
+    apiVersion: v1
+    clusters:
+    - cluster:
+        certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUYwVENDQTdtZ0F3SUJBZ0lKQUpHNHZ6VlpJa2tlTUEwR0NTcUdTSWIzRFFFQkN3VUFNRW94Q3pBSkJnTlYKQkFZVEFtTjZNUmN3RlFZRFZRUUREQTVUWVd4MElFMWhjM1JsY2lCRFFURVBNQTBHQTFVRUJ3d0dVSEpoWjNWbApNUkV3RHdZRFZRUUtEQWhOYVhKaGJuUnBjekFlRncweE56QTFNRFF4TVRVNU5USmFGdzB5TnpBMU1ESXhNVFU1Ck5USmFNRW94Q3pBSkJnTlZCQVlUQW1ONk1SY3dGUVlEVlFRRERBNVRZV3gwSUUxaGMzUmxjaUJEUVRFUE1BMEcKQTFVRUJ3d0dVSEpoWjNWbE1SRXdEd1lEVlFRS0RBaE5hWEpoYm5ScGN6Q0NBaUl3RFFZSktvWklodmNOQVFFQgpCUUFEZ2dJUEFEQ0NBZ29DZ2dJQkFLZVp5cU5lS0d4ZW1qTFY0YnFhQlZOMHc2ejgwbHB3TDYwYVV5Z2hreUNwCllCc1VKelVxd0xYMmNaankrMnJNb09PS3p2ak9SMGhyajUzU1hGSG1lcUk5djFTcGFEYkN6SjdoejZvcUgrcHQKdXZuYlkyUTdCYW02b251Z0NBMytmRkNCbFFIcThPTGVLYmtvM3dxQkpSMWd0Yjg4TWMvaVpyWFB6NmRKSGhSegptaXhVRzdrK2VpcEtaYWpwZGlJdlhCa0tLZG5IWUZKSnVsYzRzV21CWFJPWWdTNjU5LzlaNHRGTXhGTTQ3WXBPCk84cnZMZkxHWTNFRXZJQlFKV25BaG02TWZna2N1RitjR3hjdkhhbDhKYTJRZVJEQzRZcFp3WkZsMnlXMzNOWDIKcHQzWFY2NE9RamNxZSsrZUJJM1FZYXR4SHZDSHhYSnIzTjlVNE80cWpiYUZLdHg2OEZYVktYUHJhN3Y0Q3hXdApDK29kTWdJQVN3SU5jbU40QnR6K1htN2tZd3EycEZCR3dhbHpXdWNPcW9FWnNuR1BlbWc2WldrL2pkRldzelhKCisyWGFlS2RURXpHcXkxb05vRjFoRnpJQ3JoQUgyWUhCOHFhLzFGaXd5WVBoUWJZWFlzaGZHZWtudk4welM1ZEwKbXY2NHB3QVhBWkZUSnRoM1YzOVFFZnZEK2VmR2xUQXhVYXQxb0xKeCtXdFlKWnNnMU1GS1Q3bTFmQU02c3FYTgpIVlR2S29valE3YTlEVTFTL1owQ3ljaStDRy9xcUtVRjAvemc0bmI4NG5MSWR5U1VVVEVieloxWEU1eFNPUTBVCmZFbEZsQk93dW5GSWg2T1BmS0VzNTJ1QXo2NlRBVkpPWEdob1k5NEVFUFNtZjJmbkRMN2dWcmhHQ1NoUGtWSHgKQWdNQkFBR2pnYmt3Z2JZd0RBWURWUjBUQkFVd0F3RUIvekFMQmdOVkhROEVCQU1DQVFZd0hRWURWUjBPQkJZRQpGTWlHaG5FWk9NZVA4cDVFL29hZmdocG5VN3RKTUhvR0ExVWRJd1J6TUhHQUZNaUdobkVaT01lUDhwNUUvb2FmCmdocG5VN3RKb1U2a1REQktNUXN3Q1FZRFZRUUdFd0pqZWpFWE1CVUdBMVVFQXd3T1UyRnNkQ0JOWVhOMFpYSWcKUTBFeER6QU5CZ05WQkFjTUJsQnlZV2QxWlRFUk1BOEdBMVVFQ2d3SVRXbHlZVzUwYVhPQ0NRQ1J1TDgxV1NKSgpIakFOQmdrcWhraUc5dzBCQVFzRkFBT0NBZ0VBSkU2UEkvN2plY0tqcUF5RXJtUS9qN2Iyc1d4bTZ5cUlHeU43CmYzZ0o0UTdZbXRZa3hhVmhobjhjYXlpVTlINEEwQVRkKzVqRVRZdXBrNG9remJoaUoyUkNaVnJXb2hRUE9MZ2cKOW9JOEV3bmdZNGxrMzhVL2xhTkUvaTYrbmg3Q1ZiZ3dVVlpjbXY5RWI2SHlsTXljVE5qRGJFYUJKQ0YzMDljUgo3bU9wRlJkUkNhbVRIYWhEVW5kNWRlUDIwMUpZbFRNV21YRHlkeEQzdXByUDZ4em4xSHVoQTBUTmZ1QVRLdHFlCis5UkdoUXl4TTZxcUhONkhZRGVIUHRYdVE5U3I5NC83aXdQb28zczVlK0JJR2Z0SEp0aXYzaGhzK05TVU43QkYKOW0zOC8zdDR2Z0VodEZQcWxjbFAzTWR2T0xibDRRcFZQOEd2NTVnTzczMzJ3T01XS0g5ODl4RFE5Wlg1QUJRegpRTTk1TDdTZGtDV0FkcUdhWFU1VEFtVzVHNDk3RWcyVUd3QS9HZFNjcGRVcEs2ZElBaGo4c1JkL0dBQ2NvTkVFClB5Uis2cHJ2LzBVWm5samEzT3p1UkV6SnhRTnpUelo3amtqVEJHcGg1TXVicFgxaDdsQUZoSHVlenBIcDNjUS8KenY1WUF5b3lNVElLMFJBUFJVMHN6Szg1WHF0YU5SeGEwUFprVlpQM0hhczNXdEo4NVJJRHZ2VWhORzJBZGhkUgpoN2I1QnNWbEY0M1NiaVFYNmJVcUZnamoyVGFkaE95OWhNNXkzSlBGaG5XcGNqN0FDa0VEdmZFa0hNNWVSbnZiCmJMRnl2MXVqTlM4Q0dYYnQ0YjdVRzRVWENhTDIrUWdyb1V3dVR0aWo0SHBrWHJMelhpSWNjK0VJSjFJcDZvZ0sKNStCeFJybz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+        server: https://x.x.x.x
+      name: aws
+    contexts:
+    - context:
+        cluster: aws
+        namespace: default
+        user: aws
+      name: aws
+    current-context: aws
+    kind: Config
+    preferences: {}
+    users:
+    - name: aws
+      user:
+        password: aws
+        username: aws
+  gke: |
+    apiVersion: v1
+    clusters:
+    - cluster:
+        certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUYwVENDQTdtZ0F3SUJBZ0lKQUpHNHZ6VlpJa2tlTUEwR0NTcUdTSWIzRFFFQkN3VUFNRW94Q3pBSkJnTlYKQkFZVEFtTjZNUmN3RlFZRFZRUUREQTVUWVd4MElFMWhjM1JsY2lCRFFURVBNQTBHQTFVRUJ3d0dVSEpoWjNWbApNUkV3RHdZRFZRUUtEQWhOYVhKaGJuUnBjekFlRncweE56QTFNRFF4TVRVNU5USmFGdzB5TnpBMU1ESXhNVFU1Ck5USmFNRW94Q3pBSkJnTlZCQVlUQW1ONk1SY3dGUVlEVlFRRERBNVRZV3gwSUUxaGMzUmxjaUJEUVRFUE1BMEcKQTFVRUJ3d0dVSEpoWjNWbE1SRXdEd1lEVlFRS0RBaE5hWEpoYm5ScGN6Q0NBaUl3RFFZSktvWklodmNOQVFFQgpCUUFEZ2dJUEFEQ0NBZ29DZ2dJQkFLZVp5cU5lS0d4ZW1qTFY0YnFhQlZOMHc2ejgwbHB3TDYwYVV5Z2hreUNwCllCc1VKelVxd0xYMmNaankrMnJNb09PS3p2ak9SMGhyajUzU1hGSG1lcUk5djFTcGFEYkN6SjdoejZvcUgrcHQKdXZuYlkyUTdCYW02b251Z0NBMytmRkNCbFFIcThPTGVLYmtvM3dxQkpSMWd0Yjg4TWMvaVpyWFB6NmRKSGhSegptaXhVRzdrK2VpcEtaYWpwZGlJdlhCa0tLZG5IWUZKSnVsYzRzV21CWFJPWWdTNjU5LzlaNHRGTXhGTTQ3WXBPCk84cnZMZkxHWTNFRXZJQlFKV25BaG02TWZna2N1RitjR3hjdkhhbDhKYTJRZVJEQzRZcFp3WkZsMnlXMzNOWDIKcHQzWFY2NE9RamNxZSsrZUJJM1FZYXR4SHZDSHhYSnIzTjlVNE80cWpiYUZLdHg2OEZYVktYUHJhN3Y0Q3hXdApDK29kTWdJQVN3SU5jbU40QnR6K1htN2tZd3EycEZCR3dhbHpXdWNPcW9FWnNuR1BlbWc2WldrL2pkRldzelhKCisyWGFlS2RURXpHcXkxb05vRjFoRnpJQ3JoQUgyWUhCOHFhLzFGaXd5WVBoUWJZWFlzaGZHZWtudk4welM1ZEwKbXY2NHB3QVhBWkZUSnRoM1YzOVFFZnZEK2VmR2xUQXhVYXQxb0xKeCtXdFlKWnNnMU1GS1Q3bTFmQU02c3FYTgpIVlR2S29valE3YTlEVTFTL1owQ3ljaStDRy9xcUtVRjAvemc0bmI4NG5MSWR5U1VVVEVieloxWEU1eFNPUTBVCmZFbEZsQk93dW5GSWg2T1BmS0VzNTJ1QXo2NlRBVkpPWEdob1k5NEVFUFNtZjJmbkRMN2dWcmhHQ1NoUGtWSHgKQWdNQkFBR2pnYmt3Z2JZd0RBWURWUjBUQkFVd0F3RUIvekFMQmdOVkhROEVCQU1DQVFZd0hRWURWUjBPQkJZRQpGTWlHaG5FWk9NZVA4cDVFL29hZmdocG5VN3RKTUhvR0ExVWRJd1J6TUhHQUZNaUdobkVaT01lUDhwNUUvb2FmCmdocG5VN3RKb1U2a1REQktNUXN3Q1FZRFZRUUdFd0pqZWpFWE1CVUdBMVVFQXd3T1UyRnNkQ0JOWVhOMFpYSWcKUTBFeER6QU5CZ05WQkFjTUJsQnlZV2QxWlRFUk1BOEdBMVVFQ2d3SVRXbHlZVzUwYVhPQ0NRQ1J1TDgxV1NKSgpIakFOQmdrcWhraUc5dzBCQVFzRkFBT0NBZ0VBSkU2UEkvN2plY0tqcUF5RXJtUS9qN2Iyc1d4bTZ5cUlHeU43CmYzZ0o0UTdZbXRZa3hhVmhobjhjYXlpVTlINEEwQVRkKzVqRVRZdXBrNG9remJoaUoyUkNaVnJXb2hRUE9MZ2cKOW9JOEV3bmdZNGxrMzhVL2xhTkUvaTYrbmg3Q1ZiZ3dVVlpjbXY5RWI2SHlsTXljVE5qRGJFYUJKQ0YzMDljUgo3bU9wRlJkUkNhbVRIYWhEVW5kNWRlUDIwMUpZbFRNV21YRHlkeEQzdXByUDZ4em4xSHVoQTBUTmZ1QVRLdHFlCis5UkdoUXl4TTZxcUhONkhZRGVIUHRYdVE5U3I5NC83aXdQb28zczVlK0JJR2Z0SEp0aXYzaGhzK05TVU43QkYKOW0zOC8zdDR2Z0VodEZQcWxjbFAzTWR2T0xibDRRcFZQOEd2NTVnTzczMzJ3T01XS0g5ODl4RFE5Wlg1QUJRegpRTTk1TDdTZGtDV0FkcUdhWFU1VEFtVzVHNDk3RWcyVUd3QS9HZFNjcGRVcEs2ZElBaGo4c1JkL0dBQ2NvTkVFClB5Uis2cHJ2LzBVWm5samEzT3p1UkV6SnhRTnpUelo3amtqVEJHcGg1TXVicFgxaDdsQUZoSHVlenBIcDNjUS8KenY1WUF5b3lNVElLMFJBUFJVMHN6Szg1WHF0YU5SeGEwUFprVlpQM0hhczNXdEo4NVJJRHZ2VWhORzJBZGhkUgpoN2I1QnNWbEY0M1NiaVFYNmJVcUZnamoyVGFkaE95OWhNNXkzSlBGaG5XcGNqN0FDa0VEdmZFa0hNNWVSbnZiCmJMRnl2MXVqTlM4Q0dYYnQ0YjdVRzRVWENhTDIrUWdyb1V3dVR0aWo0SHBrWHJMelhpSWNjK0VJSjFJcDZvZ0sKNStCeFJybz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+        server: https://x.x.x.x
+      name: gke
+    contexts:
+    - context:
+        cluster: gke
+        user: gke
+      name: gke
+    current-context: gke
+    kind: Config
+    preferences: {}
+    users:
+    - name: gke
+      user:
+        password: gke
+        username: gke
+
+helmApplyConfig:
+  repos:
+    mirantis: https://mirantisworkloads.storage.googleapis.com
+
+  clusters:
+    aws:
+      context: aws
+      namespace: ${ENV}
+      externalIP: 172.16.180.69
+    gke:
+      context: gke
+      namespace: ${ENV}
+      externalIP: 172.16.180.65
+
+  releases:
+    tweeviz-ui-${ENV}:
+      chart: mirantis/tweeviz_ui
+      cluster: aws
+      wait: true
+      dependencies:
+        tweeviz_api: tweeviz-api-${ENV}
+      parameters:
+        image:
+          repository: mirademo/
+          tag: v${VERSION}
+
+    tweeviz-api-${ENV}:
+      chart: mirantis/tweeviz_api
+      cluster: gke
+      wait: true
+      dependencies:
+        hdfs: hdfs-${ENV}
+
+    tweepub-${ENV}:
+      chart: mirantis/tweepub
+      cluster: gke
+      dependencies:
+        kafka: kafka-${ENV}
+      parameters:
+        twitter:
+          appKey: CHANGEME
+          appSecret: CHANGEME
+          tokenKey: CHANGEME
+          tokenSecret: CHANGEME
+
+          locations: -71.4415,41.9860,-70.4747,42.9041,-122.75,36.8,-121.75,37.8,-74,40,-73,41
+
+    tweetics-${ENV}:
+      chart: mirantis/tweetics
+      cluster: gke
+      dependencies:
+        zookeeper: zookeeper-${ENV}
+        kafka: kafka-${ENV}
+        spark: spark-${ENV}
+        hdfs: hdfs-${ENV}
+
+    spark-${ENV}:
+      chart: mirantis/spark
+      cluster: gke
+      dependencies:
+        zookeeper: zookeeper-${ENV}
+
+    kafka-${ENV}:
+      chart: mirantis/kafka
+      cluster: gke
+      dependencies:
+        zookeeper: zookeeper-${ENV}
+      parameters:
+        replicas: 3
+
+    zookeeper-${ENV}:
+      chart: mirantis/zookeeper
+      cluster: gke
+
+    hdfs-${ENV}:
+      chart: mirantis/hdfs
+      cluster: gke
+
+
+# Docker account credentials that will be used during docker login
+docker:
+  user: mirademo
+  password: CHANGEME
+
+spinnaker:
+  providers:
+    docker:
+      accounts:
+      - name: dockerhub
+        address: https://index.docker.io
+        repositories:
+          - kshatrix/rollout-jenkins-slave
+
+  jenkins:
+    Master:
+      InstallPlugins:
+      - kubernetes:0.11
+      - workflow-aggregator:2.5
+      - workflow-job:2.17
+      - credentials-binding:1.14
+      - git:3.7.0
+      - gerrit-trigger:2.27.3
+    Agent:
+      Cpu: "400m"
+      Memory: "512Mi"
+      image:
+        repository: kshatrix/
+        name: rollout-jenkins-slave
+        tag: latest

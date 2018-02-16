@@ -1,0 +1,7 @@
+dependencies:
+- name: spinnaker
+  version: ^3.x
+  repository: https://mirantisworkloads.storage.googleapis.com/
+- name: gerrit
+  version: ^0.x
+  repository: https://mirantisworkloads.storage.googleapis.com/

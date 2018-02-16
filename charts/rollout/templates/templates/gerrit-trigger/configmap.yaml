@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "rollout.fullname" . }}-trigger
+data:
+  gerrit-trigger.xml: |
+    <?xml version='1.0' encoding='UTF-8'?>
+    <com.sonyericsson.hudson.plugins.gerrit.trigger.PluginImpl plugin="gerrit-trigger@2.27.3">
+      <servers class="java.util.concurrent.CopyOnWriteArrayList">
+        <com.sonyericsson.hudson.plugins.gerrit.trigger.GerritServer>
+          <name>admin</name>
+          <noConnectionOnStartup>false</noConnectionOnStartup>
+          <config class="com.sonyericsson.hudson.plugins.gerrit.trigger.config.Config">
+            <gerritHostName>{{ template "gerrit.fullname" . }}</gerritHostName>
+            <gerritSshPort>29418</gerritSshPort>
+            <gerritProxy></gerritProxy>
+            <gerritUserName>admin</gerritUserName>
+            <gerritEMail>admin@example.com</gerritEMail>
+            <gerritAuthKeyFile>/var/jenkins_home/id_rsa</gerritAuthKeyFile>
+            <gerritAuthKeyFilePassword></gerritAuthKeyFilePassword>
+            <useRestApi>false</useRestApi>
+            <gerritHttpUserName>admin</gerritHttpUserName>
+            <gerritHttpPassword>{AQAAABAAAABwCWdIlipMvzWhs31sCSY6DLnKnhSt8jcDjk8BzDKueTtpcNsE4Y9fPOuW4ROXuZ1gLD7gNCpmwVEsZgv2UtVnjOfHStIwkN4KuO3OXEwLKBybrnvaKqe/gqumbn/WoiM6tggAHaUVVyGPkea5CTR6gbfVYUlpx/P7G1c+P/IYKM0=}</gerritHttpPassword>
+            <restCodeReview>true</restCodeReview>
+            <restVerified>true</restVerified>
+            <gerritVerifiedCmdBuildSuccessful>gerrit review &lt;CHANGE&gt;,&lt;PATCHSET&gt; --message &apos;Build Successful &lt;BUILDS_STATS&gt;&apos; --verified &lt;VERIFIED&gt; --code-review &lt;CODE_REVIEW&gt;</gerritVerifiedCmdBuildSuccessful>
+            <gerritVerifiedCmdBuildUnstable>gerrit review &lt;CHANGE&gt;,&lt;PATCHSET&gt; --message &apos;Build Unstable &lt;BUILDS_STATS&gt;&apos; --verified &lt;VERIFIED&gt; --code-review &lt;CODE_REVIEW&gt;</gerritVerifiedCmdBuildUnstable>
+            <gerritVerifiedCmdBuildFailed>gerrit review &lt;CHANGE&gt;,&lt;PATCHSET&gt; --message &apos;Build Failed &lt;BUILDS_STATS&gt;&apos; --verified &lt;VERIFIED&gt; --code-review &lt;CODE_REVIEW&gt;</gerritVerifiedCmdBuildFailed>
+            <gerritVerifiedCmdBuildStarted>gerrit review &lt;CHANGE&gt;,&lt;PATCHSET&gt; --message &apos;Build Started &lt;BUILDURL&gt; &lt;STARTED_STATS&gt;&apos; --verified &lt;VERIFIED&gt; --code-review &lt;CODE_REVIEW&gt;</gerritVerifiedCmdBuildStarted>
+            <gerritVerifiedCmdBuildNotBuilt>gerrit review &lt;CHANGE&gt;,&lt;PATCHSET&gt; --message &apos;No Builds Executed &lt;BUILDS_STATS&gt;&apos; --verified &lt;VERIFIED&gt; --code-review &lt;CODE_REVIEW&gt;</gerritVerifiedCmdBuildNotBuilt>
+            <gerritFrontEndUrl>http://{{ template "gerrit.fullname" . }}:{{ .Values.gerrit.service.rest.port }}/</gerritFrontEndUrl>
+            <gerritBuildStartedVerifiedValue>0</gerritBuildStartedVerifiedValue>
+            <gerritBuildSuccessfulVerifiedValue>1</gerritBuildSuccessfulVerifiedValue>
+            <gerritBuildFailedVerifiedValue>-1</gerritBuildFailedVerifiedValue>
+            <gerritBuildUnstableVerifiedValue>0</gerritBuildUnstableVerifiedValue>
+            <gerritBuildNotBuiltVerifiedValue>0</gerritBuildNotBuiltVerifiedValue>
+            <gerritBuildStartedCodeReviewValue>0</gerritBuildStartedCodeReviewValue>
+            <gerritBuildSuccessfulCodeReviewValue>0</gerritBuildSuccessfulCodeReviewValue>
+            <gerritBuildFailedCodeReviewValue>0</gerritBuildFailedCodeReviewValue>
+            <gerritBuildUnstableCodeReviewValue>-1</gerritBuildUnstableCodeReviewValue>
+            <gerritBuildNotBuiltCodeReviewValue>0</gerritBuildNotBuiltCodeReviewValue>
+            <enableManualTrigger>true</enableManualTrigger>
+            <enablePluginMessages>true</enablePluginMessages>
+            <buildScheduleDelay>3</buildScheduleDelay>
+            <dynamicConfigRefreshInterval>30</dynamicConfigRefreshInterval>
+            <enableProjectAutoCompletion>true</enableProjectAutoCompletion>
+            <projectListRefreshInterval>3600</projectListRefreshInterval>
+            <projectListFetchDelay>0</projectListFetchDelay>
+            <categories class="linked-list">
+              <com.sonyericsson.hudson.plugins.gerrit.trigger.VerdictCategory>
+                <verdictValue>Code-Review</verdictValue>
+                <verdictDescription>Code Review</verdictDescription>
+              </com.sonyericsson.hudson.plugins.gerrit.trigger.VerdictCategory>
+              <com.sonyericsson.hudson.plugins.gerrit.trigger.VerdictCategory>
+                <verdictValue>Verified</verdictValue>
+                <verdictDescription>Verified</verdictDescription>
+              </com.sonyericsson.hudson.plugins.gerrit.trigger.VerdictCategory>
+            </categories>
+            <replicationConfig>
+              <enableReplication>false</enableReplication>
+              <slaves class="linked-list"/>
+              <enableSlaveSelectionInJobs>false</enableSlaveSelectionInJobs>
+            </replicationConfig>
+            <watchdogTimeoutMinutes>0</watchdogTimeoutMinutes>
+            <watchTimeExceptionData>
+              <daysOfWeek/>
+              <timesOfDay class="linked-list"/>
+            </watchTimeExceptionData>
+            <notificationLevel>ALL</notificationLevel>
+            <buildCurrentPatchesOnly>
+              <enabled>false</enabled>
+              <abortNewPatchsets>false</abortNewPatchsets>
+              <abortManualPatchsets>false</abortManualPatchsets>
+              <abortSameTopic>false</abortSameTopic>
+            </buildCurrentPatchesOnly>
+          </config>
+        </com.sonyericsson.hudson.plugins.gerrit.trigger.GerritServer>
+      </servers>
+      <pluginConfig>
+        <numberOfReceivingWorkerThreads>3</numberOfReceivingWorkerThreads>
+        <numberOfSendingWorkerThreads>1</numberOfSendingWorkerThreads>
+        <replicationCacheExpirationInMinutes>360</replicationCacheExpirationInMinutes>
+      </pluginConfig>
+    </com.sonyericsson.hudson.plugins.gerrit.trigger.PluginImpl>

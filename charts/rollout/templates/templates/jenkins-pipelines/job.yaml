@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "rollout.fullname" . }}-jenkins
+  labels:
+    app: {{ template "rollout.fullname" . }}-jenkins
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-weight": "1"
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ template "rollout.fullname" . }}-jenkins
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: app
+        image: "kshatrix/rollout-jenkins-slave"
+        command:
+        - "sh"
+        - "-cxe"
+        - |
+          JENKINS_POD=$(kubectl get pods -l app={{ template "jenkins.master-fullname" . }} | grep jenkins | awk '{print $1}')
+          kubectl exec $JENKINS_POD -- bash -c "mkdir -p /var/jenkins_home/jobs/{tweeviz-ui-unit-tests,tweeviz-ui-integration-tests,tweeviz-ui-trigger,tweeviz-ui-build-image}"
+          {{- range $i, $name := tuple "tweeviz-ui-unit-tests" "tweeviz-ui-integration-tests" "tweeviz-ui-trigger" "tweeviz-ui-build-image" }}
+          cp /tmp/config/{{ $name }} /tmp/config.xml && kubectl cp /tmp/config.xml $JENKINS_POD:/var/jenkins_home/jobs/{{ $name }}/
+          {{- end }}
+        volumeMounts:
+        - mountPath: /tmp/config
+          name: config
+      volumes:
+      - name: config
+        configMap:
+          name: {{ template "rollout.fullname" . }}-jenkins
