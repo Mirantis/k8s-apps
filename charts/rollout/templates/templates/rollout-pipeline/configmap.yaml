@@ -71,10 +71,10 @@ data:
               ],
               "imageDescription": {
                 "account": "dockerhub",
-                "imageId": "index.docker.io/kshatrix/rollout-jenkins-slave:latest",
+                "imageId": "index.docker.io/{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}:{{ .Values.jenkins.Agent.image.tag }}",
                 "registry": "index.docker.io",
-                "repository": "kshatrix/rollout-jenkins-slave",
-                "tag": "latest"
+                "repository": "{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}",
+                "tag": "1.0.0"
               },
               "imagePullPolicy": "ALWAYS",
               "limits": {},
@@ -221,10 +221,10 @@ data:
               ],
               "imageDescription": {
                 "account": "dockerhub",
-                "imageId": "index.docker.io/kshatrix/rollout-jenkins-slave:latest",
+                "imageId": "index.docker.io/{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}:{{ .Values.jenkins.Agent.image.tag }}",
                 "registry": "index.docker.io",
-                "repository": "kshatrix/rollout-jenkins-slave",
-                "tag": "latest"
+                "repository": "{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}",
+                "tag": "1.0.0"
               },
               "imagePullPolicy": "ALWAYS",
               "limits": {},
@@ -330,10 +330,10 @@ data:
               "envVars": [],
               "imageDescription": {
                 "account": "dockerhub",
-                "imageId": "index.docker.io/kshatrix/rollout-jenkins-slave:latest",
+                "imageId": "index.docker.io/{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}:{{ .Values.jenkins.Agent.image.tag }}",
                 "registry": "index.docker.io",
-                "repository": "kshatrix/rollout-jenkins-slave",
-                "tag": "latest"
+                "repository": "{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}",
+                "tag": "1.0.0"
               },
               "imagePullPolicy": "ALWAYS",
               "limits": {},
@@ -409,10 +409,10 @@ data:
               "envVars": [],
               "imageDescription": {
                 "account": "dockerhub",
-                "imageId": "index.docker.io/kshatrix/rollout-jenkins-slave:latest",
+                "imageId": "index.docker.io/{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}:{{ .Values.jenkins.Agent.image.tag }}",
                 "registry": "index.docker.io",
-                "repository": "kshatrix/rollout-jenkins-slave",
-                "tag": "latest"
+                "repository": "{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}",
+                "tag": "1.0.0"
               },
               "imagePullPolicy": "ALWAYS",
               "limits": {},
@@ -456,10 +456,10 @@ data:
               "envVars": [],
               "imageDescription": {
                 "account": "dockerhub",
-                "imageId": "index.docker.io/kshatrix/rollout-jenkins-slave:latest",
+                "imageId": "index.docker.io/{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}:{{ .Values.jenkins.Agent.image.tag }}",
                 "registry": "index.docker.io",
-                "repository": "kshatrix/rollout-jenkins-slave",
-                "tag": "latest"
+                "repository": "{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}",
+                "tag": "1.0.0"
               },
               "imagePullPolicy": "ALWAYS",
               "limits": {},
@@ -503,10 +503,10 @@ data:
               "envVars": [],
               "imageDescription": {
                 "account": "dockerhub",
-                "imageId": "index.docker.io/kshatrix/rollout-jenkins-slave:latest",
+                "imageId": "index.docker.io/{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}:{{ .Values.jenkins.Agent.image.tag }}",
                 "registry": "index.docker.io",
-                "repository": "kshatrix/rollout-jenkins-slave",
-                "tag": "latest"
+                "repository": "{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}",
+                "tag": "1.0.0"
               },
               "imagePullPolicy": "ALWAYS",
               "limits": {},

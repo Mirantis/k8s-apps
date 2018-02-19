@@ -135,7 +135,7 @@ spinnaker:
       - name: dockerhub
         address: https://index.docker.io
         repositories:
-          - kshatrix/rollout-jenkins-slave
+          - mirantisworkloads/rollout-jenkins-slave
 
   jenkins:
     Master:
@@ -150,6 +150,6 @@ spinnaker:
       Cpu: "400m"
       Memory: "512Mi"
       image:
-        repository: kshatrix/
+        repository: mirantisworkloads/
         name: rollout-jenkins-slave
-        tag: latest
+        tag: 1.0.0
