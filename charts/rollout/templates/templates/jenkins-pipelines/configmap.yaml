@@ -205,8 +205,8 @@ data:
 
     set -ex
     docker login -u {{ .Values.docker.user }} -p {{ .Values.docker.password }}
-    docker build --network host -t {{ .Values.docker.repository }}/tweeviz-ui:v${VERSION} .
-    docker push {{ .Values.docker.repository }}/tweeviz-ui:v${VERSION}
+    docker build --network host -t {{ .Values.docker.repository }}/tweeviz-ui:${VERSION} .
+    docker push {{ .Values.docker.repository }}/tweeviz-ui:${VERSION}
     docker logout
     echo &quot;success&quot;</command>
         </hudson.tasks.Shell>
