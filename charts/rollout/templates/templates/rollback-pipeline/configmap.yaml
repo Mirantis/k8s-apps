@@ -37,7 +37,7 @@ data:
                 },
                 {
                   "name": "VERSION",
-                  "value": "1.0"
+                  "value": "{{ .Values.docker.stableTag }}"
                 }
               ],
               "imageDescription": {

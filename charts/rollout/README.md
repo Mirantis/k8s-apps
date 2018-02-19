@@ -24,14 +24,14 @@ be launched on a single cluster if desired.
         tokenSecret: CHANGEME
         ```
 
-    * Configure docker repository:
+    * Configure docker repository and credentials:
 
-      Set credentials that will be used for docker login:
       ```yaml
       docker:
         user: CHANGEME
         password: CHANGEME
         repository: CHANGEME
+        stableTag: CHANGEME
       ```
 
       Set repository for tweeviz-ui:

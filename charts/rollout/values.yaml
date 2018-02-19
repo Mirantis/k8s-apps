@@ -120,11 +120,13 @@ helmApplyConfig:
       cluster: gke
 
 
-# Docker account credentials that will be used during docker login
+# Docker repository and credentials
 docker:
   user: CHANGEME
   password: CHANGEME
   repository: CHANGEME
+  # Tag that will be used for rollback
+  stableTag: CHANGEME
 
 spinnaker:
   providers:
