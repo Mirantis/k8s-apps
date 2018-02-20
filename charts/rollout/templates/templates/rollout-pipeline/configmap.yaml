@@ -325,7 +325,7 @@ data:
               "command": [
                 "sh",
                 "-cex",
-                "export KUBECONFIG=/etc/kube/aws && kubectl --context aws delete ns stage && helm --kube-context aws list -q | grep stage | xargs helm --kube-context aws delete --purge  && export KUBECONFIG=/etc/kube/gke && kubectl --context gke delete ns stage && helm --kube-context gke list -q | grep stage | xargs helm --kube-context gke delete --purge"
+                "sleep 10"
               ],
               "envVars": [],
               "imageDescription": {
