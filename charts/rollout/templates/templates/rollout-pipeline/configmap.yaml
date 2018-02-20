@@ -74,7 +74,7 @@ data:
                 "imageId": "index.docker.io/{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}:{{ .Values.spinnaker.jenkins.Agent.image.tag }}",
                 "registry": "index.docker.io",
                 "repository": "{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}",
-                "tag": "1.0.0"
+                "tag": "{{ .Values.spinnaker.jenkins.Agent.image.tag }}"
               },
               "imagePullPolicy": "ALWAYS",
               "limits": {},
@@ -224,7 +224,7 @@ data:
                 "imageId": "index.docker.io/{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}:{{ .Values.spinnaker.jenkins.Agent.image.tag }}",
                 "registry": "index.docker.io",
                 "repository": "{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}",
-                "tag": "1.0.0"
+                "tag": "{{ .Values.spinnaker.jenkins.Agent.image.tag }}"
               },
               "imagePullPolicy": "ALWAYS",
               "limits": {},
@@ -333,7 +333,7 @@ data:
                 "imageId": "index.docker.io/{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}:{{ .Values.spinnaker.jenkins.Agent.image.tag }}",
                 "registry": "index.docker.io",
                 "repository": "{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}",
-                "tag": "1.0.0"
+                "tag": "{{ .Values.spinnaker.jenkins.Agent.image.tag }}"
               },
               "imagePullPolicy": "ALWAYS",
               "limits": {},
@@ -412,7 +412,7 @@ data:
                 "imageId": "index.docker.io/{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}:{{ .Values.spinnaker.jenkins.Agent.image.tag }}",
                 "registry": "index.docker.io",
                 "repository": "{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}",
-                "tag": "1.0.0"
+                "tag": "{{ .Values.spinnaker.jenkins.Agent.image.tag }}"
               },
               "imagePullPolicy": "ALWAYS",
               "limits": {},
@@ -459,7 +459,7 @@ data:
                 "imageId": "index.docker.io/{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}:{{ .Values.spinnaker.jenkins.Agent.image.tag }}",
                 "registry": "index.docker.io",
                 "repository": "{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}",
-                "tag": "1.0.0"
+                "tag": "{{ .Values.spinnaker.jenkins.Agent.image.tag }}"
               },
               "imagePullPolicy": "ALWAYS",
               "limits": {},
@@ -506,7 +506,7 @@ data:
                 "imageId": "index.docker.io/{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}:{{ .Values.spinnaker.jenkins.Agent.image.tag }}",
                 "registry": "index.docker.io",
                 "repository": "{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}",
-                "tag": "1.0.0"
+                "tag": "{{ .Values.spinnaker.jenkins.Agent.image.tag }}"
               },
               "imagePullPolicy": "ALWAYS",
               "limits": {},
