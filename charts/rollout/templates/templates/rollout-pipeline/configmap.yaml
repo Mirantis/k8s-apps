@@ -71,9 +71,9 @@ data:
               ],
               "imageDescription": {
                 "account": "dockerhub",
-                "imageId": "index.docker.io/{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}:{{ .Values.jenkins.Agent.image.tag }}",
+                "imageId": "index.docker.io/{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}:{{ .Values.spinnaker.jenkins.Agent.image.tag }}",
                 "registry": "index.docker.io",
-                "repository": "{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}",
+                "repository": "{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}",
                 "tag": "1.0.0"
               },
               "imagePullPolicy": "ALWAYS",
@@ -221,9 +221,9 @@ data:
               ],
               "imageDescription": {
                 "account": "dockerhub",
-                "imageId": "index.docker.io/{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}:{{ .Values.jenkins.Agent.image.tag }}",
+                "imageId": "index.docker.io/{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}:{{ .Values.spinnaker.jenkins.Agent.image.tag }}",
                 "registry": "index.docker.io",
-                "repository": "{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}",
+                "repository": "{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}",
                 "tag": "1.0.0"
               },
               "imagePullPolicy": "ALWAYS",
@@ -325,14 +325,14 @@ data:
               "command": [
                 "sh",
                 "-cex",
-                "export KUBECONFIG=/etc/kube/aws && helm --kube-context aws list -q | grep stage | xargs helm --kube-context aws delete --purge  && export KUBECONFIG=/etc/kube/gke && helm --kube-context gke list -q | grep stage | xargs helm --kube-context gke delete --purge"
+                "export KUBECONFIG=/etc/kube/aws && kubectl --context aws delete ns stage && helm --kube-context aws list -q | grep stage | xargs helm --kube-context aws delete --purge  && export KUBECONFIG=/etc/kube/gke && kubectl --context gke delete ns stage && helm --kube-context gke list -q | grep stage | xargs helm --kube-context gke delete --purge"
               ],
               "envVars": [],
               "imageDescription": {
                 "account": "dockerhub",
-                "imageId": "index.docker.io/{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}:{{ .Values.jenkins.Agent.image.tag }}",
+                "imageId": "index.docker.io/{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}:{{ .Values.spinnaker.jenkins.Agent.image.tag }}",
                 "registry": "index.docker.io",
-                "repository": "{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}",
+                "repository": "{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}",
                 "tag": "1.0.0"
               },
               "imagePullPolicy": "ALWAYS",
@@ -409,9 +409,9 @@ data:
               "envVars": [],
               "imageDescription": {
                 "account": "dockerhub",
-                "imageId": "index.docker.io/{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}:{{ .Values.jenkins.Agent.image.tag }}",
+                "imageId": "index.docker.io/{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}:{{ .Values.spinnaker.jenkins.Agent.image.tag }}",
                 "registry": "index.docker.io",
-                "repository": "{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}",
+                "repository": "{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}",
                 "tag": "1.0.0"
               },
               "imagePullPolicy": "ALWAYS",
@@ -456,9 +456,9 @@ data:
               "envVars": [],
               "imageDescription": {
                 "account": "dockerhub",
-                "imageId": "index.docker.io/{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}:{{ .Values.jenkins.Agent.image.tag }}",
+                "imageId": "index.docker.io/{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}:{{ .Values.spinnaker.jenkins.Agent.image.tag }}",
                 "registry": "index.docker.io",
-                "repository": "{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}",
+                "repository": "{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}",
                 "tag": "1.0.0"
               },
               "imagePullPolicy": "ALWAYS",
@@ -503,9 +503,9 @@ data:
               "envVars": [],
               "imageDescription": {
                 "account": "dockerhub",
-                "imageId": "index.docker.io/{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}:{{ .Values.jenkins.Agent.image.tag }}",
+                "imageId": "index.docker.io/{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}:{{ .Values.spinnaker.jenkins.Agent.image.tag }}",
                 "registry": "index.docker.io",
-                "repository": "{{ .Values.jenkins.Agent.image.repository }}{{ .Values.jenkins.Agent.image.name }}",
+                "repository": "{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}",
                 "tag": "1.0.0"
               },
               "imagePullPolicy": "ALWAYS",

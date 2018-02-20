@@ -65,7 +65,7 @@ helmApplyConfig:
       parameters:
         image:
           repository: CHANGEME/
-          tag: v${VERSION}
+          tag: ${VERSION}
 
     tweeviz-api-${ENV}:
       chart: mirantis/tweeviz_api
