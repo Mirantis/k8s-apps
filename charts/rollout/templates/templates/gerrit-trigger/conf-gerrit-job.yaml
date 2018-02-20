@@ -17,7 +17,7 @@ spec:
       restartPolicy: OnFailure
       containers:
       - name: app
-        image: "kshatrix/rollout-jenkins-slave"
+        image: "{{ .Values.spinnaker.jenkins.Agent.image.repository }}{{ .Values.spinnaker.jenkins.Agent.image.name }}:{{ .Values.spinnaker.jenkins.Agent.image.tag }}"
         command:
         - "sh"
         - "-cxe"
