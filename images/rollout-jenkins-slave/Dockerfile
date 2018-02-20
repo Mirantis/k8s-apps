@@ -6,7 +6,7 @@ ARG KUBERNETES_VERSION=v1.8.5
 USER root
 ADD helm-apply /usr/local/bin/
 ADD ssh/* /home/jenkins/.ssh/
-ADD tweeviz-ui/* /tweeviz-ui/
+ADD tweeviz-ui /tweeviz-ui
 
 RUN apt-get update && apt-get install -y jq libltdl7 gettext-base git && \
     apt-get clean && rm -rf /var/lib/apt/lists/* && \
