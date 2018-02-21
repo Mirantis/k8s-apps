@@ -498,7 +498,7 @@ data:
               "command": [
                 "sh",
                 "-cex",
-                "export KUBECONFIG=/etc/kube/aws && NODEPORT=$(kubectl --context aws get svc tweeviz-ui-tweeviz-ui-prod -n prod -o jsonpath=\"{.spec.ports[0].nodePort}\") && for i in {1..55}; do [ \"200\" -eq $(curl --write-out \"%{http_code}\" --silent --output /dev/null http://{{ .Values.helmApplyConfig.clusters.aws.externalIP }}:$NODEPORT) ] || exit 1; sleep 5; done"
+                "export KUBECONFIG=/etc/kube/aws && NODEPORT=$(kubectl --context aws get svc tweeviz-ui-tweeviz-ui-prod -n prod -o jsonpath=\"{.spec.ports[0].nodePort}\") && for i in $(seq 1 55); do [ \"200\" -eq $(curl --write-out \"%{http_code}\" --silent --output /dev/null http://{{ .Values.helmApplyConfig.clusters.aws.externalIP }}:$NODEPORT) ] || exit 1; sleep 5; done"
               ],
               "envVars": [],
               "imageDescription": {
