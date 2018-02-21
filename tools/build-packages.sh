@@ -14,11 +14,13 @@ REPO_URL="https://${org}.storage.googleapis.com"
 repo_dir="$(dirname "$(dirname "${PWD}/$0")")"
 
 # build dependencies
-for d in ${repo_dir}/charts/*/; do
-    pushd "${d}"
-    rm -fr ./charts
-    $HELM_CMD dep up
-    popd
+for i in {1..3}; do
+    for d in ${repo_dir}/charts/*/; do
+        pushd "${d}"
+        rm -fr ./charts
+        $HELM_CMD dep up
+        popd
+    done
 done
 
 # build packages
