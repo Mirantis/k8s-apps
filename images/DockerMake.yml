@@ -1,0 +1,303 @@
+# vim: sts=2 ts=2 sw=2 ft=yaml
+
+## Don't update /images/**/Dockerfiles unless strictly needed. If possible move whole logic in this file.
+
+# SHARED
+base:
+  ignore: |
+    *~
+    *.pyc
+    *.tmp
+  build: |
+    MAINTAINER "k8s-apps@mirantis.com"
+    ENV LANG C.UTF-8
+    ENV LANGUAGE $LANG
+    ENV TZ Etc/UTC
+
+## GUIDE
+# - complex Dockerfiles link with FROM_DOCKERFILE especially if they are provided with the upstream chart.
+# - local modifications and inhouse builds, modify this file directly
+
+## List of common "shared" images with tools
+#
+busybox:
+  FROM: busybox
+
+curl:
+  FROM: appropriate/curl
+
+netcat:
+  FROM: multicloud/netcat
+
+docker-git-alpine:
+  FROM: bwits/docker-git-alpine
+
+ngingx-auth-ldap:
+  FROM: dweomer/nginx-auth-ldap:1.13.5-on-alpine-3.5
+
+
+## List of app images from external repos
+#
+akka-cluster:
+  FROM_DOCKERFILE: akka-cluster/Dockerfile
+
+akka-ingest:
+  FROM_DOCKERFILE: akka-ingest/Dockerfile
+
+akka-server:
+  FROM_DOCKERFILE: akka-server/Dockerfile
+
+alertmanager:
+  FROM_DOCKERFILE: alertmanager/Dockerfile
+
+autoscale:
+  FROM_DOCKERFILE: autoscale/Dockerfile
+
+cassandra:
+  FROM_DOCKERFILE: cassandra/Dockerfile
+
+clair:
+  FROM_DOCKERFILE: clair/Dockerfile
+
+configmap-reload:
+  FROM_DOCKERFILE: configmap-reload/Dockerfile
+
+# DEPRECATED, see elasticsearch-curator
+# curator:
+#   FROM_DOCKERFILE: curator/Dockerfile
+
+elasticsearch:
+  FROM_DOCKERFILE: elasticsearch/Dockerfile
+
+elasticsearch-exporter:
+  FROM_DOCKERFILE: elasticsearch_exporter/Dockerfile
+
+elasticsearch-curator:
+  FROM: bobrik/curator:5.4.0
+
+elasticsearch-oss:
+  FROM: docker.elastic.co/elasticsearch/elasticsearch-oss:6.1.1
+
+grafana:
+  FROM: grafana/grafana:4.6.3
+
+graphite-statsd:
+  FROM: graphiteapp/graphite-statsd:1.0.2-2
+
+etcd-amd64:
+  FROM_DOCKERFILE: etcd-amd64/Dockerfile
+
+filebeat:
+  FROM_DOCKERFILE: filebeat/Dockerfile
+
+fission:
+  FROM_DOCKERFILE: fission/Dockerfile
+
+fission-ui:
+  FROM_DOCKERFILE: fission-ui/Dockerfile
+
+fluentd:
+  FROM: alpine:3.5
+  requires:
+  - base
+  build: |
+    ARG FLUENTD_VERSION="1.0.0"
+    ENV FLUENTD_VERSION $FLUENTD_VERSION
+    LABEL Description="Fluentd docker image" Vendor="Mirantis" Version="$FLUENTD_VERSION"
+    # Do not split this into multiple RUN!
+    # Docker creates a layer for every RUN-Statement
+    # therefore an 'apk delete' has no effect
+    RUN apk update \
+     && apk upgrade \
+     && apk add --no-cache \
+        ca-certificates \
+        ruby ruby-irb \
+     && apk add --no-cache --virtual .build-deps \
+        build-base \
+        ruby-dev wget gnupg \
+     && update-ca-certificates \
+     && echo 'gem: --no-document' >> /etc/gemrc \
+     && gem install oj -v 2.18.3 \
+     && gem install json -v 2.1.0 \
+     && gem install fluentd --no-ri --no-rdoc -v $FLUENTD_VERSION \
+     && gem install fluent-plugin-elasticsearch --no-ri --no-rdoc -v 2.1.1 \
+     && gem install fluent-plugin-influxdb --no-ri --no-rdoc -v 1.0.0 \
+     && gem install fluent-plugin-mail --no-ri --no-rdoc \
+     && gem install fluent-plugin-multiprocess --no-ri --no-rdoc \
+     && gem install fluent-plugin-record-modifier --no-ri --no-rdoc -v '>= 1.0.0.rc1' \
+     && gem install fluent-plugin-filter_typecast --no-ri --no-rdoc \
+     && gem install fluent-plugin-remote_syslog --no-ri --no-rdoc \
+     && apk del .build-deps \
+     && rm -rf /var/cache/apk/* \
+     && rm -rf /tmp/* /var/tmp/* /usr/lib/ruby/gems/*/cache/*.gem
+
+gerrit:
+  FROM_DOCKERFILE: gerrit/Dockerfile
+
+hadoop:
+  FROM_DOCKERFILE: hadoop/Dockerfile
+
+hadoop-datanode:
+  FROM_DOCKERFILE: hadoop-datanode/Dockerfile
+
+hadoop-namenode:
+  FROM_DOCKERFILE: hadoop-namenode/Dockerfile
+
+iot-gen:
+  FROM_DOCKERFILE: iot-gen/Dockerfile
+
+jenkins:
+  FROM_DOCKERFILE: jenkins/Dockerfile
+
+jenkins-demo-slave:
+  FROM_DOCKERFILE: jenkins-demo-slave/Dockerfile
+
+jenkins-jnlp-slave:
+  FROM_DOCKERFILE: jenkins-jnlp-slave/Dockerfile
+
+kafka:
+  FROM_DOCKERFILE: kafka/Dockerfile
+
+kibana:
+  FROM_DOCKERFILE: kibana/Dockerfile
+
+kibana-oss:
+  FROM: docker.elastic.co/kibana/kibana-oss:6.1.1
+
+kubernetes-rabbitmq-autocluster:
+  FROM_DOCKERFILE: kubernetes-rabbitmq-autocluster/Dockerfile
+
+kube-state-metrics:
+  FROM_DOCKERFILE: kube-state-metrics/Dockerfile
+
+influxdb:
+  FROM: influxdb:1.3.4
+
+logstash:
+  FROM_DOCKERFILE: logstash/Dockerfile
+
+mariadb:
+  FROM_DOCKERFILE: mariadb/Dockerfile
+
+minio:
+  FROM_DOCKERFILE: minio/Dockerfile
+
+minio-mc:
+  FROM_DOCKERFILE: minio-mc/Dockerfile
+
+mongodb:
+  FROM_DOCKERFILE: mongodb/Dockerfile
+
+mongodb-prometheus-exporter:
+  FROM_DOCKERFILE: mongodb-prometheus-exporter/Dockerfile
+
+monocular-api:
+  FROM_DOCKERFILE: monocular-api/Dockerfile
+
+monocular-ui:
+  FROM_DOCKERFILE: monocular-ui/Dockerfile
+
+mysqld-exporter:
+  FROM_DOCKERFILE: mysqld-exporter/Dockerfile
+
+node-exporter:
+  FROM_DOCKERFILE: node-exporter/Dockerfile
+
+postgres:
+  FROM_DOCKERFILE: postgres/Dockerfile
+
+postgres_exporter:
+  FROM_DOCKERFILE: postgres_exporter/Dockerfile
+
+prerender:
+  FROM_DOCKERFILE: prerender/Dockerfile
+
+prometheus:
+  FROM_DOCKERFILE: prometheus/Dockerfile
+
+rabbitmq-autocluster:
+  FROM_DOCKERFILE: rabbitmq-autocluster/Dockerfile
+
+rabbitmq-exporter:
+  FROM_DOCKERFILE: rabbitmq-exporter/Dockerfile
+
+redis:
+  FROM_DOCKERFILE: redis/Dockerfile
+
+redis_exporter:
+  FROM_DOCKERFILE: redis_exporter/Dockerfile
+
+rollout-jenkins-slave:
+  FROM_DOCKERFILE: rollout-jenkins-slave/Dockerfile
+
+rollout-jenkins-slave:
+  FROM_DOCKERFILE: rollout-jenkins-slave/tweeviz-ui
+
+spark:
+  FROM_DOCKERFILE: spark/Dockerfile
+
+spinnaker-clouddriver:
+  FROM_DOCKERFILE: spinnaker-clouddriver/Dockerfile
+
+spinnaker-deck:
+  FROM_DOCKERFILE: spinnaker-deck/Dockerfile
+
+spinnaker-echo:
+  FROM_DOCKERFILE: spinnaker-echo/Dockerfile
+
+spinnaker-front50:
+  FROM_DOCKERFILE: spinnaker-front50/Dockerfile
+
+spinnaker-gate:
+  FROM_DOCKERFILE: spinnaker-gate/Dockerfile
+
+spinnaker-igor:
+  FROM_DOCKERFILE: spinnaker-igor/Dockerfile
+
+spinnaker-jenkins-agent:
+  FROM_DOCKERFILE: spinnaker-jenkins-agent/Dockerfile
+
+spinnaker-orca:
+  FROM_DOCKERFILE: spinnaker-orca/Dockerfile
+
+spinnaker-rosco:
+  FROM_DOCKERFILE: spinnaker-rosco/Dockerfile
+
+test-base:
+  FROM_DOCKERFILE: test-base/Dockerfile
+
+tweepub:
+  FROM_DOCKERFILE: tweepub/Dockerfile
+
+tweepub-fake:
+  FROM_DOCKERFILE: tweepub-fake/Dockerfile
+
+tweetics:
+  FROM_DOCKERFILE: tweetics/Dockerfile
+
+tweeviz-api:
+  FROM_DOCKERFILE: tweeviz-api/Dockerfile
+
+tweeviz:
+  FROM_DOCKERFILE: tweeviz/Dockerfile
+
+tweeviz-ui:
+  FROM_DOCKERFILE: tweeviz-ui/Dockerfile
+
+vernemq:
+  FROM_DOCKERFILE: vernemq/Dockerfile
+
+zeppelin:
+  FROM_DOCKERFILE: zeppelin/Dockerfile
+
+wheelhouse:
+  FROM: epcim/salt-formulas:wheelhouse-debian-stretch-salt-stable-formula-stable
+
+zipkin-dependencies:
+  FROM_DOCKERFILE: zipkin-dependencies/Dockerfile
+
+zipkin:
+  FROM_DOCKERFILE: zipkin/Dockerfile
+
+zookeeper:
+  FROM_DOCKERFILE: zookeeper/Dockerfile
