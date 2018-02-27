@@ -61,14 +61,14 @@ mail:
 
 # Images for each component
 images:
-  clouddriver: mirantisworkloads/spinnaker-clouddriver:v1.734.0
-  echo: mirantisworkloads/spinnaker-echo:release-1.5.x
-  deck: mirantisworkloads/spinnaker-deck:v2.1158.0
-  igor: mirantisworkloads/spinnaker-igor:release-1.5.x
-  orca: mirantisworkloads/spinnaker-orca:release-1.5.x
-  gate: mirantisworkloads/spinnaker-gate:release-1.5.x
-  front50: mirantisworkloads/spinnaker-front50:release-1.5.x
-  rosco: mirantisworkloads/spinnaker-rosco:release-1.5.x
+  clouddriver: mirantisworkloads/spinnaker-clouddriver:release-1.6.x
+  echo: mirantisworkloads/spinnaker-echo:release-1.6.x
+  deck: mirantisworkloads/spinnaker-deck:release-1.6.x
+  igor: mirantisworkloads/spinnaker-igor:release-1.6.x
+  orca: mirantisworkloads/spinnaker-orca:release-1.6.x
+  gate: mirantisworkloads/spinnaker-gate:release-1.6.x
+  front50: mirantisworkloads/spinnaker-front50:release-1.6.x
+  rosco: mirantisworkloads/spinnaker-rosco:release-1.6.x
   mc: mirantisworkloads/minio-mc:RELEASE.2017-06-15T03-38-43Z
 
 gate:

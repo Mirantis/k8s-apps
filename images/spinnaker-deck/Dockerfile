@@ -1,1 +1,1 @@
-FROM quay.io/spinnaker/deck:v2.1158.0
+FROM quay.io/spinnaker/deck:release-1.6.x

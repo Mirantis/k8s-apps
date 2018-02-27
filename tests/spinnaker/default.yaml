@@ -1,12 +1,12 @@
 images:
-  clouddriver: {{ .Repository }}spinnaker-clouddriver:v1.734.0
-  echo: {{ .Repository }}spinnaker-echo:release-1.5.x
-  deck: {{ .Repository }}spinnaker-deck:v2.1158.0
-  igor: {{ .Repository }}spinnaker-igor:release-1.5.x
-  orca: {{ .Repository }}spinnaker-orca:release-1.5.x
-  gate: {{ .Repository }}spinnaker-gate:release-1.5.x
-  front50: {{ .Repository }}spinnaker-front50:release-1.5.x
-  rosco: {{ .Repository }}spinnaker-rosco:release-1.5.x
+  clouddriver: {{ .Repository }}spinnaker-clouddriver:release-1.6.x
+  echo: {{ .Repository }}spinnaker-echo:release-1.6.x
+  deck: {{ .Repository }}spinnaker-deck:release-1.6.x
+  igor: {{ .Repository }}spinnaker-igor:release-1.6.x
+  orca: {{ .Repository }}spinnaker-orca:release-1.6.x
+  gate: {{ .Repository }}spinnaker-gate:release-1.6.x
+  front50: {{ .Repository }}spinnaker-front50:release-1.6.x
+  rosco: {{ .Repository }}spinnaker-rosco:release-1.6.x
   mc: {{ .Repository }}minio-mc:RELEASE.2017-06-15T03-38-43Z
 redis:
   image:

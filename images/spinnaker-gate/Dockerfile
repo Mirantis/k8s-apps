@@ -1,1 +1,1 @@
-FROM quay.io/spinnaker/gate:release-1.5.x
+FROM quay.io/spinnaker/gate:release-1.6.x

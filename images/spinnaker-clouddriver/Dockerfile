@@ -1,1 +1,1 @@
-FROM quay.io/spinnaker/clouddriver:v1.734.0
+FROM quay.io/spinnaker/clouddriver:release-1.6.x
