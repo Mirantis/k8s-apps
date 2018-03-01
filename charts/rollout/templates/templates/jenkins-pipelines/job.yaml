@@ -14,6 +14,7 @@ spec:
       labels:
         app: {{ template "rollout.fullname" . }}-jenkins
     spec:
+      serviceAccountName: {{ template "rollout.fullname" . }}
       restartPolicy: OnFailure
       containers:
       - name: app

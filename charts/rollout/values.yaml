@@ -1,3 +1,6 @@
+rbac:
+  enabled: false
+
 kubeConfigs:
   aws: |
     apiVersion: v1
