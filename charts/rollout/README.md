@@ -55,6 +55,18 @@ be launched on a single cluster if desired.
     * You should define proper `externalIP` for both `clusters` under `helmApplyConfig`
       group.
 
+    * If your cluster has RBAC enabled, the following should be added:
+      ```yaml
+      rbac:
+        enabled: true
+
+      spinnaker:
+        rbac:
+          enabled: true
+        jenkins:
+          rbac:
+            enabled: true
+      ```
     * You can optionally expose whatever services you want. They will have
       `NodePort` type by default. For more details about spinnaker and
       gerrit configuration please refer to their charts.
