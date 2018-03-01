@@ -21,7 +21,7 @@ def index():
         requests_counter.value += 1
 
 #    if requests_counter.value > 50:
-#        abort(500)
+#        flask.abort(500)
 
     return flask.render_template('index.html', tweeviz_api=tweeviz_api,
                                  header=header)
