@@ -23,8 +23,8 @@ To get the Spark URL to visit by running these commands in the same shell:
     echo http://$NODE_IP:$SPARK_NODE_PORT
 {{- else if contains "LoadBalancer" .Values.service.type -}}
 NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-You can watch the status of it by running in the same shell 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "master-fullname" . }} {{ template "zeppelin-fullname" . }}'
-    export SPARK_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "master-fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+You can watch the status of it by running in the same shell 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ template "master-fullname" . }}-0
+    export SPARK_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "master-fullname" . }}-0 -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
     echo http://$SPARK_IP:{{ .Values.spark.master.webuiPort }}
 {{- end -}}
 {{- end -}}
