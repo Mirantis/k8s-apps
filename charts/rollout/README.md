@@ -39,7 +39,7 @@ be launched on a single cluster if desired.
       releases:
           tweeviz-ui-${ENV}:
             chart: mirantis/tweeviz_ui
-            cluster: aws
+            cluster: frontend
             wait: true
             dependencies:
               tweeviz_api: tweeviz-api-${ENV}
@@ -49,8 +49,8 @@ be launched on a single cluster if desired.
                 tag: v${VERSION}
       ```
 
-    * It's mandatory to have `aws` and `gke` files under `kubeConfigs` parameter.
-      And it's also mandatory to have `aws` and `gke` contexts defined inside of them.
+    * It's mandatory to have `frontend` and `backend` files under `kubeConfigs` parameter.
+      And it's also mandatory to have `frontend` and `backend` contexts defined inside of them.
 
     * You should define proper `externalIP` for both `clusters` under `helmApplyConfig`
       group.
