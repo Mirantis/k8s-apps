@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "rollout.fullname" . }}-cleanup
+  labels:
+    app: {{ template "rollout.fullname" . }}-cleanup
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-weight": "1"
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ template "rollout.fullname" . }}-cleanup
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: app
+        image: "appropriate/curl"
+        command:
+        - curl
+        - -f
+        - -m
+        - "10"
+        - -d@/tmp/body/cleanup.json
+        - -X
+        - POST
+        - --header
+        - "Content-Type: application/json"
+        - --header
+        - "Accept: application/json"
+        - http://{{ template "rollout.gate-address" . }}/pipelines
+        volumeMounts:
+        - mountPath: /tmp/body
+          name: pipeline
+      volumes:
+      - name: pipeline
+        configMap:
+          name: {{ template "rollout.fullname" . }}-cleanup
