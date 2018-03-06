@@ -24,12 +24,12 @@ data:
               "command": [
                 "sh",
                 "-cx",
-                "kubectl --context aws delete ns stage ; helm --kube-context aws list -q | grep stage | xargs helm --kube-context aws delete --purge  ; kubectl --context gke delete ns stage ; helm --kube-context gke list -q | grep stage | xargs helm --kube-context gke delete --purge ; true"
+                "kubectl --context frontend delete ns stage ; helm --kube-context frontend list -q | grep stage | xargs helm --kube-context frontend delete --purge  ; kubectl --context backend delete ns stage ; helm --kube-context backend list -q | grep stage | xargs helm --kube-context backend delete --purge ; true"
               ],
               "envVars": [
                 {
                   "name": "KUBECONFIG",
-                  "value": "/etc/kube/aws:/etc/kube/gke"
+                  "value": "/etc/kube/frontend:/etc/kube/backend"
                 }
               ],
               "imageDescription": {
@@ -106,12 +106,12 @@ data:
               "command": [
                 "sh",
                 "-cx",
-                "kubectl --context aws delete ns prod ; helm --kube-context aws list -q | grep prod | xargs helm --kube-context aws delete --purge  ; kubectl --context gke delete ns prod ; helm --kube-context gke list -q | grep prod | xargs helm --kube-context gke delete --purge ; true"
+                "kubectl --context frontend delete ns prod ; helm --kube-context frontend list -q | grep prod | xargs helm --kube-context frontend delete --purge  ; kubectl --context backend delete ns prod ; helm --kube-context backend list -q | grep prod | xargs helm --kube-context backend delete --purge ; true"
               ],
               "envVars": [
                 {
                   "name": "KUBECONFIG",
-                  "value": "/etc/kube/aws:/etc/kube/gke"
+                  "value": "/etc/kube/frontend:/etc/kube/backend"
                 }
               ],
               "imageDescription": {

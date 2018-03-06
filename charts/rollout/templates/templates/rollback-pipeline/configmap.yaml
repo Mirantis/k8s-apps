@@ -29,7 +29,7 @@ data:
               "envVars": [
                 {
                   "name": "KUBECONFIG",
-                  "value": "/etc/kube/aws:/etc/kube/gke"
+                  "value": "/etc/kube/frontend:/etc/kube/backend"
                 },
                 {
                   "name": "ENV",
