@@ -4,7 +4,7 @@
 image:
   repository: mirantisworkloads/
   name: tweeviz-ui
-  tag: 0.2.0
+  tag: 0.3.0
   pullPolicy: IfNotPresent
 
 port: 8589
