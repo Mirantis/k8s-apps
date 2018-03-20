@@ -64,8 +64,9 @@ be launched on a single cluster if desired.
         rbac:
           enabled: true
         jenkins:
-          rbac:
-            enabled: true
+          Master:
+            rbac:
+              enabled: true
       ```
     * You can optionally expose whatever services you want. They will have
       `NodePort` type by default. For more details about spinnaker and
