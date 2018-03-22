@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "halyard.fullname" . }}
+  labels:
+    app: {{ template "halyard.fullname" . }}
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+      labels:
+        app: {{ template "halyard.fullname" . }}
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: daemon
+        image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        volumeMounts:
+        {{- range $id, $file := .Values.files }}
+        - mountPath: {{ index $file "path" }}
+          name: file-{{ $id }}
+          subPath: {{ regexFind "[^/]+$" (index $file "path") }}
+        {{- end }}
+      - name: apply
+        image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        command:
+        - sh
+        - -cex
+        - |
+          sleep 10
+          hal deploy apply
+      volumes:
+      {{- range $id, $file := .Values.files }}
+      - name: file-{{ $id }}
+        configMap:
+          name: {{ template "halyard.fullname" $ }}-file-{{ $id }}
+      {{- end }}

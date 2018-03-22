@@ -1,0 +1,12 @@
+{{- range $id, $file := .Values.files }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "halyard.fullname" $ }}-file-{{ $id }}
+  labels:
+    app: {{ template "halyard.fullname" $ }}
+data:
+  {{ regexFind "[^/]+$" (index $file "path") }}: |
+{{ (index $file "content") | indent 4}}
+---
+{{- end }}
