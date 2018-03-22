@@ -27,7 +27,7 @@ spec:
         - sh
         - -cex
         - |
-          sleep 10
+          until hal --ready; do sleep 2; done
           hal deploy apply
       volumes:
       {{- range $id, $file := .Values.files }}
