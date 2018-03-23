@@ -12,36 +12,31 @@ spec:
         app: {{ template "halyard.fullname" . }}
     spec:
       restartPolicy: Never
-      {{- if .Values.prepareKubeconfig.enabled }}
-      initContainers:
-      - name: kubeconfig
+      containers:
+      - name: daemon
         image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
         command:
         - sh
         - -cex
         - |
+          {{- if .Values.prepareKubeconfig.enabled }}
           kubectl config set-cluster {{ .Values.prepareKubeconfig.cluster }} --server=https://kubernetes.default --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
           token=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
           kubectl config set-credentials {{ .Values.prepareKubeconfig.user }} --token=$token
           kubectl config set-context {{ .Values.prepareKubeconfig.context }} --cluster={{ .Values.prepareKubeconfig.cluster }} --user={{ .Values.prepareKubeconfig.user }}
           kubectl config use-context {{ .Values.prepareKubeconfig.context }}
-        volumeMounts:
-          - mountPath: /root/.kube/
-            name: kubeconfig
-      {{- end }}
-      containers:
-      - name: daemon
-        image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
+          {{- end }}
+          mkdir -p /root/.hal
+          cp /root/tmp/halconfig /root/.hal/config
+          exec /opt/halyard/bin/halyard
         volumeMounts:
         {{- range $id, $file := .Values.files }}
         - mountPath: {{ index $file "path" }}
           name: file-{{ $id }}
           subPath: {{ regexFind "[^/]+$" (index $file "path") }}
         {{- end }}
-        {{- if .Values.prepareKubeconfig.enabled }}
-        - mountPath: /root/.kube/
-          name: kubeconfig
-        {{- end }}
+        - mountPath: /root/tmp
+          name: halconfig
       - name: apply
         image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
         command:
@@ -60,7 +55,6 @@ spec:
         configMap:
           name: {{ template "halyard.fullname" $ }}-file-{{ $id }}
       {{- end }}
-      {{- if .Values.prepareKubeconfig.enabled }}
-      - name: kubeconfig
-        emptyDir: {}
-      {{- end }}
+      - name: halconfig
+        configMap:
+          name: {{ template "halyard.fullname" . }}-halconfig
