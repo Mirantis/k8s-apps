@@ -18,14 +18,28 @@ image:
   pullPolicy: IfNotPresent
 
 service:
-  type: NodePort # or ClusterIP or LoadBalancer
+  # K8s service to expose deck
+  ui:
+    type: NodePort # or ClusterIP or LoadBalancer
 
-  nodePort: ""
+    port: 9000
+    nodePort: ""
 
-  loadBalancerIP: ""
-  loadBalancerSourceRanges: []
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
 
-  annotations: {}
+    annotations: {}
+  # K8s service to expose gate
+  api:
+    type: NodePort # or ClusterIP or LoadBalancer
+
+    port: 8084
+    nodePort: ""
+
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+
+    annotations: {}
 
 # If enabled, Minio chart will be deployed and configured as
 # a storage for Spinnaker

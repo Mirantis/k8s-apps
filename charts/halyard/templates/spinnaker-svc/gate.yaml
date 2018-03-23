@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "halyard.gate.fullname" . }}
+  namespace: {{ template "halyard.spinnaker-namespace" . }}
+  labels:
+    app: {{ template "halyard.gate.fullname" . }}
+{{- if .Values.service.api.annotations }}
+  annotations:
+{{ toYaml .Values.service.api.annotations | indent 4}}
+{{- end }}
+spec:
+  ports:
+    - port: {{ .Values.service.api.port }}
+      name: http
+      {{- if eq .Values.service.api.type "NodePort" }}
+      {{- if .Values.service.api.nodePort }}
+      nodePort: {{ .Values.service.api.nodePort }}
+      {{- end -}}
+      {{- end }}
+  selector:
+    load-balancer-spin-gate: "true"
+  type: "{{ .Values.service.api.type }}"
+{{- if eq .Values.service.api.type "LoadBalancer" }}
+  {{- if .Values.service.api.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service.api.loadBalancerIP }}
+  {{- end -}}
+  {{- if .Values.service.api.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+  {{- range .Values.service.api.loadBalancerSourceRanges }}
+  - {{ . }}
+  {{- end }}
+  {{- end -}}
+{{- end -}}
