@@ -48,6 +48,9 @@ spec:
           hal config storage edit --type s3
           echo {{ .Values.minio.secretKey }} | hal config storage s3 edit --endpoint {{ template "halyard.minio-address" . }} --access-key-id {{ .Values.minio.accessKey }} --secret-access-key
           {{- end }}
+          {{- if .Values.prepareKubeconfig.enabled }}
+          hal config deploy edit --location {{ template "halyard.spinnaker-namespace" . }}
+          {{- end }}
           hal deploy apply
       volumes:
       {{- range $id, $file := .Values.files }}

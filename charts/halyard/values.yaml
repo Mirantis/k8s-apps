@@ -7,6 +7,9 @@ prepareKubeconfig:
   context: default
   user: default
   cluster: default
+  # The namespace Spinnaker will be deployed into. The namespace of the
+  # release will be used by default. Override if necessary.
+  namespace:
 
 image:
   repository: gcr.io/spinnaker-marketplace/
