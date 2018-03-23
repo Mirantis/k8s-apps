@@ -12,6 +12,23 @@ spec:
         app: {{ template "halyard.fullname" . }}
     spec:
       restartPolicy: Never
+      {{- if .Values.prepareKubeconfig.enabled }}
+      initContainers:
+      - name: kubeconfig
+        image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        command:
+        - sh
+        - -cex
+        - |
+          kubectl config set-cluster {{ .Values.prepareKubeconfig.cluster }} --server=https://kubernetes.default --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          token=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+          kubectl config set-credentials {{ .Values.prepareKubeconfig.user }} --token=$token
+          kubectl config set-context {{ .Values.prepareKubeconfig.context }} --cluster={{ .Values.prepareKubeconfig.cluster }} --user={{ .Values.prepareKubeconfig.user }}
+          kubectl config use-context {{ .Values.prepareKubeconfig.context }}
+        volumeMounts:
+          - mountPath: /root/.kube/
+            name: kubeconfig
+      {{- end }}
       containers:
       - name: daemon
         image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
@@ -20,6 +37,10 @@ spec:
         - mountPath: {{ index $file "path" }}
           name: file-{{ $id }}
           subPath: {{ regexFind "[^/]+$" (index $file "path") }}
+        {{- end }}
+        {{- if .Values.prepareKubeconfig.enabled }}
+        - mountPath: /root/.kube/
+          name: kubeconfig
         {{- end }}
       - name: apply
         image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
@@ -34,4 +55,8 @@ spec:
       - name: file-{{ $id }}
         configMap:
           name: {{ template "halyard.fullname" $ }}-file-{{ $id }}
+      {{- end }}
+      {{- if .Values.prepareKubeconfig.enabled }}
+      - name: kubeconfig
+        emptyDir: {}
       {{- end }}
