@@ -24,14 +24,11 @@ service:
 
   annotations: {}
 
-hdfs:
+# If enabled, Minio chart will be deployed and configured as
+# a storage for Spinnaker
+minio:
   # if disabled, subchart will not be deployed
-  deployChart: false
-  path: /
-
-  # these values should be set if subchart deployment is disabled:
-  addresses:
-    namenode: ""
+  deployChart: true
 
 files:
   - path: /root/.hal/config

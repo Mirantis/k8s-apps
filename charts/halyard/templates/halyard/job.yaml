@@ -49,6 +49,10 @@ spec:
         - -cex
         - |
           until hal --ready; do sleep 2; done
+          {{- if .Values.minio.deployChart }}
+          hal config storage edit --type s3
+          echo {{ .Values.minio.secretKey }} | hal config storage s3 edit --endpoint {{ template "halyard.minio-address" . }} --access-key-id {{ .Values.minio.accessKey }} --secret-access-key
+          {{- end }}
           hal deploy apply
       volumes:
       {{- range $id, $file := .Values.files }}
