@@ -206,6 +206,11 @@ halconfig: |
         subscriptions: []
 
 files:
-#  - path: /root/example
-#    content: |
+  - path: /root/.hal/default/service-settings/deck.yml
+    content: |
+      env:
+        API_HOST: "http://spin-gate:8084"
+  - path: /root/.hal/default/service-settings/gate.yml
+    content: |
+      overrideBaseUrl: "/gate"
 
