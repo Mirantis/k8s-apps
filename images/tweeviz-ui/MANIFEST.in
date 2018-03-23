@@ -1,2 +1,2 @@
-include templates/*
-include static/*
+recursive-include tweeviz_ui/templates *
+recursive-include tweeviz_ui/static *
