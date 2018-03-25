@@ -4,6 +4,9 @@ metadata:
   name: {{ template "halyard.fullname" . }}
   labels:
     app: {{ template "halyard.fullname" . }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   template:
     metadata:
