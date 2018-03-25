@@ -19,6 +19,9 @@ spec:
         - sh
         - -cex
         - |
+          mkdir -p /root/.hal /var/log/halyard
+          cp /root/tmp/halconfig /root/.hal/config
+          /opt/halyard/bin/halyard > /var/log/halyard/halyard.log 2>&1 &
           {{- if .Values.prepareKubeconfig.enabled }}
           kubectl config set-cluster {{ .Values.prepareKubeconfig.cluster }} --server=https://kubernetes.default --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
           token=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
@@ -26,23 +29,6 @@ spec:
           kubectl config set-context {{ .Values.prepareKubeconfig.context }} --cluster={{ .Values.prepareKubeconfig.cluster }} --user={{ .Values.prepareKubeconfig.user }}
           kubectl config use-context {{ .Values.prepareKubeconfig.context }}
           {{- end }}
-          mkdir -p /root/.hal
-          cp /root/tmp/halconfig /root/.hal/config
-          exec /opt/halyard/bin/halyard
-        volumeMounts:
-        {{- range $id, $file := .Values.files }}
-        - mountPath: {{ index $file "path" }}
-          name: file-{{ $id }}
-          subPath: {{ regexFind "[^/]+$" (index $file "path") }}
-        {{- end }}
-        - mountPath: /root/tmp
-          name: halconfig
-      - name: apply
-        image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
-        command:
-        - sh
-        - -cex
-        - |
           until hal --ready; do sleep 2; done
           {{- if .Values.minio.deployChart }}
           hal config storage edit --type s3
@@ -52,6 +38,14 @@ spec:
           hal config deploy edit --location {{ template "halyard.spinnaker-namespace" . }}
           {{- end }}
           hal deploy apply
+        volumeMounts:
+        {{- range $id, $file := .Values.files }}
+        - mountPath: {{ index $file "path" }}
+          name: file-{{ $id }}
+          subPath: {{ regexFind "[^/]+$" (index $file "path") }}
+        {{- end }}
+        - mountPath: /root/tmp
+          name: halconfig
       volumes:
       {{- range $id, $file := .Values.files }}
       - name: file-{{ $id }}
