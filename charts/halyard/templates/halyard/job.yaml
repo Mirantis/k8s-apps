@@ -1,23 +1,28 @@
+{{ range $i, $stage := list "apply" "clean" }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ template "halyard.fullname" . }}
+  name: {{ template "halyard.fullname" $ }}-{{ $stage }}
   labels:
-    app: {{ template "halyard.fullname" . }}
+    app: {{ template "halyard.fullname" $ }}
   annotations:
+    {{- if eq $stage "apply" }}
     "helm.sh/hook": post-install,post-upgrade
+    {{- else }}
+    "helm.sh/hook": pre-delete
+    {{- end }}
     "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   template:
     metadata:
-      name: "{{ .Release.Name }}"
+      name: "{{ $.Release.Name }}"
       labels:
-        app: {{ template "halyard.fullname" . }}
+        app: {{ template "halyard.fullname" $ }}
     spec:
       restartPolicy: Never
       containers:
       - name: daemon
-        image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        image: "{{ $.Values.image.repository }}{{ $.Values.image.name }}:{{ $.Values.image.tag }}"
         command:
         - sh
         - -cex
@@ -25,24 +30,28 @@ spec:
           mkdir -p /root/.hal /var/log/halyard
           cp /root/tmp/halconfig /root/.hal/config
           /opt/halyard/bin/halyard > /var/log/halyard/halyard.log 2>&1 &
-          {{- if .Values.prepareKubeconfig.enabled }}
-          kubectl config set-cluster {{ .Values.prepareKubeconfig.cluster }} --server=https://kubernetes.default --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          {{- if $.Values.prepareKubeconfig.enabled }}
+          kubectl config set-cluster {{ $.Values.prepareKubeconfig.cluster }} --server=https://kubernetes.default --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
           token=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
-          kubectl config set-credentials {{ .Values.prepareKubeconfig.user }} --token=$token
-          kubectl config set-context {{ .Values.prepareKubeconfig.context }} --cluster={{ .Values.prepareKubeconfig.cluster }} --user={{ .Values.prepareKubeconfig.user }}
-          kubectl config use-context {{ .Values.prepareKubeconfig.context }}
+          kubectl config set-credentials {{ $.Values.prepareKubeconfig.user }} --token=$token
+          kubectl config set-context {{ $.Values.prepareKubeconfig.context }} --cluster={{ $.Values.prepareKubeconfig.cluster }} --user={{ $.Values.prepareKubeconfig.user }}
+          kubectl config use-context {{ $.Values.prepareKubeconfig.context }}
           {{- end }}
           until hal --ready; do sleep 2; done
-          {{- if .Values.minio.deployChart }}
-          echo {{ .Values.minio.secretKey }} | hal config storage s3 edit --endpoint {{ template "halyard.minio-address" . }} --access-key-id {{ .Values.minio.accessKey }} --secret-access-key
+          {{- if $.Values.minio.deployChart }}
+          echo {{ $.Values.minio.secretKey }} | hal config storage s3 edit --endpoint {{ template "halyard.minio-address" $ }} --access-key-id {{ $.Values.minio.accessKey }} --secret-access-key
           hal config storage edit --type s3
           {{- end }}
-          {{- if .Values.prepareKubeconfig.enabled }}
-          hal config deploy edit --location {{ template "halyard.spinnaker-namespace" . }}
+          {{- if $.Values.prepareKubeconfig.enabled }}
+          hal config deploy edit --location {{ template "halyard.spinnaker-namespace" $ }}
           {{- end }}
+          {{- if eq $stage "apply" }}
           hal deploy apply
+          {{- else }}
+          hal -q deploy clean
+          {{- end }}
         volumeMounts:
-        {{- range $id, $file := .Values.files }}
+        {{- range $id, $file := $.Values.files }}
         - mountPath: {{ index $file "path" }}
           name: file-{{ $id }}
           subPath: {{ regexFind "[^/]+$" (index $file "path") }}
@@ -50,11 +59,13 @@ spec:
         - mountPath: /root/tmp
           name: halconfig
       volumes:
-      {{- range $id, $file := .Values.files }}
+      {{- range $id, $file := $.Values.files }}
       - name: file-{{ $id }}
         configMap:
           name: {{ template "halyard.fullname" $ }}-file-{{ $id }}
       {{- end }}
       - name: halconfig
         configMap:
-          name: {{ template "halyard.fullname" . }}-halconfig
+          name: {{ template "halyard.fullname" $ }}-halconfig
+---
+{{- end }}
