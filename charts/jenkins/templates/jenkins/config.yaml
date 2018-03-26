@@ -31,8 +31,9 @@ data:
       <viewsTabBar class="hudson.views.DefaultViewsTabBar"/>
       <myViewsTabBar class="hudson.views.DefaultMyViewsTabBar"/>
       <clouds>
-        <org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud plugin="kubernetes@0.11">
+        <org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud plugin="kubernetes@1.4">
           <name>kubernetes</name>
+          <defaultsProviderTemplate></defaultsProviderTemplate>
           <templates>
 {{- if .Values.Agent.Enabled }}
             <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
@@ -42,6 +43,11 @@ data:
               <idleMinutes>0</idleMinutes>
               <label>{{ .Release.Name }}-{{ .Values.Agent.Component }}</label>
               <nodeSelector></nodeSelector>
+              <nodeUsageMode>NORMAL</nodeUsageMode>
+              <customWorkspaceVolumeEnabled>false</customWorkspaceVolumeEnabled>
+              <workspaceVolume class="org.csanchez.jenkins.plugins.kubernetes.volumes.workspace.EmptyDirWorkspaceVolume">
+                <memory>false</memory>
+              </workspaceVolume>
               <volumes>
 {{- range $index, $volume := .Values.Agent.volumes }}
                 <org.csanchez.jenkins.plugins.kubernetes.volumes.{{ $volume.type }}Volume>
@@ -70,6 +76,15 @@ data:
                   <resourceLimitCpu>{{ .Values.Agent.Cpu }}</resourceLimitCpu>
                   <resourceLimitMemory>{{ .Values.Agent.Memory }}</resourceLimitMemory>
                   <envVars/>
+                  <ports/>
+                  <livenessProbe>
+                    <execArgs></execArgs>
+                    <timeoutSeconds>0</timeoutSeconds>
+                    <initialDelaySeconds>0</initialDelaySeconds>
+                    <failureThreshold>0</failureThreshold>
+                    <periodSeconds>0</periodSeconds>
+                    <successThreshold>0</successThreshold>
+                  </livenessProbe>
                 </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
               </containers>
               <envVars/>
@@ -88,6 +103,13 @@ data:
           <retentionTimeout>5</retentionTimeout>
           <connectTimeout>0</connectTimeout>
           <readTimeout>0</readTimeout>
+          <labels class="linked-hash-map">
+            <entry>
+              <string>{{ .Release.Name }}-{{ .Values.Agent.Component }}</string>
+              <string>true</string>
+            </entry>
+          </labels>
+          <maxRequestsPerHost>32</maxRequestsPerHost>
         </org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud>
       </clouds>
       <quietPeriod>5</quietPeriod>

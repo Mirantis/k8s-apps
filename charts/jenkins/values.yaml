@@ -8,7 +8,7 @@ Master:
   image:
     repository: mirantisworkloads/
     name: jenkins
-    tag: "2.104"
+    tag: "2.113"
     pullPolicy: IfNotPresent
 
   persistence:
@@ -70,11 +70,11 @@ Master:
 # JMXPort: 4000
 # List of plugins to be install during Jenkins master start
   InstallPlugins:
-      - kubernetes:1.1.4
+      - kubernetes:1.4
       - workflow-aggregator:2.5
       - workflow-job:2.17
-      - credentials-binding:1.14
-      - git:3.7.0
+      - credentials-binding:1.16
+      - git:3.8.0
   NeverDownloadPlugins: false
 # Used to approve a list of groovy functions in pipelines used the script-security plugin. Can be viewed under /scriptApproval
   # ScriptApproval:
