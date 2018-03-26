@@ -48,6 +48,13 @@ service:
 minio:
   deployChart: true
 
+# If enabled, Jenkins chart will be deployed and configured
+# for Spinnaker
+jenkins:
+  deployChart: true
+  Master:
+    UseSecurity: false
+
 # Halconfig file will appear at /root/.hal/config
 halconfig: |
   currentDeployment: default

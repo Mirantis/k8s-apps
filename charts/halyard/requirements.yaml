@@ -3,3 +3,7 @@ dependencies:
   version: ^1.x
   repository: https://mirantisworkloads.storage.googleapis.com/
   condition: minio.deployChart
+- name: jenkins
+  version: ^2.x
+  repository: https://mirantisworkloads.storage.googleapis.com/
+  condition: jenkins.deployChart

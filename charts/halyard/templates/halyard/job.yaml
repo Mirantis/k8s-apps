@@ -45,6 +45,10 @@ spec:
           {{- if $.Values.prepareKubeconfig.enabled }}
           hal config deploy edit --location {{ template "halyard.spinnaker-namespace" $ }}
           {{- end }}
+          {{- if $.Values.jenkins.deployChart }}
+          echo {{ $.Values.jenkins.Master.AdminPassword }} | hal config ci jenkins master add local --address {{ template "spinnaker.jenkins-address" $ }} --username {{ $.Values.jenkins.Master.AdminUser }} --password
+          hal config ci jenkins enable
+          {{- end }}
           {{- if eq $stage "apply" }}
           hal deploy apply
           {{- else }}

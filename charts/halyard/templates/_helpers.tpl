@@ -14,6 +14,10 @@
     http://{{- template "minio.fullname" . -}}.{{ .Release.Namespace }}:{{ .Values.minio.port }}
 {{- end -}}
 
+{{- define "spinnaker.jenkins-address" -}}
+    http://{{ template "jenkins.master-fullname" . }}:{{ .Values.jenkins.Master.port }}
+{{- end -}}
+
 {{- define "halyard.spinnaker-namespace" -}}
     {{- if .Values.prepareKubeconfig.namespace -}}
         {{- .Values.prepareKubeconfig.namespace -}}
