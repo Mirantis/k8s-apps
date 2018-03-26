@@ -46,7 +46,6 @@ service:
 # If enabled, Minio chart will be deployed and configured as
 # a storage for Spinnaker
 minio:
-  # if disabled, subchart will not be deployed
   deployChart: true
 
 # Halconfig file will appear at /root/.hal/config
@@ -88,6 +87,9 @@ halconfig: |
       type: Distributed
       accountName: local
       updateVersions: true
+    persistentStorage:
+      s3:
+        bucket: spin-bucket
     features:
       auth: false
       fiat: false
