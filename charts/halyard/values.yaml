@@ -8,7 +8,9 @@ prepareKubeconfig:
   user: default
   cluster: default
   # The namespace Spinnaker will be deployed into. The namespace of the
-  # release will be used by default. Override if necessary.
+  # release will be used by default. Change if necessary.
+  # NOTE: The "location" parameter under "deploymentEnvironment" will be
+  # set by that option.
   namespace:
 
 image:
@@ -54,62 +56,25 @@ halconfig: |
   - name: default
     version: 1.6.0
     providers:
-      appengine:
-        enabled: false
-        accounts: []
-      aws:
-        enabled: false
-        accounts: []
-        defaultKeyPairTemplate: '{{name}}-keypair'
-        defaultRegions:
-        - name: us-west-2
-        defaults:
-          iamRole: BaseIAMRole
-      azure:
-        enabled: false
-        accounts: []
-        bakeryDefaults:
-          templateFile: azure-linux.json
-          baseImages: []
-      dcos:
-        enabled: false
-        accounts: []
-        clusters: []
       dockerRegistry:
         enabled: true
         accounts:
-        - name: my-docker-registry
+        - name: dockerhub
           requiredGroupMembership: []
           providerVersion: V1
           address: https://index.docker.io
           email: fake.email@spinnaker.io
-          cacheIntervalSeconds: 30
-          clientTimeoutMillis: 60000
-          cacheThreads: 1
-          paginateSize: 100
-          sortTagsByDate: false
-          trackDigests: false
-          insecureRegistry: false
           repositories:
           - library/nginx
-        primaryAccount: my-docker-registry
-      google:
-        enabled: false
-        accounts: []
-        bakeryDefaults:
-          templateFile: gce.json
-          baseImages: []
-          zone: us-central1-f
-          network: default
-          useInternalIp: false
+        primaryAccount: dockerhub
       kubernetes:
         enabled: true
         accounts:
-        - name: my-k8s-account
+        - name: local
           requiredGroupMembership: []
           providerVersion: V1
           dockerRegistries:
-          - accountName: my-docker-registry
+          - accountName: dockerhub
             namespaces: []
           configureImagePullSecrets: true
           namespaces: []
@@ -117,110 +82,21 @@ halconfig: |
           kubeconfigFile: /root/.kube/config
           oauthScopes: []
           oAuthScopes: []
-        primaryAccount: my-k8s-account
-      openstack:
-        enabled: false
-        accounts: []
-        bakeryDefaults:
-          baseImages: []
-      oraclebmcs:
-        enabled: false
-        accounts: []
+        primaryAccount: local
     deploymentEnvironment:
       size: SMALL
       type: Distributed
-      accountName: my-k8s-account
+      accountName: local
       updateVersions: true
-      consul:
-        enabled: false
-      vault:
-        enabled: false
-      customSizing: {}
-      gitConfig:
-        upstreamUser: spinnaker
-    persistentStorage:
-      persistentStoreType: s3
-      azs: {}
-      gcs:
-        rootFolder: front50
-      redis: {}
-      s3:
-        bucket: spin-bucket
-        rootFolder: front50
-        endpoint: http://minio-minio.default:9000
-        accessKeyId: miniokey
-        secretAccessKey: miniosecret
-      oraclebmcs: {}
     features:
       auth: false
       fiat: false
       chaos: false
       entityTags: false
-      jobs: false
+      jobs: true
       pipelineTemplates: true
-      artifacts: true
-    metricStores:
-      datadog:
-        enabled: false
-      prometheus:
-        enabled: false
-        add_source_metalabels: true
-      stackdriver:
-        enabled: false
-      period: 30
-      enabled: false
-    notifications:
-      slack:
-        enabled: false
+      artifacts: false
     timezone: America/Los_Angeles
-    ci:
-      jenkins:
-        enabled: false
-        masters: []
-      travis:
-        enabled: false
-        masters: []
-    security:
-      apiSecurity:
-        ssl:
-          enabled: false
-      uiSecurity:
-        ssl:
-          enabled: false
-      authn:
-        oauth2:
-          enabled: false
-          client: {}
-          resource: {}
-          userInfoMapping: {}
-        saml:
-          enabled: false
-        ldap:
-          enabled: false
-        x509:
-          enabled: false
-        enabled: false
-      authz:
-        groupMembership:
-          service: EXTERNAL
-          google:
-            roleProviderType: GOOGLE
-          github:
-            roleProviderType: GITHUB
-          file:
-            roleProviderType: FILE
-        enabled: false
-    artifacts:
-      gcs:
-        enabled: false
-        accounts: []
-      github:
-        enabled: false
-        accounts: []
-    pubsub:
-      google:
-        enabled: false
-        subscriptions: []
 
 files:
   - path: /root/.hal/default/service-settings/deck.yml
