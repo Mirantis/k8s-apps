@@ -12,6 +12,7 @@ metadata:
 spec:
   ports:
     - port: {{ .Values.service.ui.port }}
+      targetPort: 9000
       name: http
       {{- if eq .Values.service.ui.type "NodePort" }}
       {{- if .Values.service.ui.nodePort }}

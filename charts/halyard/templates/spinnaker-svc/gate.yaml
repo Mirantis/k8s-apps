@@ -12,6 +12,7 @@ metadata:
 spec:
   ports:
     - port: {{ .Values.service.api.port }}
+      targetPort: 8084
       name: http
       {{- if eq .Values.service.api.type "NodePort" }}
       {{- if .Values.service.api.nodePort }}
