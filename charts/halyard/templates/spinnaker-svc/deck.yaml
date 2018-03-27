@@ -5,6 +5,9 @@ metadata:
   namespace: {{ template "halyard.spinnaker-namespace" . }}
   labels:
     app: {{ template "halyard.deck.fullname" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
 {{- if .Values.service.ui.annotations }}
   annotations:
 {{ toYaml .Values.service.ui.annotations | indent 4}}

@@ -4,6 +4,9 @@ metadata:
   name: {{ template "halyard.fullname" . }}-halconfig
   labels:
     app: {{ template "halyard.fullname" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
 data:
   halconfig: |
 {{ .Values.halconfig | indent 4 }}

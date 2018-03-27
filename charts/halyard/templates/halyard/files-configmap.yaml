@@ -5,6 +5,9 @@ metadata:
   name: {{ template "halyard.fullname" $ }}-file-{{ $id }}
   labels:
     app: {{ template "halyard.fullname" $ }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
 data:
   {{ regexFind "[^/]+$" (index $file "path") }}: |
 {{ (index $file "content") | indent 4}}

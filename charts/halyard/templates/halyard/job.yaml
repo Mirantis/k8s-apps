@@ -5,6 +5,9 @@ metadata:
   name: {{ template "halyard.fullname" $ }}-{{ $stage }}
   labels:
     app: {{ template "halyard.fullname" $ }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
   annotations:
     {{- if eq $stage "apply" }}
     "helm.sh/hook": post-install,post-upgrade
