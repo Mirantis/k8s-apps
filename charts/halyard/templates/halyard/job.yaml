@@ -20,6 +20,7 @@ spec:
         app: {{ template "halyard.fullname" $ }}
     spec:
       restartPolicy: Never
+      serviceAccountName: {{ template "halyard.fullname" $ }}
       containers:
       - name: daemon
         image: "{{ $.Values.image.repository }}{{ $.Values.image.name }}:{{ $.Values.image.tag }}"

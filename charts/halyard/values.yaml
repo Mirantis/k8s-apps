@@ -55,6 +55,9 @@ jenkins:
   Master:
     UseSecurity: false
 
+rbac:
+  enabled: false
+
 # Halconfig file will appear at /root/.hal/config
 halconfig: |
   currentDeployment: default
