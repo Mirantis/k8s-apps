@@ -1,0 +1,30 @@
+{{ if .Values.serviceAccounts }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "halyard.fullname" . }}-sync
+  labels:
+    app: {{ template "halyard.fullname" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-weight": "2"
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: sync
+        image: "appropriate/curl"
+        command:
+        - curl
+        - -f
+        - -m
+        - "10"
+        - -X
+        - POST
+        - http://spin-fiat.{{ template "halyard.spinnaker-namespace" . }}:7003/roles/sync
+{{- end }}

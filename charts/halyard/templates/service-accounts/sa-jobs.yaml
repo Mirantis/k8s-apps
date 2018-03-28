@@ -1,0 +1,35 @@
+{{ range $i, $acc := .Values.serviceAccounts }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "halyard.fullname" $ }}-sa-{{ $i }}
+  labels:
+    app: {{ template "halyard.fullname" $ }}
+    chart: {{ $.Chart.Name }}-{{ $.Chart.Version }}
+    heritage: {{ $.Release.Service }}
+    release: {{ $.Release.Name }}
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-weight": "1"
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: sa
+        image: "appropriate/curl"
+        command:
+        - curl
+        - -f
+        - -m
+        - "10"
+        - -d
+        - '{{ $acc | toJson }}'
+        - -X
+        - POST
+        - -H
+        - "Content-Type: application/json"
+        - http://spin-front50.{{ template "halyard.spinnaker-namespace" $ }}:8080/serviceAccounts
+---
+{{- end }}
