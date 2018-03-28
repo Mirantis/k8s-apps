@@ -119,3 +119,8 @@ files:
     content: |
       overrideBaseUrl: "/gate"
 
+# Creates service accounts in Front50 and runs Fiat sync
+# after Spinnaker deployment
+serviceAccounts:
+#  - name: example
+#    memberOf: ["example"]

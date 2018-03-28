@@ -5,9 +5,9 @@ metadata:
   name: {{ template "halyard.fullname" $ }}-{{ $stage }}
   labels:
     app: {{ template "halyard.fullname" $ }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-    heritage: {{ .Release.Service }}
-    release: {{ .Release.Name }}
+    chart: {{ $.Chart.Name }}-{{ $.Chart.Version }}
+    heritage: {{ $.Release.Service }}
+    release: {{ $.Release.Name }}
   annotations:
     {{- if eq $stage "apply" }}
     "helm.sh/hook": post-install,post-upgrade
@@ -15,12 +15,9 @@ metadata:
     "helm.sh/hook": pre-delete
     {{- end }}
     "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-weight": "0"
 spec:
   template:
-    metadata:
-      name: "{{ $.Release.Name }}"
-      labels:
-        app: {{ template "halyard.fullname" $ }}
     spec:
       restartPolicy: Never
       serviceAccountName: {{ template "halyard.fullname" $ }}
