@@ -52,7 +52,7 @@ spec:
           hal config ci jenkins enable
           {{- end }}
           {{- if eq $stage "apply" }}
-          hal deploy apply
+          hal {{- if $.Values.debug }} --debug {{- end }} deploy apply
           {{- else }}
           hal -q deploy clean
           {{- end }}
