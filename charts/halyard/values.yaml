@@ -18,8 +18,8 @@ prepareKubeconfig:
 image:
   repository: gcr.io/spinnaker-marketplace/
   name: halyard
-  tag: stable
-  pullPolicy: Always
+  tag: 0.44.0
+  pullPolicy: IfNotPresent
 
 service:
   # K8s service to expose deck
