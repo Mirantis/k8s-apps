@@ -28,7 +28,7 @@ spec:
           command:
             - bash
             - -c
-            - "chmod +x /usr/local/spark/conf/spark-env.sh && /usr/local/spark/sbin/start-master.sh"
+            - "/usr/local/spark/sbin/start-master.sh"
           resources:
 {{ toYaml $.Values.spark.master.resources | indent 12 }}
           ports:

@@ -27,7 +27,7 @@ spec:
           command:
             - bash
             - -c
-            - "chmod +x /usr/local/spark/conf/spark-env.sh && /usr/local/spark/sbin/start-slave.sh spark://{{ template "spark-address" . }}"
+            - "/usr/local/spark/sbin/start-slave.sh spark://{{ template "spark-address" . }}"
           resources:
 {{ toYaml .Values.spark.worker.resources | indent 12 }}
           {{- if .Values.prometheusExporter.enabled }}
