@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "es-master-cm-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "es-master-fullname" . }}
+data:
+  elasticsearch.yml: |
+    node.data: ${NODE_DATA}
+    node.master: ${NODE_MASTER}
+    node.name: ${HOSTNAME}
+
+    network.host: 0.0.0.0
+
+    cloud:
+      kubernetes:
+        service: ${SERVICE}
+        namespace: ${KUBERNETES_NAMESPACE}
+
+    discovery.zen.minimum_master_nodes: ${MINIMUM_MASTER_NODES:2}
+    discovery.zen.hosts_provider: kubernetes
+    discovery.zen.master_election.ignore_non_master_pings: true

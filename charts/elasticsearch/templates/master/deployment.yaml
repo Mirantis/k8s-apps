@@ -35,6 +35,8 @@ spec:
               fieldPath: metadata.namespace
         - name: NODE_DATA
           value: "false"
+        - name: MINIMUM_MASTER_NODES
+          value: {{ .Values.master.quorum | quote }}
         - name: ES_JAVA_OPTS
           value: "-Xms{{ .Values.master.heapSize }} -Xmx{{ .Values.master.heapSize }}"
         image: "{{ .Values.image.repository }}{{ .Values.image.name }}:{{ .Values.image.tag }}"
@@ -46,12 +48,26 @@ spec:
         ports:
         - containerPort: {{ .Values.transportPort }}
           name: transport
-        readinessProbe:
-          httpGet:
-            path: /
-            port: {{ .Values.port }}
-          timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
-          initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+        #readinessProbe:
+        #  httpGet:
+        #    path: /_nodes/_local
+        #    port: {{ .Values.port }}
+        #  timeoutSeconds: {{ .Values.probeTimeoutSeconds }}
+        #  initialDelaySeconds: {{ .Values.probeInitialDelaySeconds }}
+        volumeMounts:
+        - mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+          name: config
+          subPath: elasticsearch.yml
+        - mountPath: /usr/share/elasticsearch/config/log4j2.properties
+          name: shared-config
+          subPath: log4j2.properties
+      volumes:
+      - name: config
+        configMap:
+          name: {{ template "es-master-cm-fullname" . }}
+      - name: shared-config
+        configMap:
+          name: {{ template "es-cm-fullname" . }}
       {{- if .Values.master.prometheusExporter.enabled }}
       - name: metrics
         image: "{{ .Values.master.prometheusExporter.image.repository }}{{ .Values.master.prometheusExporter.image.name }}:{{ .Values.master.prometheusExporter.image.tag }}"
