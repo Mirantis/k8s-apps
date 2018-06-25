@@ -1,8 +1,5 @@
-# Run `hal deploy apply` with --debug flag
-debug: false
-# If enabled, will generate the in-cluster kubeconfig (located at
-# /root/.kube/config) that might be used for the distributed installation
-# https://www.spinnaker.io/setup/install/environment/#distributed
+command: "hal deploy apply"
+
 prepareKubeconfig:
   enabled: true
   # Name of the context, user and cluster that will be generated
@@ -18,7 +15,7 @@ prepareKubeconfig:
 image:
   repository: gcr.io/spinnaker-marketplace/
   name: halyard
-  tag: 0.44.0
+  tag: 1.4.0
   pullPolicy: IfNotPresent
 
 service:
@@ -65,7 +62,7 @@ halconfig: |
   currentDeployment: default
   deploymentConfigurations:
   - name: default
-    version: 1.6.0
+    version: 1.7.6
     providers:
       dockerRegistry:
         enabled: true
@@ -90,7 +87,7 @@ halconfig: |
           configureImagePullSecrets: true
           namespaces: []
           omitNamespaces: []
-          kubeconfigFile: /root/.kube/config
+          kubeconfigFile: /home/spinnaker/.kube/config
           oauthScopes: []
           oAuthScopes: []
         primaryAccount: local
@@ -113,13 +110,16 @@ halconfig: |
     timezone: America/Los_Angeles
 
 files:
-  - path: /root/.hal/default/service-settings/deck.yml
+  - path: /home/spinnaker/.hal/default/service-settings/deck.yml
     content: |
       env:
         API_HOST: "http://spin-gate:8084"
-  - path: /root/.hal/default/service-settings/gate.yml
+  - path: /home/spinnaker/.hal/default/service-settings/gate.yml
     content: |
       overrideBaseUrl: "/gate"
+  - path: /home/spinnaker/.hal/default/profiles/front50-local.yml
+    content: |
+      spinnaker.s3.versioning: false
 
 # Creates service accounts in Front50 and runs Fiat sync
 # after Spinnaker deployment

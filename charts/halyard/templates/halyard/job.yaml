@@ -29,9 +29,7 @@ spec:
         - sh
         - -cex
         - |
-          mkdir -p /root/.hal /var/log/halyard
-          cp /root/tmp/halconfig /root/.hal/config
-          /opt/halyard/bin/halyard > /var/log/halyard/halyard.log 2>&1 &
+          mkdir -p ~/.hal
           {{- if $.Values.prepareKubeconfig.enabled }}
           kubectl config set-cluster {{ $.Values.prepareKubeconfig.cluster }} --server=https://kubernetes.default --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
           token=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
@@ -39,30 +37,34 @@ spec:
           kubectl config set-context {{ $.Values.prepareKubeconfig.context }} --cluster={{ $.Values.prepareKubeconfig.cluster }} --user={{ $.Values.prepareKubeconfig.user }}
           kubectl config use-context {{ $.Values.prepareKubeconfig.context }}
           {{- end }}
+          {{- range $id, $file := $.Values.files }}
+          mkdir -p $(dirname {{ index $file "path" }})
+          ln -s /tmp/files{{ index $file "path" }} {{ index $file "path" }}
+          {{- end }}
+          cp /tmp/conf/halconfig ~/.hal/config
+          /opt/halyard/bin/halyard > ~/halyard.log 2>&1 &
           until hal --ready; do sleep 2; done
           {{- if $.Values.minio.deployChart }}
           echo {{ $.Values.minio.secretKey }} | hal config storage s3 edit --endpoint {{ template "halyard.minio-address" $ }} --access-key-id {{ $.Values.minio.accessKey }} --secret-access-key
           hal config storage edit --type s3
           {{- end }}
-          {{- if $.Values.prepareKubeconfig.enabled }}
           hal config deploy edit --location {{ template "halyard.spinnaker-namespace" $ }}
-          {{- end }}
           {{- if $.Values.jenkins.deployChart }}
           echo {{ $.Values.jenkins.Master.AdminPassword }} | hal config ci jenkins master add local --address {{ template "spinnaker.jenkins-address" $ }} --username {{ $.Values.jenkins.Master.AdminUser }} --password
           hal config ci jenkins enable
           {{- end }}
           {{- if eq $stage "apply" }}
-          hal {{- if $.Values.debug }} --debug {{- end }} deploy apply
+          {{ $.Values.command }}
           {{- else }}
           hal -q deploy clean
           {{- end }}
         volumeMounts:
         {{- range $id, $file := $.Values.files }}
-        - mountPath: {{ index $file "path" }}
+        - mountPath: /tmp/files{{ index $file "path" }}
           name: file-{{ $id }}
           subPath: {{ regexFind "[^/]+$" (index $file "path") }}
         {{- end }}
-        - mountPath: /root/tmp
+        - mountPath: /tmp/conf
           name: halconfig
       volumes:
       {{- range $id, $file := $.Values.files }}
