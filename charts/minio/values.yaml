@@ -104,3 +104,11 @@ minioConfig:
     user: ""
     password: ""
     database: ""
+  mqtt:
+    enable: false
+    broker: ""
+    topic: ""
+    qos: 0
+    clientId: ""
+    username: ""
+    password: ""

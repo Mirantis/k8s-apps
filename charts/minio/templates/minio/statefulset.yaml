@@ -57,7 +57,8 @@ spec:
             - name: datadir
               mountPath: /datadir
             - name: minio-server-config
-              mountPath: /root/.minio/
+              mountPath: /root/.minio/config.json
+              subPath: config.json
             - name: podinfo
               mountPath: /podinfo
           ports:
