@@ -158,12 +158,11 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: datadir
-      {{- if .Values.persistence.storageClass }}
-      annotations:
-        volume.beta.kubernetes.io/storage-class: "{{ .Values.persistence.storageClass }}"
-      {{- end }}
     spec:
       accessModes: [ "ReadWriteOnce" ]
+      {{- if .Values.persistence.storageClass }}
+      storageClassName: "{{ .Values.persistence.storageClass }}"
+      {{- end }}
       resources:
         requests:
           storage: {{ .Values.persistence.volumeSize }}
