@@ -1,3 +1,6 @@
+# Run halyard as a daemon process (and as deployment)
+# Job will be created and per each install/upgrade otherwise
+daemon: false
 command: "hal deploy apply"
 
 prepareKubeconfig:

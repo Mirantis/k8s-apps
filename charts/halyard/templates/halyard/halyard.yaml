@@ -1,6 +1,11 @@
 {{ range $i, $stage := list "apply" "clean" }}
+{{- if and (eq $stage "apply") $.Values.daemon }}
+apiVersion: extensions/v1beta1
+kind: Deployment
+{{- else }}
 apiVersion: batch/v1
 kind: Job
+{{- end }}
 metadata:
   name: {{ template "halyard.fullname" $ }}-{{ $stage }}
   labels:
@@ -10,16 +15,27 @@ metadata:
     release: {{ $.Release.Name }}
   annotations:
     {{- if eq $stage "apply" }}
+    {{- if not $.Values.daemon }}
     "helm.sh/hook": post-install,post-upgrade
+    {{- end }}
     {{- else }}
     "helm.sh/hook": pre-delete
     {{- end }}
+    {{- if not $.Values.daemon }}
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
     "helm.sh/hook-weight": "0"
+    {{- end }}
 spec:
   template:
+    {{- if and (eq $stage "apply") $.Values.daemon }}
+    metadata:
+      labels:
+        app: {{ template "halyard.fullname" $ }}
+    {{- end }}
     spec:
+      {{- if and (eq $stage "apply") (not $.Values.daemon) }}
       restartPolicy: Never
+      {{- end }}
       serviceAccountName: {{ template "halyard.fullname" $ }}
       containers:
       - name: daemon
