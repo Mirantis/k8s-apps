@@ -14,7 +14,7 @@ metadata:
     {{- else }}
     "helm.sh/hook": pre-delete
     {{- end }}
-    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
     "helm.sh/hook-weight": "0"
 spec:
   template:
