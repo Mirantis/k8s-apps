@@ -21,7 +21,7 @@ image:
 service:
   # K8s service to expose deck
   ui:
-    type: NodePort # or ClusterIP or LoadBalancer
+    type: LoadBalancer # or ClusterIP or NodePort
 
     port: 9000
     nodePort: ""
@@ -32,7 +32,7 @@ service:
     annotations: {}
   # K8s service to expose gate
   api:
-    type: NodePort # or ClusterIP or LoadBalancer
+    type: LoadBalancer # or ClusterIP or NodePort
 
     port: 8084
     nodePort: ""
@@ -55,7 +55,7 @@ jenkins:
     UseSecurity: false
 
 rbac:
-  enabled: false
+  enabled: true
 
 # Halconfig file will appear at /root/.hal/config
 halconfig: |
