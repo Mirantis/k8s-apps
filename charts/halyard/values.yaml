@@ -60,7 +60,7 @@ jenkins:
 rbac:
   enabled: true
 
-# Halconfig file will appear at /root/.hal/config
+# Halconfig file will appear at ~/.hal/config
 halconfig: |
   currentDeployment: default
   deploymentConfigurations:
