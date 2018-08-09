@@ -33,7 +33,9 @@ spec:
         app: {{ template "halyard.fullname" $ }}
     {{- end }}
     spec:
-      {{- if and (eq $stage "apply") (not $.Values.daemon) }}
+      {{- if and (eq $stage "apply") $.Values.daemon }}
+      restartPolicy: Always
+      {{- else }}
       restartPolicy: Never
       {{- end }}
       serviceAccountName: {{ template "halyard.fullname" $ }}
