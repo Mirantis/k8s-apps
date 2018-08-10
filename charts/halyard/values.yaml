@@ -32,6 +32,11 @@ service:
     loadBalancerIP: ""
     loadBalancerSourceRanges: []
 
+    selector:
+      load-balancer-spin-deck: "true"
+      # Replace with the following labels for k8s v2 provider:
+      # app: spin
+      # cluster: spin-deck
     annotations: {}
   # K8s service to expose gate
   api:
@@ -43,6 +48,11 @@ service:
     loadBalancerIP: ""
     loadBalancerSourceRanges: []
 
+    selector:
+      load-balancer-spin-gate: "true"
+      # Replace with the following labels for k8s v2 provider:
+      # app: spin
+      # cluster: spin-gate
     annotations: {}
 
 # If enabled, Minio chart will be deployed and configured as

@@ -23,7 +23,7 @@ spec:
       {{- end -}}
       {{- end }}
   selector:
-    load-balancer-spin-gate: "true"
+{{ toYaml .Values.service.api.selector | indent 4 }}
   type: "{{ .Values.service.api.type }}"
 {{- if eq .Values.service.api.type "LoadBalancer" }}
   {{- if .Values.service.api.loadBalancerIP }}
