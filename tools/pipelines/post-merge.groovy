@@ -46,6 +46,13 @@ def run(helm_home, namespace_prefix, kubernetes_domain, buildId, docker_reposito
       sh("./tools/push-packages.sh")
     }
   }
+
+  stage("Push icons") {
+    withCredentials([file(credentialsId: "gcloud-mirantisworkloads", variable: "GCLOUD_KEYPATH"),
+                     string(credentialsId: "gcloud-mirantisworkloads-project", variable: "GCLOUD_PROJECT")]) {
+      sh("./tools/push-icons.sh")
+    }
+  }
 }
 
 return this;
