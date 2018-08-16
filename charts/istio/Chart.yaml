@@ -1,5 +1,5 @@
 description: Istio Helm chart for Kubernetes
 name: istio
-version: 1.1.1
-icon: https://istio.io/img/istio-blue-logo.svg
+version: 1.1.2
+icon: https://mirantisworkloads.storage.googleapis.com/icons/istio.png
 appVersion: 0.1.6

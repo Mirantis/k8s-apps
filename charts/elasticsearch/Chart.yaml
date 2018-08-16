@@ -1,5 +1,5 @@
 name: elasticsearch
 description: Flexible and powerful open source, distributed real-time search and analytics engine.
-version: 1.4.1
-icon: https://www.elastic.co/assets/blteb1c97719574938d/logo-elastic-elasticsearch-lt.svg
+version: 1.4.2
+icon: https://mirantisworkloads.storage.googleapis.com/icons/elasticsearch.png
 appVersion: 5.5.2

@@ -1,7 +1,7 @@
 name: kibana
-version: 1.2.4
+version: 1.2.5
 description: |
   Kibana is an open source analytics and visualization platform
   designed to work with Elasticsearch.
 appVersion: 5.2.2
-icon: https://www.elastic.co/assets/bltf11265439e44d327/logo-elastic-kibana-lt.svg
+icon: https://mirantisworkloads.storage.googleapis.com/icons/kibana.png

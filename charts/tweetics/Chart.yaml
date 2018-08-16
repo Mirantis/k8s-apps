@@ -1,4 +1,4 @@
 description: A Helm chart for Tweetics - Spark job that parses tweets from Kafka and stores hashtags popularity as text files (to HDFS) or to Cassandra.
 name: tweetics
-version: 2.4.1
-icon: https://upload.wikimedia.org/wikipedia/en/9/9f/Twitter_bird_logo_2012.svg
+version: 2.4.2
+icon: https://mirantisworkloads.storage.googleapis.com/icons/twitter.png
