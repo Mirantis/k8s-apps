@@ -1,3 +1,4 @@
 description: A Helm chart for TweePub - Streaming tweets to Apache Kafka
 name: tweepub
-version: 2.3.0
+version: 2.3.1
+icon: https://upload.wikimedia.org/wikipedia/en/9/9f/Twitter_bird_logo_2012.svg

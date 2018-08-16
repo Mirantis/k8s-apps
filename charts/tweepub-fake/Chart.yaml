@@ -1,3 +1,4 @@
 description: A Helm chart for TweePub Fake - Streaming fake tweets to Apache Kafka
 name: tweepub-fake
-version: 1.1.1
+version: 1.1.2
+icon: https://upload.wikimedia.org/wikipedia/en/9/9f/Twitter_bird_logo_2012.svg
