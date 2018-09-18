@@ -21,6 +21,14 @@ testImage:
   tag: "1.0.0"
   pullPolicy: "IfNotPresent"
 
+## Install Default RBAC roles and bindings
+rbac:
+  install: false
+  # RBAC api version (currently either v1beta1 or v1alpha1)
+  apiVersion: v1beta1
+  # Cluster role reference
+  roleRef: cluster-admin
+
 master:
   replicas: 1
   quorum: 1 # quorum should be replicas - 1, at least 1

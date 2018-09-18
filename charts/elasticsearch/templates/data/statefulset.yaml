@@ -20,6 +20,9 @@ spec:
         app: {{ template "es-fullname" . }}
         type: data
     spec:
+      {{ if .Values.rbac.install }}
+      serviceAccountName: {{ template "es-fullname" . }}
+      {{ end }}
       {{- if ne .Values.data.persistence.type "emptyDir" }}
       affinity:
         podAntiAffinity:

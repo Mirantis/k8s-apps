@@ -24,6 +24,9 @@ spec:
         prometheus.io/port: "9108"
       {{- end }}
     spec:
+      {{ if .Values.rbac.install }}
+      serviceAccountName: {{ template "es-fullname" . }}
+      {{ end }}
       containers:
       - name: elasticsearch
         env:

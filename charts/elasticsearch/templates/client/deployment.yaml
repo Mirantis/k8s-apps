@@ -19,6 +19,9 @@ spec:
         app: {{ template "es-fullname" . }}
         type: client
     spec:
+      {{ if .Values.rbac.install }}
+      serviceAccountName: {{ template "es-fullname" . }}
+      {{ end }}
       containers:
       - name: elasticsearch
         env:
