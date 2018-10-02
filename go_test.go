@@ -440,7 +440,7 @@ func WaitForResources(t *testing.T, helmHome string, ns string, rel string) {
 			deployments[obj.Metadata.Name] = true
 		}
 	}
-	t.Logf("Found deployments: %l", deployments)
+	t.Logf("Found deployments: %v", deployments)
 	if len(deployments) == 0 {
 		return
 	}
