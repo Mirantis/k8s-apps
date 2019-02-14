@@ -1,0 +1,63 @@
+{{ if .Values.wheelhouse.enabled }}
+{{ $wh := .Values.wheelhouse }}
+{{ with .Values.wheelhouse }}
+{{ range $job_name, $job := .job }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "influx-fullname" $ }}-job-{{ $job_name }}
+  labels:
+    heritage: {{ $.Release.Service | quote }}
+    release: {{ $.Release.Name | quote }}
+    chart: "{{ $.Chart.Name }}-{{ $.Chart.Version }}"
+    app: {{ template "influx-fullname" $ }}
+  {{ if $job.annotations  }}
+  annotations: {{ $job.annotations }}
+  {{- end }}
+spec:
+  template:
+    metadata:
+      name: {{ template "influx-fullname" $ }}
+      labels:
+        heritage: {{ $.Release.Service | quote }}
+        release: {{ $.Release.Name | quote }}
+        chart: "{{ $.Chart.Name }}-{{ $.Chart.Version }}"
+        app: {{ template "influx-fullname" $ }}
+    spec:
+      restartPolicy: Never
+      volumes:
+        - name: wheelhouse-salt
+          configMap:
+            name: {{ template "influx-cm-fullname" $ }}
+            items:
+              - key: wheelhouse.py
+                path: wheelhouse.py
+      containers:
+      - name: influx-wheel-job-{{ $job_name }}
+        image: "{{ $wh.image.repository }}{{ $wh.image.name }}:{{ default "latest" $wh.image.tag }}"
+        imagePullPolicy: {{ default "IfNotPresent" $wh.image.pullPolicy | quote }}
+        volumeMounts:
+        - name: wheelhouse-salt
+          mountPath: /wh
+        env:
+         - name: PYTHONPATH
+           value: /wh:$PYTHONPATH
+         - name: INFLUXDB_HOST
+           value: {{ template "influx-fullname" $ }}
+        command:
+          - "bash"
+          - "-cx"
+        args:
+          - |
+            cat <<-EOF | /usr/bin/python /wh/wheelhouse.py initdb
+{{ toYaml $wh |indent 15 }}
+            EOF
+---
+{{- end }}
+{{- end }}
+{{- end }}
+
+
+
+
+
